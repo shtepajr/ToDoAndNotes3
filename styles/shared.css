@@ -1,0 +1,32 @@
+.btn-default {
+    height: 48px;
+    font-size: 16px;
+    border-radius: 10px;
+    background-color: #3D405B;
+    color: #FFFFFF;
+    border: 0;
+}
+
+.btn-clear {
+    border: 0;
+    background-color: hsla(0, 0%, 0%, 0);
+}
+
+.google-image {
+    width: 50px;
+}
+
+button:hover {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+
+.tdn-image {
+    /* Images will overflow their container by default. To
+    prevent this, we set max-width and max-height to 100%
+    so they stay inside their container. */
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+}
