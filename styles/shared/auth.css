@@ -100,7 +100,7 @@ body {
     column-gap: 10px;
 }
 
-.external-provider {
+.auth-external-provider {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -108,7 +108,7 @@ body {
 }
 
 
-.ref-list {
+.auth-ref-list {
     display: flex;
     justify-content: center;
     column-gap: 10px;
@@ -116,6 +116,6 @@ body {
     margin-top: 60px;
 }
 
-.ref-list a {
+.auth-ref-list a {
     color: #000000;
 }
