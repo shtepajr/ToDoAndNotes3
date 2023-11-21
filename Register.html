@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log in</title>
+    <title>Register</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="styles/shared/auth.css">
     <link rel="stylesheet" href="styles/shared/general.css">
@@ -16,11 +16,17 @@
     <div class="main">
         <div class="container">
             <div class="auth-left">
-                <p class="auth-title">Log in</p>
+                <p class="auth-title">Sign up</p>
                 <form action="" method="post" class="auth-form mt-5">
                     <div class="auth-field">
                         <span class="material-symbols-outlined icon-absolute md-20">
-                            mail
+                            person
+                        </span>
+                        <input type="text" placeholder="Your name">
+                    </div>
+                    <div class="auth-field">
+                        <span class="material-symbols-outlined icon-absolute md-20">
+                            email
                         </span>
                         <input type="text" placeholder="Your email">
                     </div>
@@ -30,7 +36,13 @@
                         </span>
                         <input type="password" placeholder="Your password">
                     </div>
-                    <button class="btn-default" type="submit">Log in</button>
+                    <div class="auth-field">
+                        <span class="material-symbols-outlined icon-absolute md-20">
+                            lock
+                        </span>
+                        <input type="password" placeholder="Confirm password">
+                    </div>
+                    <button class="btn-default" type="submit">Sign up</button>
                 </form>
                 <div class="external-provider mt-3">
                     <p>Or login with</p>
@@ -39,8 +51,7 @@
                     </button>
                 </div>
                 <div class="ref-list">
-                    <a href="Register.html">Create an account</a>
-                    <a href="ResetPassword.html">Forgot password</a>
+                    <a href="login.html">Log in</a>
                 </div>
             </div>
             <div class="image-container">

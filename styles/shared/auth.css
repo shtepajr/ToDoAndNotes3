@@ -1,40 +1,43 @@
-.material-symbols-outlined.md-18 {
-    font-size: 18px;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.material-symbols-outlined.md-20 {
-    font-size: 20px;
-}
-
-/* Default */
-.material-symbols-outlined.md-24 {
-    font-size: 24px;
-}
-
-.material-symbols-outlined.md-36 {
-    font-size: 36px;
-}
-
-.material-symbols-outlined.md-48 {
-    font-size: 48px;
-}
-
-.btn-default {
-    height: 48px;
+html,
+body {
+    background-color: #F2CC8F;
     font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 80%;
+    max-width: 800px;
+    background-color: #F4F1DE;
+    color: #000000;
+    padding: 72px 64px;
+    margin-top: 90px;
+    display: flex;
+    align-items: start;
+    column-gap: 64px;
     border-radius: 10px;
-    background-color: #3D405B;
-    color: #FFFFFF;
-    border: 0;
 }
 
-.btn-clear {
-    border: 0;
-    background-color: hsla(0, 0%, 0%, 0);
-}
+@media (max-width: 700px) {
+    .image-container {
+        display: none;
+    }
 
-.icon-absolute {
-    position: absolute;
+    .container {
+        padding: 36px 32px;
+    }
 }
 
 .image-container {
@@ -55,11 +58,6 @@
     width: 50px;
 }
 
-button:hover {
-    cursor: pointer;
-    opacity: 0.9;
-}
-
 /*AUTH section*/
 
 .auth-left {
@@ -72,7 +70,6 @@ button:hover {
 }
 
 .auth-form {
-    margin-top: 52px;
     display: flex;
     flex-direction: column;
     row-gap: 20px;
@@ -98,17 +95,18 @@ button:hover {
     padding-bottom: 4px;
 }
 
+.auth-description {
+    display: flex;
+    column-gap: 10px;
+}
+
 .external-provider {
-    margin-top: 28px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.external-provider .btn-clear {
-    margin-top: 20px;
-}
 
 .ref-list {
     display: flex;
@@ -116,4 +114,8 @@ button:hover {
     column-gap: 10px;
     font-size: 14px;
     margin-top: 60px;
+}
+
+.ref-list a {
+    color: #000000;
 }
