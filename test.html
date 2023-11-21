@@ -4,18 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Above Element</title>
     <style>
+        .container {
+            position: relative;
+        }
 
+        .icon {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            /* Adjust the above properties based on your layout requirements */
+        }
+
+        .content {
+            /* Add styles for your content element */
+            background-color: lightgray;
+            padding: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
+
     <div class="container">
-        <div class="centered-div">
-            <!-- Your content goes here -->
-            Hello, I'm centered and adaptive with media queries!
+        <i class="icon">YourIconHere</i>
+        <div class="content">
+            <!-- Your other content goes here -->
+            <p>This is the content below the icon.</p>
         </div>
     </div>
+
 </body>
 
 </html>

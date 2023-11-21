@@ -1,3 +1,24 @@
+.material-symbols-outlined.md-18 {
+    font-size: 18px;
+}
+
+.material-symbols-outlined.md-20 {
+    font-size: 20px;
+}
+
+/* Default */
+.material-symbols-outlined.md-24 {
+    font-size: 24px;
+}
+
+.material-symbols-outlined.md-36 {
+    font-size: 36px;
+}
+
+.material-symbols-outlined.md-48 {
+    font-size: 48px;
+}
+
 .btn-default {
     height: 48px;
     font-size: 16px;
@@ -12,6 +33,24 @@
     background-color: hsla(0, 0%, 0%, 0);
 }
 
+.icon-absolute {
+    position: absolute;
+}
+
+.image-container {
+    flex: 1;
+    align-self: center;
+}
+
+.tdn-image {
+    /* Images will overflow their container by default. To
+    prevent this, we set max-width and max-height to 100%
+    so they stay inside their container. */
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+}
+
 .google-image {
     width: 50px;
 }
@@ -21,12 +60,60 @@ button:hover {
     opacity: 0.9;
 }
 
+/*AUTH section*/
 
-.tdn-image {
-    /* Images will overflow their container by default. To
-    prevent this, we set max-width and max-height to 100%
-    so they stay inside their container. */
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 10px;
+.auth-left {
+    flex: 1;
+}
+
+.auth-title {
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.auth-form {
+    margin-top: 52px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.auth-field {
+    display: flex;
+    position: relative;
+}
+
+.auth-field .icon-absolute {
+    top: -2px;
+}
+
+.auth-form input {
+    border: 0;
+    border-bottom: 1px #000000 solid;
+    background-color: hsla(0, 0%, 0%, 0);
+    font-size: 16px;
+    outline: 0;
+    flex: 1;
+    padding-left: 32px;
+    padding-bottom: 4px;
+}
+
+.external-provider {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.external-provider .btn-clear {
+    margin-top: 20px;
+}
+
+.ref-list {
+    display: flex;
+    justify-content: center;
+    column-gap: 10px;
+    font-size: 14px;
+    margin-top: 60px;
 }
