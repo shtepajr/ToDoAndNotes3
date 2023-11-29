@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container">
+    <div class="auth-left">
+        <p class="auth-title">Log in</p>
+        <form action="" method="post" class="auth-form mt-5">
+            <div class="auth-field">
+                <span class="material-symbols-outlined icon-absolute md-20">
+                    mail
+                </span>
+                <input type="text" placeholder="Your email">
+            </div>
+            <div class="auth-field">
+                <span class="material-symbols-outlined icon-absolute md-20">
+                    lock
+                </span>
+                <input type="password" placeholder="Your password">
+            </div>
+            <button class="btn-default" type="submit">Log in</button>
+        </form>
+        <partial name="_ExternalProviderPartial" />
+        <div class="auth-ref-list">
+            <a asp-controller="Account" asp-action="Register">Create an account</a>
+            <a asp-controller="Account" asp-action="ForgotPassword">Forgot password</a>
+        </div>
+    </div>
+    <div class="image-container">
+        <img src="https://image.lexica.art/full_jpg/5532ad7c-5c5a-4cc0-9687-804546e78861" alt=""
+             class="tdn-image">
+    </div>
+</div>

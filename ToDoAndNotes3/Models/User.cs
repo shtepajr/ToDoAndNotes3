@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace ToDoAndNotes3.Models
 {
@@ -6,5 +7,6 @@ namespace ToDoAndNotes3.Models
     {
         [PersonalData]
         public override int Id { get; set; }
+
     }
 }

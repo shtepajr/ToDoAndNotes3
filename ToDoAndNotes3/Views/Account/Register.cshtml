@@ -1,0 +1,50 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container">
+    <div class="auth-left">
+        <p class="auth-title">Sign up</p>
+        <form asp-controller="Account" asp-action="Register" asp-route-returnurl=@ViewData["ReturnUrl"] method="post" class="auth-form mt-5">
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="auth-field">
+                <span class="material-symbols-outlined icon-absolute md-20">
+                    person
+                </span>
+                <input asp-for="Name" type="text" placeholder="Your name">
+                <span asp-validation-for="Name"></span>
+            </div>
+            <div class="auth-field">
+                <span class="material-symbols-outlined icon-absolute md-20">
+                    email
+                </span>
+                <input asp-for="Email" type="text" placeholder="Your email">
+                <span asp-validation-for="Email"></span>
+            </div>
+            <div class="auth-field">
+                <span class="material-symbols-outlined icon-absolute md-20">
+                    lock
+                </span>
+                <input asp-for="Password" type="password" placeholder="Your password">
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div class="auth-field">
+                <span class="material-symbols-outlined icon-absolute md-20">
+                    lock
+                </span>
+                <input asp-for="ConfirmPassword" type="password" placeholder="Confirm password">
+                <span asp-validation-for="ConfirmPassword"></span>
+            </div>
+            <button class="btn-default" type="submit">Sign up</button>
+        </form>
+        <partial name="_ExternalProviderPartial" />
+        <div class="auth-ref-list">
+            <a asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
+    </div>
+    <div class="image-container">
+        <img src="https://image.lexica.art/full_jpg/5532ad7c-5c5a-4cc0-9687-804546e78861" alt=""
+             class="tdn-image">
+    </div>
+</div>

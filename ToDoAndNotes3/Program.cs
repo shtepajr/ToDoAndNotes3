@@ -13,6 +13,10 @@ builder.Services.AddDbContext<TdnDbContext>(options =>
 // Identity https://www.nuget.org/packages/Microsoft.AspNetCore.Identity.UI/8.0.0
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<TdnDbContext>();
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
+});
 
 var app = builder.Build();
 
@@ -31,9 +35,14 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+//app.MapControllerRoute(
+//    name: "account",
+//    pattern: "{controller=Account}/{action=Login}/{id?}");
+
 
 app.Run();
 
