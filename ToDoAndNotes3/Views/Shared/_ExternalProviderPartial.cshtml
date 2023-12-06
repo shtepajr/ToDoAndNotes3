@@ -1,7 +1,7 @@
 ﻿<div class="auth-external-provider mt-3">
     <p>Or login with</p>
-    <form action="ExternalLogin" method="post">
-        <button class="btn-clear mt-2" type="submit">
+    <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+        <button name="provider" value="Google" class="btn-clear mt-2" type="submit">
             <img src="~/images/google256.png" alt="Google" class="google-image">
         </button>
     </form>

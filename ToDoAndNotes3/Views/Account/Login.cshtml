@@ -1,22 +1,26 @@
-﻿@{
+﻿@model LoginViewModel
+@{
     ViewData["Title"] = "Login";
 }
 
 <div class="container">
     <div class="auth-left">
         <p class="auth-title">Log in</p>
-        <form action="" method="post" class="auth-form mt-5">
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl=@ViewData["ReturnUrl"] method="post" class="auth-form mt-5">
+            <div asp-validation-summary="ModelOnly"></div>
             <div class="auth-field">
                 <span class="material-symbols-outlined icon-absolute md-20">
                     mail
                 </span>
-                <input type="text" placeholder="Your email">
+                <input asp-for="Email" type="text" placeholder="Your email">
+                <span asp-validation-for="Email"></span>
             </div>
             <div class="auth-field">
                 <span class="material-symbols-outlined icon-absolute md-20">
                     lock
                 </span>
-                <input type="password" placeholder="Your password">
+                <input asp-for="Password" type="password" placeholder="Your password">
+                <span asp-validation-for="Password"></span>
             </div>
             <button class="btn-default" type="submit">Log in</button>
         </form>

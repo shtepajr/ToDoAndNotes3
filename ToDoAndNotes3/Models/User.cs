@@ -7,6 +7,7 @@ namespace ToDoAndNotes3.Models
     {
         [PersonalData]
         public override int Id { get; set; }
-
+        [PersonalData]
+        public string? Name { get; set; }
     }
 }

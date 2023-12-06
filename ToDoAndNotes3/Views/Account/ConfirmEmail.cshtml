@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "RegisterConfirmation";
+    ViewData["Title"] = "Confirm email";
 }
 
 <div class="container">
@@ -9,9 +9,9 @@
             <span class="material-symbols-outlined md-20">
                 check_circle
             </span>
-            <p>Success! Your registration is complete.</p>
+            <p>Success! Your email is confirmed.</p>
         </div>
-        <a href="Login.html" class="btn-default mt-2">Return to login</a>
+        <a asp-controller="Account" asp-action="Login" class="btn-default mt-2">Return to login</a>
     </div>
     <div class="image-container">
         <img src="https://image.lexica.art/full_jpg/5532ad7c-5c5a-4cc0-9687-804546e78861" alt=""

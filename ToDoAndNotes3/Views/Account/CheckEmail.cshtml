@@ -1,5 +1,6 @@
-﻿@{
-    ViewData["Title"] = "CheckEmail";
+﻿@model string
+@{
+    ViewData["Title"] = "Check email";
 }
 
 <div class="container">
@@ -10,11 +11,10 @@
                 mark_email_read
             </span>
             <p>
-                We’ve sent an email to
-                generatedtest222@gmail.com with instructions.
+                We’ve sent an email to @Model
             </p>
         </div>
-        <a href="Login.html" class="btn-default mt-2">Return to login</a>
+        <a asp-controller="Account" asp-action="Login" class="btn-default mt-2">Return to login</a>
     </div>
     <div class="image-container">
         <img src="https://image.lexica.art/full_jpg/5532ad7c-5c5a-4cc0-9687-804546e78861" alt=""
