@@ -34,6 +34,10 @@ namespace ToDoAndNotes3.Controllers
         public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
+            }
             return View();
         }
 
@@ -85,6 +89,10 @@ namespace ToDoAndNotes3.Controllers
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
+            }
             return View();
         }
 
@@ -152,7 +160,7 @@ namespace ToDoAndNotes3.Controllers
                 await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
                 _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
-                return returnUrl == null ? RedirectToAction("Main", "Home") : RedirectToLocal(returnUrl);
+                return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
             {
@@ -178,7 +186,7 @@ namespace ToDoAndNotes3.Controllers
                         // Update any authentication tokens as well
                         await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
-                        return returnUrl == null ? RedirectToAction("Main", "Home") : RedirectToLocal(returnUrl);
+                        return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
                     }
                 }
                 AddErrors(createResult);
@@ -186,8 +194,6 @@ namespace ToDoAndNotes3.Controllers
             }
         }
 
-        //
-        // GET: /Account/ForgotPassword
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
@@ -195,8 +201,6 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -205,27 +209,33 @@ namespace ToDoAndNotes3.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    return View("CheckEmail");
+                }
+           
+                if (!await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+                        "To change your password, you must first confirm your email by clicking this <a href=\"" + callbackUrl + "\">link</a>. Then try to change the password again.");
+                }
+                else
+                {
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var callbackUrl = Url.Action("ResetPassword", "Account", new { email = user.Email, code = code }, protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(model.Email, "Reset Password", 
+                        "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
                 }
 
-                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                // Send an email with this link
-                //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                //await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                //   "Please reset your password by clicking here: <a href=\"" + callbackUrl + "\">link</a>");
-                //return View("ForgotPasswordConfirmation");
+                return View("CheckEmail");
             }
 
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
-        //
-        // GET: /Account/ForgotPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
@@ -233,17 +243,13 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
-        //
-        // GET: /Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult ResetPassword(string code = null)
+        public IActionResult ResetPassword(string code = null, string email = null)
         {
-            return code == null ? View("Error") : View();
+            return code == null || email == null ? View("Error") : View();
         }
 
-        //
-        // POST: /Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -253,6 +259,7 @@ namespace ToDoAndNotes3.Controllers
             {
                 return View(model);
             }
+            
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
@@ -268,8 +275,6 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
-        //
-        // GET: /Account/ResetPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation()
@@ -286,11 +291,6 @@ namespace ToDoAndNotes3.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
-
-        //private Task<TdnDbContext> GetCurrentUserAsync()
-        //{
-        //    return _userManager.GetUserAsync(HttpContext.User);
-        //}
 
         private IActionResult RedirectToLocal(string returnUrl)
         {
