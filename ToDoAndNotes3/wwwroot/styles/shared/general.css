@@ -13,6 +13,10 @@
     font-size: 24px;
 }
 
+.material-symbols-outlined.md-32 {
+    font-size: 32px;
+}
+
 .material-symbols-outlined.md-36 {
     font-size: 36px;
 }
@@ -40,14 +44,9 @@
     background-color: hsla(0, 0%, 0%, 0);
 }
 
-button:hover {
+button:hover, a:hover {
     cursor: pointer;
     opacity: 0.9;
-}
-
-/**/
-.icon-absolute {
-    position: absolute;
 }
 
 /*margins*/
@@ -69,10 +68,6 @@ button:hover {
 
 .mt-5 {
     margin-top: 50px;
-}
-
-.d-flex {
-    display: flex;
 }
 
 /*colors*/
@@ -113,4 +108,21 @@ button:hover {
 .light-green,
 .light-orange {
     text-decoration: none;
+}
+
+/**/
+.icon-absolute {
+    position: absolute;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.d-inline {
+    display: inline;
+}
+
+.d-inline-flex {
+    display: inline-flex;
 }

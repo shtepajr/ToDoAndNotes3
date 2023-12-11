@@ -1,13 +1,61 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Main";
 }
 
-<div>
-    <p>Hello Main</p>
-    <form asp-controller="Account" asp-action="LogOff" method="post">
-        <button type="submit">Log out</button>
-    </form>
-</div>
-    
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - TDN</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="~/styles/shared/general.css">
+    <link rel="stylesheet" href="~/styles/pages/main.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+
+<body>
+    <header>
+        <section class="header-left">
+            <button id="burger-menu-toggle" class="btn-clear d-inline">
+                <span class="material-symbols-outlined md-32 white">
+                    menu
+                </span>
+            </button>
+            <button asp-controller="Home" asp-action="Main" class="btn-clear d-inline">
+                <span class="material-symbols-outlined md-32 white">
+                    home
+                </span>
+            </button>
+            <form class="search-form">
+                <span class="material-symbols-outlined md-32 white search-icon">
+                    search
+                </span>
+                <input type="search" />
+            </form>
+        </section>
+        <section class="d-inline header-right">
+            <button class="btn-clear">
+                <span class="material-symbols-outlined md-32 white">
+                    account_circle
+                </span>
+            </button>
+        </section>
+    </header>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div>Hello aside</div>
+        </aside>
+        <main>
+            <div>Hello main</div>
+        </main>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/scripts/main.js" type="text/javascript"></script>
+</body>
+
+</html>
