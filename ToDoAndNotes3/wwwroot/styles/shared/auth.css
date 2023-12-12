@@ -60,12 +60,21 @@ body {
     border-radius: 10px;
 }
 
-.google-image {
+.image-google {
     width: 50px;
 }
 
-/*AUTH section*/
+.btn-google {
+    border: 0;
+    background-color: hsla(0, 0%, 0%, 0);
+}
 
+.btn-google:hover {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+/*AUTH section*/
 .auth-left {
     flex: 1;
 }
@@ -118,7 +127,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 
 .auth-ref-list {
     display: flex;

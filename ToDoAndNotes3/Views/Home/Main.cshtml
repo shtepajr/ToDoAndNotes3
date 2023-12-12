@@ -11,6 +11,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - TDN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="~/styles/shared/general.css">
     <link rel="stylesheet" href="~/styles/pages/main.css">
@@ -21,12 +24,12 @@
 <body>
     <header>
         <section class="header-left">
-            <button id="burger-menu-toggle" class="btn-clear d-inline">
+            <button id="burger-menu-toggle" class="btn-icon d-inline">
                 <span class="material-symbols-outlined md-32 white">
                     menu
                 </span>
             </button>
-            <button asp-controller="Home" asp-action="Main" class="btn-clear d-inline">
+            <button asp-controller="Home" asp-action="Main" class="btn-icon d-inline">
                 <span class="material-symbols-outlined md-32 white">
                     home
                 </span>
@@ -38,8 +41,8 @@
                 <input type="search" />
             </form>
         </section>
-        <section class="d-inline header-right">
-            <button class="btn-clear">
+        <section class="header-right">
+            <button class="btn-icon">
                 <span class="material-symbols-outlined md-32 white">
                     account_circle
                 </span>
@@ -48,10 +51,53 @@
     </header>
     <div class="container">
         <aside class="sidebar" id="sidebar">
-            <div>Hello aside</div>
+            <nav class="days">
+                <ul>
+                    <li class="nav-link">
+                        <a>
+                            <span class="material-symbols-outlined md-24 black">
+                                calendar_today
+                            </span>
+                            Today
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a>
+                            <span class="material-symbols-outlined md-24 black">
+                                calendar_month
+                            </span>
+                            Upcoming
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a>
+                            <span class="material-symbols-outlined md-24 black">
+                                label
+                            </span>
+                            Labels
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <nav class="folders">
+                <p>Folders</p>
+                <ul>
+                    <li class="nav-link">
+                        <a>
+                            English
+                            <span class="material-symbols-outlined md-24 black">
+                                more_horiz
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </aside>
         <main>
             <div>Hello main</div>
+            <form asp-controller="Account" asp-action="LogOff" method="post">
+                <button type="submit">Log out</button>
+            </form>
         </main>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
