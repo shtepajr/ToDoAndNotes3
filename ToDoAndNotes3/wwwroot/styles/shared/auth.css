@@ -62,6 +62,7 @@ body {
 
 .image-google {
     width: 50px;
+    user-select: none;
 }
 
 .btn-google {
@@ -100,7 +101,7 @@ body {
     top: -2px;
 }
 
-.auth-form input {
+.auth-field input {
     border: 0;
     border-bottom: 1px #000000 solid;
     background-color: hsla(0, 0%, 0%, 0);

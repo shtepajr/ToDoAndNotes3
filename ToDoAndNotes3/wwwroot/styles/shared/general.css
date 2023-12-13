@@ -1,5 +1,7 @@
 /*Google material*/
-
+.material-symbols-outlined {
+    user-select: none;
+}
 .material-symbols-outlined.md-18 {
     font-size: 18px;
 }

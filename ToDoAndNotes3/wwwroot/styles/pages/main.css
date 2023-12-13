@@ -21,6 +21,7 @@
 
 html, body {
     height: 100%;
+    background-color: var(--light-orange-color);
 }
 .container {
     display: flex;
@@ -42,7 +43,7 @@ header {
     transition: margin-left 0.25s;
     padding: 16px 16px;
 }
-.sidebar.active {
+.sidebar-hide {
     margin-left: calc(var(--sidebar-width) * -1);
 }
 
@@ -50,6 +51,7 @@ main {
     flex: 1;
     margin-top: var(--top-bar-height);
     background-color: var(--light-orange-color);
+    transition: visibility 0.1s, opacity 0.1s linear;
 }
 
 .search-form {
