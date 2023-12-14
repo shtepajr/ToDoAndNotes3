@@ -24,12 +24,12 @@
 <body>
     <header>
         <section class="header-left">
-            <button id="burger-menu-toggle" class="btn-icon d-inline">
+            <button id="burger-menu-toggle" class="btn btn-icon">
                 <span class="material-symbols-outlined md-32 white">
                     menu
                 </span>
             </button>
-            <button asp-controller="Home" asp-action="Main" class="btn-icon d-inline">
+            <button asp-controller="Home" asp-action="Main" class="btn btn-icon">
                 <span class="material-symbols-outlined md-32 white">
                     home
                 </span>
@@ -42,7 +42,7 @@
             </form>
         </section>
         <section class="header-right">
-            <button class="btn-icon">
+            <button class="btn btn-icon">
                 <span class="material-symbols-outlined md-32 white">
                     account_circle
                 </span>
@@ -79,9 +79,16 @@
                     </li>
                 </ul>
             </nav>
-            <nav class="folders">
-                <p>Folders</p>
-                <ul>
+            <nav class="projects">
+                <div class="projects-preview">
+                    <p>Projects</p>
+                    <button asp-controller="Home" asp-action="Main" class="btn btn-plus">
+                        <span class="material-symbols-outlined md-24">
+                            add
+                        </span>
+                    </button>
+                </div>
+                <ul class="projects-data js-projects-test">
                     <li class="nav-link">
                         <a>
                             English
@@ -94,10 +101,47 @@
             </nav>
         </aside>
         <main id="main">
-            <div>Hello main</div>
+            <div class="main-header">
+                <div class="main-header-left">
+                    <div class="main-header-title">Today</div>
+                    <div class="main-header-buttons">
+                        <button asp-controller="Home" asp-action="Main" class="btn btn-action">
+                            <span class="material-symbols-outlined md-30">
+                                add_task
+                            </span>
+                        </button>
+                        <button asp-controller="Home" asp-action="Main" class="btn btn-action">
+                            <span class="material-symbols-outlined md-30">
+                                note_add
+                            </span>
+                        </button>
+                        <button asp-controller="Home" asp-action="Main" class="btn btn-action">
+                            <span class="material-symbols-outlined md-30">
+                                filter_alt
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="main-header-right">
+
+                </div>
+            </div>
+            <div class="main-container">
+                <section class="tasks js-tasks-test">
+                    <div class="task">Hello task</div>
+                </section>
+                <section class="notes js-notes-test">
+                    <div class="note">Hello task</div>
+                </section>
+                <section class="tasks-with-notes js-tasks-with-notes-test">
+                    <div class="task">Hello task</div>
+                    <div class="note">Hello note</div>
+                </section>
+            </div>
+@*             <div>Hello main</div>
             <form asp-controller="Account" asp-action="LogOff" method="post">
                 <button type="submit">Log out</button>
-            </form>
+            </form> *@
         </main>
     </div>
     <script src="~/scripts/main.js" type="text/javascript"></script>
