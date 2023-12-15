@@ -36,6 +36,10 @@
 .btn{
     cursor: pointer;
 }
+a.btn {
+    text-decoration: none;
+    color: unset;
+}
 
 .btn-default {
     display: inline-block;
@@ -46,11 +50,9 @@
     background-color: #3D405B;
     color: #FFFFFF;
     border: 0;
-    text-decoration: none;
 }
 
 .btn-default:hover {
-    cursor: pointer;
     opacity: 0.9;
 }
 

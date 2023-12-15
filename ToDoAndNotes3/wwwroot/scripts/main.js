@@ -14,12 +14,17 @@ document.addEventListener('DOMContentLoaded', function () {
     LoadTestTasksWithNotes();
 });
 
-// Hide main if (is on mobile screen) + (sidebar is shown)
+window.addEventListener('load', checkWindowSize);
+window.addEventListener('resize', checkWindowSize);
+
+window.onclick = toggleDropdown;
+
 function checkWindowSize() {
     const aside = document.getElementById('sidebar');
     const main = document.getElementById('main');
 
-    if (window.innerWidth <= 600 && !aside.classList.contains('sidebar-hide')) {
+    // Hide main if (is on "mobile"" screen) + (sidebar is shown)
+    if (window.innerWidth <= 635 && !aside.classList.contains('sidebar-hide')) {
         main.style.opacity = 0;
         setTimeout(() => {
             main.style.display = 'none';
@@ -32,30 +37,75 @@ function checkWindowSize() {
         }, 200);  
     }
 }
-
-window.addEventListener('load', checkWindowSize);
-window.addEventListener('resize', checkWindowSize);
+function toggleDropdown(event) {
+    let dropdownContentElems = document.getElementsByClassName("dropdown-content");
+  
+    if (event.target.classList.contains('dropdown-btn-ellipsis')) {
+        for (let i = 0; i < dropdownContentElems.length; i++) {
+            var dropdownContentElem = dropdownContentElems[i];
+            // show dropdown-content if its button was clicked || hide if it was already shown
+            if (dropdownContentElem.id === event.target.id) {
+                dropdownContentElem.classList.toggle('show');
+            }
+            else { // hide previous dropdown-content
+                dropdownContentElem.classList.remove('show');
+            }
+        }
+    } // hide if click on other elements
+    else {
+        for (let i = 0; i < dropdownContentElems.length; i++) {
+            dropdownContentElems[i].classList.remove('show');
+        }
+    }
+    event.stopPropagation();  // Stop the event from propagating up the DOM tree
+}
 
 
 // For testing
+function generateUniqueId() {
+    const timestamp = new Date().getTime();
+    const randomString = Math.random().toString(36).substring(2, 8);
+    return `${timestamp}-${randomString}`;
+}
 function LoadTestProjects(){
     var projectsElem = document.querySelector('.js-projects-test');
-    let htmlChild = `
-                <li class="nav-link">
+
+    const items = [];
+    items.length = 30;
+
+    for (var i = 0; i < 30; i++) {
+
+        const uniqueId = generateUniqueId();
+        const dropdownContentElem = document.createElement('div');
+        dropdownContentElem.className = 'dropdown-content';
+        dropdownContentElem.innerHTML = `
+                    <a href="#Edit">Edit</a>
+                    <a href="#Remove">Remove</a>
+        `;
+        dropdownContentElem.id = uniqueId;
+
+
+        const navElem = document.createElement('li');
+        navElem.className = 'nav-link dropdown';
+        navElem.innerHTML = `
                 <a>
-                    English
-                    <span class="material-symbols-outlined md-24 black">
+                    <div class="project-title">Project: ${dropdownContentElem.id}</div>
+                    <span class="material-symbols-outlined md-24 black dropdown-btn-ellipsis">
                         more_horiz
                     </span>
                 </a>
-                </li>
-    `;
+        `;
 
-    let innerHTML = '';
-    for (var i = 0; i < 30; i++) {
-        innerHTML += htmlChild;
+        const dropdownBtnElem = navElem.getElementsByClassName('dropdown-btn-ellipsis')[0];
+        dropdownBtnElem.id = uniqueId;
+
+        dropdownBtnElem.addEventListener('click', (event) => {
+            toggleDropdown(event);       
+        });
+
+        navElem.appendChild(dropdownContentElem);
+        projectsElem.appendChild(navElem);
     }
-    projectsElem.innerHTML = innerHTML;
 }
 function LoadTestTasks() {
     var projectsElem = document.querySelector('.js-tasks-test');

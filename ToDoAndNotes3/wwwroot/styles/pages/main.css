@@ -22,6 +22,10 @@
     --sidebar-width: 300px;
 }
 
+::-webkit-scrollbar {
+    display: none;
+}
+
 html, body {
     height: 100%;
     background-color: var(--light-orange-color);
@@ -156,10 +160,12 @@ main {
     align-items: center;
     column-gap: 5px;
     padding: 5px 12px;
+    z-index: 1;
+
 }
 .nav-link:hover {
-    opacity: 0.9;
     background-color: var(--light-orange-color);
+    z-index: 1;
 }
 
 .days {
@@ -180,6 +186,8 @@ main {
 .projects-data {
     height: calc(100% - var(--projects-preview-height));
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 .projects p {
     font-size: 20px;
@@ -188,7 +196,12 @@ main {
     border-radius: 10px;
 }
 .projects a {
-    justify-content: space-between;
+}
+.project-title {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .main-header {
@@ -201,6 +214,7 @@ main {
 .main-header-left, .main-header-right {
     display: flex;
     flex: 1;
+    column-gap: 10px;
     justify-content: space-between;
 }
 .main-header-title {
@@ -240,41 +254,12 @@ main {
     flex-direction: column;
     row-gap: 8px;
 }
-
 .task, .note {
     flex: 1;
     background-color: var(--light-yellow-color);
     border-radius: 10px;
     min-height: 52px;
 }
-/*.tasks, .notes {
-    border-radius: 10px;
-    background-color: var(--light-green-color);
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(2,minmax(160px, 1fr));
-    grid-template-rows: repeat(auto-fill,minmax(52px, 52px));
-    column-gap: 8px;
-    row-gap: 8px;
-    padding: 8px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.notes {
-    border-radius: 10px;
-    background-color: var(--light-green-color);
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(1,minmax(160px, 1fr));
-    grid-template-rows: repeat(auto-fill,minmax(52px, 52px));
-    row-gap: 8px;
-    padding: 8px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}*/
-
-
 
 @media (max-width: 700px) {
     .tasks, .notes {
@@ -288,4 +273,35 @@ main {
     .tasks-with-notes {
         display: flex;
     }
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+    float: right;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--light-orange-color);
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    right: 0;
+    z-index: 2;
+}
+.dropdown-content a {
+    color: black;
+    padding: 14px;
+    text-decoration: none;
+    display: block;
+
+}
+.dropdown-content a:hover {
+    border: 1px solid;
+}
+.show {
+    display: flex;
+    flex-direction: column;
+    row-gap: -0px;
 }
