@@ -41,7 +41,7 @@ a.btn {
     color: unset;
 }
 
-.btn-default {
+a.btn-default, button.btn-default {
     display: inline-block;
     width: 100%;
     text-align: center;
@@ -132,4 +132,8 @@ a.btn {
 
 .d-inline-flex {
     display: inline-flex;
+}
+
+.line-through {
+    text-decoration: line-through;
 }

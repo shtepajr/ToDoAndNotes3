@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Testing
     LoadTestProjects();
     LoadTestTasks();
-    LoadTestNotes();
-    LoadTestTasksWithNotes();
+    //LoadTestNotes();
+    //LoadTestTasksWithNotes();
 });
 
 window.addEventListener('load', checkWindowSize);
@@ -67,6 +67,10 @@ function generateUniqueId() {
     const randomString = Math.random().toString(36).substring(2, 8);
     return `${timestamp}-${randomString}`;
 }
+function generateUniqueId2(event) {
+    console.log('gggg');
+    event.target.id =  generateUniqueId();
+}
 function LoadTestProjects(){
     var projectsElem = document.querySelector('.js-projects-test');
 
@@ -89,7 +93,7 @@ function LoadTestProjects(){
         navElem.className = 'nav-link dropdown';
         navElem.innerHTML = `
                 <a>
-                    <div class="project-title">Project: ${dropdownContentElem.id}</div>
+                    <div class="nowrap-ellipsis">Project: ${dropdownContentElem.id}</div>
                     <span class="material-symbols-outlined md-24 black dropdown-btn-ellipsis">
                         more_horiz
                     </span>
@@ -108,16 +112,46 @@ function LoadTestProjects(){
     }
 }
 function LoadTestTasks() {
-    var projectsElem = document.querySelector('.js-tasks-test');
+    var tasksElem = document.querySelector('.js-tasks-test');
     let htmlChild = `
-            <div class="task">Hello task</div>
+            <li class="task nav-link dropdown">
+                        <a>
+                            <span class="material-symbols-outlined md-24 is-done-btn">
+                                radio_button_unchecked
+                            </span>
+                            <div class="nowrap-ellipsis">
+                                <div class="nowrap-ellipsis">Project: dsgsdfgsdfgsfdgsgdsfgsdfddddddddddddddd</div>
+                                <div class="tools-row">
+                                    <div class="d-flex">
+                                        <span class="material-symbols-outlined md-20 black dropdown-btn-ellipsis">
+                                            date_range
+                                        </span>
+                                        6 nov
+                                    </div>
+                                    <div class="d-flex">
+                                        <span class="material-symbols-outlined md-20 black dropdown-btn-ellipsis">
+                                            label
+                                        </span>
+                                        Dev
+                                    </div>
+                                </div>                           
+                            </div>                           
+                            <span class="material-symbols-outlined md-24 black dropdown-btn-ellipsis">
+                                more_horiz
+                            </span>
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="#Edit">Edit</a>
+                            <a href="#Remove">Remove</a>
+                        </div>
+                    </li>
     `;
 
     let innerHTML = '';
     for (var i = 0; i < 60; i++) {
         innerHTML += htmlChild;
     }
-    projectsElem.innerHTML = innerHTML;
+    tasksElem.innerHTML += innerHTML;
 }
 function LoadTestNotes() {
     var projectsElem = document.querySelector('.js-notes-test');
