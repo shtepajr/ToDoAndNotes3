@@ -137,3 +137,7 @@ a.btn-default, button.btn-default {
 .line-through {
     text-decoration: line-through;
 }
+
+.min-width-0 {
+    min-width: 0;
+}

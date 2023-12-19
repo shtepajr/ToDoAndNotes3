@@ -59,7 +59,7 @@
     <div class="container">
         <aside class="sidebar" id="sidebar">
             <nav class="days">
-                <ul>
+                <ul class="days-list">
                     <li class="nav-link">
                         <a>
                             <span class="material-symbols-outlined md-24 black">
@@ -141,72 +141,10 @@
             <div class="main-container">
                 <ul class="tasks js-tasks-test">
                     @* test generation in js *@
-                    <li class="task nav-link dropdown">
-                        <a>
-                            <span class="material-symbols-outlined md-24 is-done-btn">
-                                radio_button_unchecked
-                            </span>
-                            <div class="nowrap-ellipsis">
-                                <div class="nowrap-ellipsis">Project: ${dropdownContentElem.id}ddddddddddddddd</div>
-                                <div class="tools-row">
-                                    <div class="d-flex">
-                                        <span class="material-symbols-outlined md-20 black dropdown-btn-ellipsis">
-                                            date_range
-                                        </span>6 nov
-                                    </div>
-                                    <div class="d-flex">
-                                        <span class="material-symbols-outlined md-20 black dropdown-btn-ellipsis">
-                                            label
-                                        </span>Dev
-                                    </div>
-                                </div>                           
-                            </div>                           
-                            <span class="material-symbols-outlined md-24 black dropdown-btn-ellipsis">
-                                more_horiz
-                            </span>
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="#Edit">Edit</a>
-                            <a href="#Remove">Remove</a>
-                        </div>
-                    </li>
-                    <li class="task nav-link dropdown">
-                        <a>
-                            <span class="material-symbols-outlined md-24 is-done-btn">
-                                radio_button_checked
-                            </span>
-                            <div class="nowrap-ellipsis">
-                                <div class="nowrap-ellipsis line-through">Project: ${dropdownContentElem.id}ddddddddddddddd</div>
-                                <div class="tools-row">
-                                    <div class="d-flex">
-                                        <span class="material-symbols-outlined md-20 black dropdown-btn-ellipsis">
-                                            date_range
-                                        </span>
-                                        6 nov
-                                    </div>
-                                    <div class="d-flex">
-                                        <span class="material-symbols-outlined md-20 black dropdown-btn-ellipsis">
-                                            label
-                                        </span>
-                                        Dev
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="material-symbols-outlined md-24 black dropdown-btn-ellipsis">
-                                more_horiz
-                            </span>
-                        </a>
-                        <div class="dropdown-content">
-                            <a href="#Edit">Edit</a>
-                            <a href="#Remove">Remove</a>
-                        </div>
-                    </li>
                 </ul>
-                <section class="notes js-notes-test">
-                    <div class="task">Hello note!!</div>
-                    <div class="note">Hello note</div>
-                    <div class="note">Hello note</div>
-                </section>
+                <ul class="notes js-notes-test">
+                    @* test generation in js *@
+                </ul>
                 <section class="tasks-with-notes js-tasks-with-notes-test">
                     <div class="task">Hello task</div>
                     <div class="note">Hello note</div>
