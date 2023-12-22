@@ -48,7 +48,6 @@ header {
 }
 
 .sidebar {
-    flex: 0 0 auto;
     background-color: var(--coral-color);
     width: var(--sidebar-width);
     transition: margin-left 0.25s;
@@ -173,7 +172,6 @@ main {
     text-overflow: ellipsis;
 }
 
-
 .days {
     height: var(--days-height);
 }
@@ -197,15 +195,12 @@ main {
 .projects-preview p {
     font-size: 20px;
 }
-.projects-data {
+.projects-list {
     height: calc(100% - var(--projects-preview-height));
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     row-gap: 4px;
-}
-.projects-data .nav-link {
-    border-radius: 10px;
 }
 
 .main-header {
@@ -306,7 +301,13 @@ main {
     row-gap: -0px;
 }
 
-/* Task */
+/* Single object*/
+.project {
+    border-radius: 10px;
+}
+.project.nav-link a .nowrap-ellipsis {
+    flex: 1;
+}
 .task, .note {
     flex: 1;
     background-color: var(--light-yellow-color);
@@ -318,16 +319,13 @@ main {
 .task.nav-link a {
     padding-top: 2px;
 }
-.task.nav-link a .nowrap-ellipsis {
-    flex: 1;
-}
 .task .is-done-btn {
     align-self: baseline;
     margin-top: 2px;
 }
 .task-content, .note-content {
-    min-width: 0;
     flex: 1;
+    min-width: 0;
 }
 .tools-row{
     display: flex;
@@ -339,4 +337,43 @@ main {
 }
 .note-description {
     font-size: 12px;
+}
+
+/* Modal */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
 }

@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ToDoAndNotes3.Models
 {
-    public class User : IdentityUser<int>
+    public class User : IdentityUser
     {
-        [PersonalData]
-        public override int Id { get; set; }
         [PersonalData]
         public string? Name { get; set; }
     }

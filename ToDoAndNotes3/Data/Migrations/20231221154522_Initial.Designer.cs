@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAndNotes3.Data;
 
@@ -11,9 +12,11 @@ using ToDoAndNotes3.Data;
 namespace ToDoAndNotes3.Migrations
 {
     [DbContext(typeof(TdnDbContext))]
-    partial class TdnDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231221154522_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

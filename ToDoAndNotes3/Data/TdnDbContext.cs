@@ -5,7 +5,7 @@ using ToDoAndNotes3.Models;
 
 namespace ToDoAndNotes3.Data
 {
-    public class TdnDbContext : IdentityDbContext<User, Role, int>
+    public class TdnDbContext : IdentityDbContext<User>
     {
         public TdnDbContext(DbContextOptions options) : base(options)
         {
@@ -15,5 +15,9 @@ namespace ToDoAndNotes3.Data
         {
             base.OnConfiguring(optionsBuilder);
         }
+        public DbSet<Project> Projects { get; set; } = default!;
+        public DbSet<Models.Task> Tasks { get; set; } = default!;
+        public DbSet<Note> Notes { get; set; } = default!;
+        public DbSet<Label> Labels { get; set; } = default!;
     }
 }
