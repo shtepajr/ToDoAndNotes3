@@ -46,10 +46,10 @@
         </section>
         <section class="header-right">
             <div class="dropdown">
-                <span class="material-symbols-outlined md-32 white btn js-dropdown-btn-ellipsis">
+                <span class="material-symbols-outlined md-32 white btn dropdown-btn" data-target-id="profile">
                     account_circle
                 </span>
-                <div class="dropdown-content">
+                <div class="dropdown-content" id="profile">
                     <a href="#Account">Account</a>
                     <a href="#RecycleBin">Recycle Bin</a>
                     <form asp-controller="Account" asp-action="LogOff" method="post">
@@ -100,31 +100,31 @@
                     <div id="add-project-modal" class="modal">
                         <div class="modal-content">
                             <span class="close">&times;</span>
-                            <partial name="Projects/Create" model="new ToDoAndNotes3.Models.Project() {UserId = UserManager.GetUserId(User)}" />
+                            <partial name="Partials/Projects/_Create" model="new ToDoAndNotes3.Models.Project() {UserId = UserManager.GetUserId(User)}" />
                         </div>
                     </div>
                 </div>
-                <ul class="projects-list js-projects-test">
+                <ul class="projects-list">
                     @foreach (var project in Model.Projects)
                     {
                         <li class="project nav-link dropdown">
                             <a>
                                 <div class="nowrap-ellipsis">@project.Title</div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn-ellipsis" id="project-@project.ProjectId">
+                                <span class="material-symbols-outlined md-24 black dropdown-btn" data-target-id="project-@project.ProjectId">
                                     more_horiz
                                 </span>
                             </a>
                             <div class="dropdown-content" id="project-@project.ProjectId">
-                                <a class="modal-button" data-target-id="edit-project-modal">
+                                <a class="modal-button" data-target-id="edit-project-@project.ProjectId-modal">
                                     Edit
                                 </a>
                                 <a href="#Remove">Remove</a>
                             </div>
                         </li>
-                        <div id="edit-project-modal" class="modal">
+                        <div id="edit-project-@project.ProjectId-modal" class="modal">
                             <div class="modal-content">
                                 <span class="close">&times;</span>
-                                <partial name="Projects/Edit" model="project" />
+                                <partial name="Partials/Projects/_Edit" model="project" />
                             </div>
                         </div>
                     }
@@ -145,7 +145,7 @@
                             <div class="modal-content">
                                 <span class="close">&times;</span>
                                 <p>Some text in the Modal..</p>
-                                @* <partial name="Task/Create" model="new ToDoAndNotes3.Models.Task()" /> *@
+                                @* <partial name="Partials/Projects/Create" model="new ToDoAndNotes3.Models.Project()" /> *@
                             </div>
                         </div>
                         <button class="btn btn-action modal-button" data-target-id="add-note-modal">
@@ -201,7 +201,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn-ellipsis" id="task-@task.TaskId">
+                                <span class="material-symbols-outlined md-24 black dropdown-btn" data-target-id="task-@task.TaskId">
                                     more_horiz
                                 </span>
                             </a>
@@ -239,7 +239,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn-ellipsis" id="note-@i">
+                                <span class="material-symbols-outlined md-24 black dropdown-btn" id="note-@i">
                                     more_horiz
                                 </span>
                             </a>
@@ -279,7 +279,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn-ellipsis" id="task-@i">
+                                <span class="material-symbols-outlined md-24 black dropdown-btn" id="task-@i">
                                     more_horiz
                                 </span>
                             </a>
@@ -312,7 +312,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn-ellipsis" id="note-@i">
+                                <span class="material-symbols-outlined md-24 black dropdown-btn" id="note-@i">
                                     more_horiz
                                 </span>
                             </a>

@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     toggleSidebar();
     configureModals();
+    configureDropdown();
 
     window.addEventListener('load', checkWindowSize);
     window.addEventListener('resize', checkWindowSize);
-    window.addEventListener('click', toggleDropdown);
 });
 
 function toggleSidebar() {
@@ -34,33 +34,38 @@ function checkWindowSize() {
         }, 200);  
     }
 }
-function toggleDropdown(event) {
-    let dropdownContentElems = document.getElementsByClassName("dropdown-content");
-  
-    if (event.target.classList.contains('js-dropdown-btn-ellipsis')) {
-        for (let i = 0; i < dropdownContentElems.length; i++) {
-            var dropdownContentElem = dropdownContentElems[i];
-             // show dropdown-content if its button was clicked || hide if it was already shown
-            if (dropdownContentElem.id === event.target.id) {
-                dropdownContentElem.classList.toggle('show');
+function configureDropdown() {
+    let btnElems = document.getElementsByClassName('dropdown-btn');
+    let dropdownElems = document.getElementsByClassName('dropdown-content');
+
+    for (let btn of btnElems) {
+        btn.addEventListener('click', function () {
+            let dropdown = document.getElementById(btn.getAttribute('data-target-id'));
+            dropdown.classList.toggle('show');
+            // Do not show previous
+            for (let olddropdown of dropdownElems) {
+                if (olddropdown.id !== dropdown.id) {
+                    olddropdown.classList.remove('show');
+                }
             }
-            else { // hide previous dropdown-content
-                dropdownContentElem.classList.remove('show');
-            }
-        }
-    } // hide if click on other elements
-    else {
-        for (let i = 0; i < dropdownContentElems.length; i++) {
-            dropdownContentElems[i].classList.remove('show');
-        }
+        });
     }
-    //event.stopPropagation();  // Stop the event from propagating up the DOM tree
+    // Do not show anything if click outside
+    window.addEventListener('click', function (event) {
+        if (!event.target.classList.contains('dropdown-btn')) {
+            for (let dropdown of dropdownElems) {
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        }
+    })
 }
 function configureModals() {
     let btnElems = document.getElementsByClassName('modal-button');
+
     for (let i = 0; i < btnElems.length; i++) {
         let btn = btnElems[i];
-
         btn.addEventListener('click', function() {
             let modal = document.getElementById(btn.getAttribute('data-target-id'));
             modal.style.display = 'block';
@@ -68,14 +73,12 @@ function configureModals() {
     }
 
     let modalElems = document.getElementsByClassName('modal');
-    window.onclick = function (event) {
+    // Do not show anything if click outside
+    window.addEventListener('click', function (event) {
         if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
-            for (let i in modalElems) {
-                if (typeof modalElems[i].style !== 'undefined') {
-                    modalElems[i].style.display = "none";
-                }
+            for (let modal of modalElems) {
+                modal.style.display = "none";
             }
         }
-    }
+    });
 }
-
