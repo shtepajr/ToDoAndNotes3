@@ -81,4 +81,62 @@ function configureModals() {
             }
         }
     });
+
+    configureProjectPartials();
+}
+
+function configureProjectPartials() {
+    $('.modal-button').click(function () {
+        let targetId = $(this).data('target-id');
+
+        // GET: ADD PROJECT modal
+        if (targetId.includes('add-project-modal')) {
+            $.ajax({
+                url: '/Projects/CreatePartial',
+                type: 'GET',
+                success: function (result) {
+                    $(`#${targetId}`).html(result);
+                }
+            });
+        }
+        // GET: EDIT PROJECT modal
+        if (targetId.includes('edit-project-modal')) {
+            let projectId = $(this).data("target-id").replace('edit-project-modal-', '');
+            $.ajax({
+                url: '/Projects/EditPartial',
+                type: 'GET',
+                data: { id: projectId },
+                success: function (result) {
+                    $(`#${targetId}`).html(result);
+                    $('.submit-button').on('click', handleEditSubmit); // post handler link
+                }
+            });
+        }
+    });
+
+    // POST: EDIT PROJECT handler
+    function handleEditSubmit() {
+        let targetId = $(this).data('target-id');
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        if (targetId.includes('edit-project-form')) {
+            let formData = $(`#${targetId}`).serialize();
+            let modalId = $(this).data('target-id').replace('edit-project-form-', 'edit-project-modal-');
+            $.ajax({
+                url: '/Projects/EditPartial',
+                type: 'POST',
+                data: formData,
+                headers: {
+                    RequestVerificationToken: token
+                },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload(true);
+                    }
+                    else {
+                        $(`#${modalId}`).find('.modal-content').html(result);
+                    }
+                }
+            });
+        }
+    }  
 }

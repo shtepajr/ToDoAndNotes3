@@ -1,23 +1,16 @@
 ﻿@model ToDoAndNotes3.Models.Project
 
 @{
-    Layout = null;
+    Layout = "_ModalContentLayout";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Edit</title>
-</head>
-<body>
 
 <h4>Project</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form id="edit-project-form-@Model.ProjectId">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="ProjectId" class="control-label"></label>
@@ -45,15 +38,12 @@
                 <span asp-validation-for="IsDeleted" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <button type="button" class="btn btn-primary submit-button" data-target-id="edit-project-form-@Model.ProjectId">Save</button>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Projects" asp-action="Index">Back to List</a>
 </div>
-
-</body>
-</html>
