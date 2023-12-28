@@ -81,6 +81,7 @@ namespace ToDoAndNotes3.Controllers
             {
                 return NotFound();
             }
+            ViewData["EditProjectId"] = project.ProjectId;
             return PartialView("Projects/_EditPartial", project);
         }
 
@@ -88,7 +89,7 @@ namespace ToDoAndNotes3.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        //[ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPartial(Project project)
         {
             if (ModelState.IsValid)

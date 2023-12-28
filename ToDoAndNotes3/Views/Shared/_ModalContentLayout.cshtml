@@ -1,4 +1,17 @@
-﻿<div class="modal-content">
-    <span class="close">&times;</span>
+﻿@{
+    var editProjectId = ViewData["EditProjectId"];
+}
+
+<div class="modal-content">
+    <div class="dropdown">
+        <span class="material-symbols-outlined md-24 black dropdown-btn" data-target-id="edit-project-@editProjectId">
+            more_horiz
+        </span>
+        <div class="dropdown-content" id="edit-project-@editProjectId">
+            <a href="#Duplicate">Duplicate</a>
+            <a href="#Remove">Remove</a>
+        </div>
+    </div>
+    @* <span class="close">&times;</span> *@
     @RenderBody()
 </div>

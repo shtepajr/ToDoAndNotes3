@@ -12,11 +12,11 @@
         <form id="edit-project-form-@Model.ProjectId">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="ProjectId" class="control-label"></label>
-                    <input asp-for="ProjectId" class="form-control" />
-                    <span asp-validation-for="ProjectId" class="text-danger"></span>
-                </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <input asp-for="ProjectId" class="form-control" />
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="UserId" class="control-label"></label>
                 <input asp-for="UserId" class="form-control" />
@@ -38,7 +38,8 @@
                 <span asp-validation-for="IsDeleted" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <button type="button" class="btn btn-primary submit-button" data-target-id="edit-project-form-@Model.ProjectId">Save</button>
+                <button type="button" class="btn btn-primary edit-submit-btn"
+                    data-target-id="edit-project-form-@Model.ProjectId">Save</button>
             </div>
         </form>
     </div>
