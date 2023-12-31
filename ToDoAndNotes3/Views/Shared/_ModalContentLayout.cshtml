@@ -1,17 +1,15 @@
 ﻿@{
-    var editProjectId = ViewData["EditProjectId"];
+    var currentProjectId = ViewData["CurrentProjectId"]; // for unique dropdown-content id
 }
 
 <div class="modal-content">
-    <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black dropdown-btn" data-target-id="edit-project-@editProjectId">
-            more_horiz
-        </span>
-        <div class="dropdown-content" id="edit-project-@editProjectId">
-            <a href="#Duplicate">Duplicate</a>
-            <a href="#Remove">Remove</a>
-        </div>
+    <div class="modal-header">
+        @await RenderSectionAsync("ModalHeaderContent", required: false)
+        <span class="material-symbols-outlined md-24 black btn js-close">
+            close
+        </span>   
     </div>
-    @* <span class="close">&times;</span> *@
-    @RenderBody()
+    <div class="modal-body">
+        @RenderBody()
+    </div>
 </div>

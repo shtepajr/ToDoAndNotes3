@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Claims;
 using ToDoAndNotes3.Data;
@@ -55,23 +56,37 @@ namespace ToDoAndNotes3.Controllers
         #region Helpers
         void SeedDbData()
         {
+            if (_context.Projects.Any())
+            {
+                _context.Projects.RemoveRange(_context.Projects);
+            }
+            //_context.Database.EnsureDeleted();
+            //_context.Database.EnsureCreated();
+
+            for (int i = 0; i < 5; i++)
+            {
+                _context.Labels.Add(new Label()
+                {
+                    Title = "Label title lorem" + i,
+                });
+            }
+
             for (int i = 0; i < 10; i++)
             {
-                _context.Projects.Add(
-                new Project()
+                _context.Projects.Add(new Project()
                 {
                     UserId = _userManager.GetUserId(User),
                     CreatedDate = DateTime.UtcNow,
                     IsDeleted = false,
-                    Title = "Lorem ipsum hello",
+                    Title = "Project title lorem" + i,
                     Tasks = new List<Models.Task>()
                     {
                         new Models.Task()
                         {
-                            Title = "Task title test",
-                            Description = "Desc"
+                            Title = "Task title lorem " + i,
+                            Description = "Desc",
                         }
-                    }
+                    }                   
                 });
             }            
             _context.SaveChanges();

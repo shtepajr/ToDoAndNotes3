@@ -25,7 +25,7 @@ namespace ToDoAndNotes3.Controllers
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Projects.ToListAsync());
+            return PartialView("Projects/_IndexPartial", await _context.Projects.ToListAsync());
         }
 
         // GET: Projects/Details/5
@@ -65,7 +65,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(project);
+            return PartialView("Projects/_CreatePartial", project);
         }
 
         // GET: Projects/Edit/5
@@ -81,7 +81,7 @@ namespace ToDoAndNotes3.Controllers
             {
                 return NotFound();
             }
-            ViewData["EditProjectId"] = project.ProjectId;
+            ViewData["CurrentProjectId"] = project.ProjectId;
             return PartialView("Projects/_EditPartial", project);
         }
 

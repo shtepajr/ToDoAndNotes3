@@ -2,45 +2,17 @@ $(function () {
     checkWindowSize();
     $(window).on('resize', checkWindowSize);
     $('#burger-menu-toggle').on('click', function () {
-        $('#sidebar').toggleClass('sidebar-hide');
+        $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
 
     partialsController.configureProjectPartials();
 
     // parent element (document) in this case allow to set handlers for selected elements (that will be added to html later)
-    $(document).on('click', '.create-submit-btn', partialsController.submitHandler);
-    $(document).on('click', '.edit-submit-btn', partialsController.submitHandler);
-    $(document).on('click', '.delete-submit-btn', partialsController.submitHandler);
-    $(document).on('click', '.dropdown-btn', function () {
-        let dropdown = document.getElementById($(this).attr('data-target-id'));
-        dropdown.classList.toggle('show');
-        let dropdowns = document.getElementsByClassName('dropdown-content');
-        for (let olddropdown of dropdowns) {
-            if (olddropdown.id !== dropdown.id) {
-                olddropdown.classList.remove('show'); // hide previous dropdown
-            }
-        }
-    });
-    $(document).on('click', '.modal-button', function () {
-        let modal = document.getElementById($(this).attr('data-target-id'));
-        modal.style.display = 'block';
-    });
-    // parent element (document)
-    $(document).on('click', function (event) {
-        if (!event.target.classList.contains('dropdown-btn')) {
-            let dropdowns = document.getElementsByClassName('dropdown-content');
-            for (let dropdown of dropdowns) {
-                dropdown.classList.remove('show'); // hide dropdown if click outside
-            }
-        }
-        if (event.target.classList.contains('modal') || event.target.classList.contains('close')) {
-            let modals = document.getElementsByClassName('modal');
-            for (let modal of modals) {
-                modal.style.display = "none"; // do not show anything if click outside
-            }
-        }
-    });
+    $(document).on('click', '.js-create-submit-btn', partialsController.submitHandler);
+    $(document).on('click', '.js-edit-submit-btn', partialsController.submitHandler);
+    $(document).on('click', '.js-delete-submit-btn', partialsController.submitHandler);
+
 });
 
 function checkWindowSize() {
@@ -64,7 +36,7 @@ function checkWindowSize() {
 
 const partialsController = {
     configureProjectPartials() {
-        $('.modal-button').click(function () {
+        $('.js-modal-btn').click(function () {
             let targetId = $(this).data('target-id');
 
             // GET: ADD PROJECT modal
@@ -94,9 +66,9 @@ const partialsController = {
     },
     submitHandler() {
         switch (true) {
-            case $(this).hasClass('create-submit-btn'):
+            case $(this).hasClass('js-create-submit-btn'):
                 break;
-            case $(this).hasClass('edit-submit-btn'):
+            case $(this).hasClass('js-edit-submit-btn'):
                 let targetId = $(this).data('target-id');
                 var token = $('input[name="__RequestVerificationToken"]').val();
                 if (targetId.includes('edit-project-form')) {
@@ -120,7 +92,7 @@ const partialsController = {
                     });
                 }
                 break;
-            case $(this).hasClass('delete-submit-btn'):
+            case $(this).hasClass('js-delete-submit-btn'):
                 break;
             default:
         }    

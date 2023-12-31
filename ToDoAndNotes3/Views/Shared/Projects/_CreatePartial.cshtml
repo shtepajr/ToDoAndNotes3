@@ -2,36 +2,36 @@
 
 @{
     Layout = "_ModalContentLayout";
-}
-<h4>Project</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-controller="Projects" asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-             <input type="hidden" asp-for="UserId" class="form-control" />
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IsDeleted" class="control-label"></label>
-                <input asp-for="IsDeleted" class="form-control" />
-                <span asp-validation-for="IsDeleted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
 
-<div>
-    <a asp-controller="Projects" asp-action="Index">Back to List</a>
-</div>
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Create</div>
+    </div>
+    <div class="dropdown">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-target-id="current-project-dropdown-content">
+            more_horiz
+        </span>
+        <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
+            <a href="#Duplicate">Duplicate</a>
+            <a href="#Remove">Remove</a>
+        </div>
+    </div>
+}
+
+
+<form asp-controller="Projects" asp-action="Create">
+    <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="IsDeleted" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" asp-for="UserId" />
+    <div class="d-flex">
+        <input asp-for="Title" placeholder="Project name"/>
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div class="btns-ok-cancel mt-5">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok" type="submit">Ok</button>
+    </div>
+</form>
