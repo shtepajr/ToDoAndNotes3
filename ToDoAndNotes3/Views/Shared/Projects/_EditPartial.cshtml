@@ -4,47 +4,38 @@
     Layout = "_ModalContentLayout";
 }
 
-
-<h4>Project</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form id="edit-project-form-@Model.ProjectId">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ProjectId" class="control-label"></label>
-                <input asp-for="ProjectId" class="form-control" />
-                <span asp-validation-for="ProjectId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IsDeleted" class="control-label"></label>
-                <input asp-for="IsDeleted" class="form-control" />
-                <span asp-validation-for="IsDeleted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <button type="button" class="btn btn-primary js-edit-submit-btn"
-                    data-target-id="edit-project-form-@Model.ProjectId">Save</button>
-            </div>
-        </form>
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Edit</div>
     </div>
-</div>
+    <div class="dropdown">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-target-id="current-project-dropdown-content-@Model.ProjectId">
+            more_horiz
+        </span>
+        <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content-@Model.ProjectId">
+            <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@Model.ProjectId">
+                <button class="btn" type="submit">Duplicate</button>
+            </form>
+            <form asp-controller="Projects" asp-action="Delete" asp-route-id="@Model.ProjectId">
+                <button class="btn" type="submit">Remove</button>
+            </form>
+        </div>
+    </div>
+}
 
-<div>
-    <a asp-controller="Projects" asp-action="Index">Back to List</a>
-</div>
+<form id="edit-project-form-@Model.ProjectId">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="ProjectId" />
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="IsDeleted" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <div>
+        <input asp-for="Title" placeholder="Project name" />
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok js-edit-submit-btn" type="button" data-target-id="edit-project-form-@Model.ProjectId">Ok</button>
+    </div>
+</form>

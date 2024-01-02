@@ -64,7 +64,7 @@
             <nav class="days">
                 <ul class="days-list">
                     <li class="nav-link">
-                        <a>
+                        <a asp-controller="Home" asp-action="Main">
                             <span class="material-symbols-outlined md-24 black">
                                 calendar_today
                             </span>
@@ -72,7 +72,7 @@
                         </a>
                     </li>
                     <li class="nav-link">
-                        <a>
+                        <a asp-controller="Home" asp-action="Main">
                             <span class="material-symbols-outlined md-24 black">
                                 calendar_month
                             </span>
@@ -92,13 +92,13 @@
             <nav class="projects">
                 <div class="projects-preview">
                     <p>Projects</p>
-                    <button class="btn btn-plus js-modal-btn" data-target-id="add-project-modal">
+                    <button class="btn btn-plus js-modal-btn" data-target-id="create-project-modal">
                         <span class="material-symbols-outlined md-24">
                             add
                         </span>
                     </button>
                     @* modal (ajax request content) *@
-                    <div id="add-project-modal" class="modal">
+                    <div id="create-project-modal" class="modal">
 
                     </div>
                 </div>
@@ -106,17 +106,22 @@
                     @foreach (var project in Model.Projects)
                     {
                         <li class="project nav-link dropdown">
-                            <a>
+                            <a asp-controller="Home" asp-action="Main" asp-route-currentProjectId="@project.ProjectId">
                                 <div class="nowrap-ellipsis">@project.Title</div>
                                 <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="project-dropdown-content-@project.ProjectId">
                                     more_horiz
                                 </span>
                             </a>
                             <div class="dropdown-content js-dropdown-content" id="project-dropdown-content-@project.ProjectId">
-                                <a class="js-modal-btn" data-target-id="edit-project-modal-@project.ProjectId">
+                                <a class="btn js-modal-btn" data-target-id="edit-project-modal-@project.ProjectId">
                                     Edit
                                 </a>
-                                <a href="#Remove">Remove</a>
+                                <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@project.ProjectId">
+                                    <button class="btn" type="submit">Duplicate</button>
+                                </form>
+                                <form asp-controller="Projects" asp-action="Delete" asp-route-id="@project.ProjectId">
+                                    <button class="btn" type="submit">Remove</button>
+                                </form>
                             </div>
                         </li>
                         @* modal (ajax request content) *@

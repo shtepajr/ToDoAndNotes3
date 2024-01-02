@@ -9,29 +9,20 @@
     <div class="modal-header-left">
         <div class="modal-title">Create</div>
     </div>
-    <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-target-id="current-project-dropdown-content">
-            more_horiz
-        </span>
-        <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
-            <a href="#Duplicate">Duplicate</a>
-            <a href="#Remove">Remove</a>
-        </div>
-    </div>
 }
 
-
-<form asp-controller="Projects" asp-action="Create">
+<form id="create-project-form">
+    @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="IsDeleted" />
     <input type="hidden" asp-for="CreatedDate" />
     <input type="hidden" asp-for="UserId" />
-    <div class="d-flex">
-        <input asp-for="Title" placeholder="Project name"/>
+    <div>
+        <input asp-for="Title" placeholder="Project name" />
         <span asp-validation-for="Title"></span>
     </div>
-    <div class="btns-ok-cancel mt-5">
+    <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
-        <button class="btn btn-ok" type="submit">Ok</button>
+        <button class="btn btn-ok js-create-submit-btn" type="button" data-target-id="create-project-form">Ok</button>
     </div>
 </form>

@@ -39,8 +39,8 @@ const partialsController = {
         $('.js-modal-btn').click(function () {
             let targetId = $(this).data('target-id');
 
-            // GET: ADD PROJECT modal
-            if (targetId.includes('add-project-modal')) {
+            // GET: CREATE PROJECT modal
+            if (targetId.includes('create-project-modal')) {
                 $.ajax({
                     url: '/Projects/CreatePartial',
                     type: 'GET',
@@ -65,12 +65,33 @@ const partialsController = {
 
     },
     submitHandler() {
+        let targetId = $(this).data('target-id');
+        let token = $('input[name="__RequestVerificationToken"]').val();
+
         switch (true) {
-            case $(this).hasClass('js-create-submit-btn'):
+            case $(this).hasClass('js-create-submit-btn'):           
+                if (targetId.includes('create-project-form')) {
+                    let formData = $(`#${targetId}`).serialize();
+                    let modalId = $(this).data('target-id').replace('create-project-form', 'create-project-modal');
+                    $.ajax({
+                        url: '/Projects/CreatePartial',
+                        type: 'POST',
+                        data: formData,
+                        headers: {
+                            RequestVerificationToken: token
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                location.reload(true);
+                            }
+                            else {
+                                $(`#${modalId}`).html(result);
+                            }
+                        }
+                    });
+                }
                 break;
             case $(this).hasClass('js-edit-submit-btn'):
-                let targetId = $(this).data('target-id');
-                var token = $('input[name="__RequestVerificationToken"]').val();
                 if (targetId.includes('edit-project-form')) {
                     let formData = $(`#${targetId}`).serialize();
                     let modalId = $(this).data('target-id').replace('edit-project-form-', 'edit-project-modal-');
@@ -86,13 +107,14 @@ const partialsController = {
                                 location.reload(true);
                             }
                             else {
-                                $(`#${modalId}`).find('.modal-content').html(result);
+                                $(`#${modalId}`).html(result);
                             }
                         }
                     });
                 }
                 break;
             case $(this).hasClass('js-delete-submit-btn'):
+                // to do here or in bin.js
                 break;
             default:
         }    

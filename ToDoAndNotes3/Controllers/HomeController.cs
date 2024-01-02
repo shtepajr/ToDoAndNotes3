@@ -31,14 +31,37 @@ namespace ToDoAndNotes3.Controllers
         }
 
         [HttpGet]
-        public IActionResult Main()
+        public async Task<IActionResult> Main(int? currentProjectId = null)
         {
-            //SeedDbData();
             GeneralViewModel generalViewModel = new GeneralViewModel();
-            generalViewModel.Projects = _context.Projects.ToList();
-            generalViewModel.Tasks = _context.Tasks.ToList();
-            generalViewModel.Notes = _context.Notes.ToList();
-            generalViewModel.Labels = _context.Labels.ToList();
+            string? userId = _userManager.GetUserId(User);
+
+            //SeedDbData();
+            if (currentProjectId == null)
+            {
+                var projectsInclude = await _context.Projects.Where(p => p.UserId == userId)
+                    .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
+                generalViewModel.Projects = projectsInclude;
+
+                foreach (var project in projectsInclude)
+                {
+                    generalViewModel.Tasks.AddRange(project.Tasks);
+                    generalViewModel.Notes.AddRange(project.Notes);
+                }
+            }
+            else
+            {
+                var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
+                generalViewModel.Projects = projects;
+
+                var currentProjectInclude = _context.Projects
+                    .Where(p => p.UserId == userId && p.ProjectId == currentProjectId)
+                    .Include(t => t.Tasks).Include(n => n.Notes)
+                    .First();
+
+                generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
+                generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
+            }
 
             return View(generalViewModel);
         }

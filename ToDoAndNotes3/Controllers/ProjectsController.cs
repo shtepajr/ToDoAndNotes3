@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -16,10 +17,12 @@ namespace ToDoAndNotes3.Controllers
     public class ProjectsController : Controller
     {
         private readonly TdnDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public ProjectsController(TdnDbContext context)
+        public ProjectsController(TdnDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Projects
@@ -53,17 +56,16 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // POST: Projects/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectId,UserId,Title,CreatedDate,IsDeleted")] Project project)
+        public async Task<IActionResult> CreatePartial(Project project)
         {
             if (ModelState.IsValid)
             {
+                project.UserId = _userManager.GetUserId(User);
                 _context.Add(project);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
             }
             return PartialView("Projects/_CreatePartial", project);
         }
@@ -81,13 +83,10 @@ namespace ToDoAndNotes3.Controllers
             {
                 return NotFound();
             }
-            ViewData["CurrentProjectId"] = project.ProjectId;
             return PartialView("Projects/_EditPartial", project);
         }
 
         // POST: Projects/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPartial(Project project)
@@ -145,9 +144,52 @@ namespace ToDoAndNotes3.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(HomeController.Main), "Home");
         }
 
+
+        public async Task<IActionResult> Duplicate(int? id)
+        {
+            var project = _context.Projects
+                .Include(t => t.Tasks)
+                .Include(n => n.Notes)
+                .SingleOrDefault(p => p.ProjectId == id);
+            if (project != null)
+            {
+                Project copy = new Project()
+                {
+                    UserId = project.UserId,
+                    Title = "Copy of " +  project.Title                   
+                };
+                
+                foreach (var task in project.Tasks)
+                {
+                    copy.Tasks.Add(new Models.Task()
+                    {
+                        Description = task.Description,
+                        DueDate = task.DueDate,
+                        Title = task.Title,
+                        //TaskLabels = task.TaskLabels
+                    });
+                }
+                foreach (var note in project.Notes)
+                {
+                    copy.Notes.Add(new Note()
+                    {
+                        Description = note.Description,
+                        DueDate = note.DueDate,
+                        Title = note.Title,
+                        //TaskLabels = task.TaskLabels
+                    });
+                }
+
+                await _context.Projects.AddAsync(copy);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(HomeController.Main), "Home");
+            }
+            // mb handle error somehow
+            return RedirectToAction(nameof(HomeController.Main), "Home");
+        }
         private bool ProjectExists(int? id)
         {
             return _context.Projects.Any(e => e.ProjectId == id);

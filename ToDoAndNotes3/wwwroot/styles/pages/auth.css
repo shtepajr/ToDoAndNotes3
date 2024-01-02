@@ -112,11 +112,6 @@ body {
     padding-bottom: 4px;
 }
 
-.field-validation-error {
-    font-size: 14px;
-    color: #E07A5F;
-}
-
 .auth-description {
     display: flex;
     column-gap: 10px;
