@@ -79,8 +79,9 @@
                             Upcoming
                         </a>
                     </li>
+                    @* Test now *@
                     <li class="nav-link">
-                        <a>
+                        <a class="btn js-modal-btn" data-target-id="labels-modal">
                             <span class="material-symbols-outlined md-24 black">
                                 label
                             </span>
@@ -88,6 +89,10 @@
                         </a>
                     </li>
                 </ul>
+                @* modal (ajax request content) *@
+                <div id="labels-modal" class="modal">
+
+                </div>
             </nav>
             <nav class="projects">
                 <div class="projects-preview">
@@ -119,7 +124,7 @@
                                 <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@project.ProjectId">
                                     <button class="btn" type="submit">Duplicate</button>
                                 </form>
-                                <form asp-controller="Projects" asp-action="Delete" asp-route-id="@project.ProjectId">
+                                <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@project.ProjectId">
                                     <button class="btn" type="submit">Remove</button>
                                 </form>
                             </div>

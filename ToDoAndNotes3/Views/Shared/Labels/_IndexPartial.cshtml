@@ -1,0 +1,11 @@
+﻿@model IEnumerable<ToDoAndNotes3.Models.Label>
+
+@{
+    Layout = "_ModalContentLayout";
+
+}
+
+@foreach (var label in Model)
+{
+    <div>@label.Title</div>
+}

@@ -17,7 +17,7 @@ namespace ToDoAndNotes3.Controllers
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, TdnDbContext context, UserManager<User> userManager = null)
+        public HomeController(ILogger<HomeController> logger, TdnDbContext context, UserManager<User> userManager)
         {
             _logger = logger;
             _context = context;
@@ -36,9 +36,11 @@ namespace ToDoAndNotes3.Controllers
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
 
-            //SeedDbData();
+
             if (currentProjectId == null)
             {
+                SeedDbData();
+
                 var projectsInclude = await _context.Projects.Where(p => p.UserId == userId)
                     .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
                 generalViewModel.Projects = projectsInclude;
@@ -79,9 +81,11 @@ namespace ToDoAndNotes3.Controllers
         #region Helpers
         void SeedDbData()
         {
-            if (_context.Projects.Any())
+            if (_context.Projects.Any() || _context.Labels.Any())
             {
-                _context.Projects.RemoveRange(_context.Projects);
+                return;
+                //_context.Projects.RemoveRange(_context.Projects);
+                //_context.Labels.RemoveRange(_context.Labels);
             }
             //_context.Database.EnsureDeleted();
             //_context.Database.EnsureCreated();
@@ -90,6 +94,7 @@ namespace ToDoAndNotes3.Controllers
             {
                 _context.Labels.Add(new Label()
                 {
+                    UserId = _userManager.GetUserId(User),
                     Title = "Label title lorem" + i,
                 });
             }

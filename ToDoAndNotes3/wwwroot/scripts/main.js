@@ -61,6 +61,16 @@ const partialsController = {
                     }
                 });
             }
+            // GET: LABELS modal
+            if (targetId.includes('labels-modal')) {
+                $.ajax({
+                    url: '/Labels/Index',
+                    type: 'GET',
+                    success: function (result) {
+                        $(`#${targetId}`).html(result);
+                    }
+                });
+            }
         });
 
     },

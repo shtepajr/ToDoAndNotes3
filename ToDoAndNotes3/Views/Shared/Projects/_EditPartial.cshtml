@@ -16,7 +16,7 @@
             <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@Model.ProjectId">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
-            <form asp-controller="Projects" asp-action="Delete" asp-route-id="@Model.ProjectId">
+            <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@Model.ProjectId">
                 <button class="btn" type="submit">Remove</button>
             </form>
         </div>

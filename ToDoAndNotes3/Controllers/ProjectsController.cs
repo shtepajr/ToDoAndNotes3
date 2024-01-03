@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.EntityFrameworkCore;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
@@ -132,6 +126,28 @@ namespace ToDoAndNotes3.Controllers
             return View(project);
         }
 
+        // POST: Projects/SoftDelete/5
+        public async Task<IActionResult> SoftDelete(int? id)
+        {
+            var project = _context.Projects
+                .Include(t => t.Tasks)
+                .Include(n => n.Notes)
+                .SingleOrDefault(p => p.ProjectId == id);
+            if (project != null)
+            {
+                project.IsDeleted = true;
+                foreach (var task in project.Tasks)
+                {
+                    task.IsDeleted = true;
+                }
+                foreach (var note in project.Notes)
+                {
+                    note.IsDeleted = true;
+                }
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(HomeController.Main), "Home");
+        }
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -141,12 +157,10 @@ namespace ToDoAndNotes3.Controllers
             if (project != null)
             {
                 _context.Projects.Remove(project);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
-
 
         public async Task<IActionResult> Duplicate(int? id)
         {
