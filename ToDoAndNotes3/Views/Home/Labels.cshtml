@@ -1,0 +1,53 @@
+﻿@model ProjectLabelViewModel
+
+@{
+    Layout = "_MainLayout";
+    ViewData["Title"] = "Labels";
+}
+
+@section Header
+{
+    <partial name="_HeaderPartial" />
+}
+@section Sidebar
+{
+    <partial name="_SidebarPartial" model="Model.Projects" />
+}
+
+<main id="main">
+    <div class="main-header">
+        <div class="main-header-left">
+            <div class="main-header-title">@ViewData["Title"]</div>
+            <div class="main-header-buttons">
+                <button class="btn btn-action js-modal-btn" data-target-id="add-task-modal">
+                    <span class="material-symbols-outlined md-30">
+                        new_label
+                    </span>
+                </button>
+                <div id="add-task-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p>Some text in the Modal..</p>
+                        @* <partial name="Partials/Projects/Create" model="new ToDoAndNotes3.Models.Project()" /> *@
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-header-right">
+        </div>
+    </div>
+    <div class="main-container">
+        <ul class="tasks">
+            @foreach (var label in Model.Labels)
+            {
+                <div>@label.Title</div>
+            }
+        </ul>
+        <ul class="notes">
+            
+        </ul>
+        <ul class="tasks-with-notes">
+            
+        </ul>
+    </div>
+</main>

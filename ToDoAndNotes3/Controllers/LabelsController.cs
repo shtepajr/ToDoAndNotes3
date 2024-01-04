@@ -16,10 +16,10 @@ namespace ToDoAndNotes3.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
-        {
-            var labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User));
-            return PartialView("Labels/_IndexPartial", labels);
-        }
+        //public IActionResult Index()
+        //{
+        //    var labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User));
+        //    return PartialView("Labels/_IndexPartial", labels);
+        //}
     }
 }

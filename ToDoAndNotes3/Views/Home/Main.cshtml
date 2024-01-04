@@ -1,341 +1,209 @@
-﻿@using System.Security.Claims
-@using Microsoft.AspNetCore.Identity
-@model GeneralViewModel
+﻿@model GeneralViewModel
 @inject UserManager<User> UserManager
 @{
-    Layout = null;
+    Layout = "_MainLayout";
     ViewData["Title"] = "Main";
 }
 
-<!DOCTYPE html>
-<html lang="en">
+@section Header 
+{
+    <partial name="_HeaderPartial" />
+}
+@section Sidebar
+{
+    <partial name="_SidebarPartial" model="Model.Projects" />
+}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - TDN</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="~/styles/shared/general.css">
-    <link rel="stylesheet" href="~/styles/pages/main.css">
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-</head>
-
-<body>
-    <header>
-        <section class="header-left">
-            <button id="burger-menu-toggle" class="btn btn-icon">
-                <span class="material-symbols-outlined md-32 white">
-                    menu
-                </span>
-            </button>
-            <button asp-controller="Home" asp-action="Main" class="btn btn-icon">
-                <span class="material-symbols-outlined md-32 white">
-                    home
-                </span>
-            </button>
-            <form class="search-form">
-                <span class="material-symbols-outlined md-32 white search-icon">
-                    search
-                </span>
-                <input type="search" />
-            </form>
-        </section>
-        <section class="header-right">
-            <div class="dropdown">
-                <span class="material-symbols-outlined md-32 white btn js-dropdown-btn" data-target-id="profile">
-                    account_circle
-                </span>
-                <div class="dropdown-content js-dropdown-content" id="profile">
-                    <a href="#Account">Account</a>
-                    <a href="#RecycleBin">Recycle Bin</a>
-                    <form asp-controller="Account" asp-action="LogOff" method="post">
-                        <button type="submit" class="btn">Log out</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </header>
-    <div class="container">
-        <aside class="sidebar" id="sidebar">
-            <nav class="days">
-                <ul class="days-list">
-                    <li class="nav-link">
-                        <a asp-controller="Home" asp-action="Main">
-                            <span class="material-symbols-outlined md-24 black">
-                                calendar_today
-                            </span>
-                            Today
-                        </a>
-                    </li>
-                    <li class="nav-link">
-                        <a asp-controller="Home" asp-action="Main">
-                            <span class="material-symbols-outlined md-24 black">
-                                calendar_month
-                            </span>
-                            Upcoming
-                        </a>
-                    </li>
-                    @* Test now *@
-                    <li class="nav-link">
-                        <a class="btn js-modal-btn" data-target-id="labels-modal">
-                            <span class="material-symbols-outlined md-24 black">
-                                label
-                            </span>
-                            Labels
-                        </a>
-                    </li>
-                </ul>
-                @* modal (ajax request content) *@
-                <div id="labels-modal" class="modal">
-
-                </div>
-            </nav>
-            <nav class="projects">
-                <div class="projects-preview">
-                    <p>Projects</p>
-                    <button class="btn btn-plus js-modal-btn" data-target-id="create-project-modal">
-                        <span class="material-symbols-outlined md-24">
-                            add
-                        </span>
-                    </button>
-                    @* modal (ajax request content) *@
-                    <div id="create-project-modal" class="modal">
-
+<main id="main">
+    <div class="main-header">
+        <div class="main-header-left">
+            <div class="main-header-title">Today</div>
+            <div class="main-header-buttons">
+                <button class="btn btn-action js-modal-btn" data-target-id="add-task-modal">
+                    <span class="material-symbols-outlined md-30">
+                        add_task
+                    </span>
+                </button>
+                <div id="add-task-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p>Some text in the Modal..</p>
+                        @* <partial name="Partials/Projects/Create" model="new ToDoAndNotes3.Models.Project()" /> *@
                     </div>
                 </div>
-                <ul class="projects-list">
-                    @foreach (var project in Model.Projects)
-                    {
-                        <li class="project nav-link dropdown">
-                            <a asp-controller="Home" asp-action="Main" asp-route-currentProjectId="@project.ProjectId">
-                                <div class="nowrap-ellipsis">@project.Title</div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="project-dropdown-content-@project.ProjectId">
-                                    more_horiz
-                                </span>
-                            </a>
-                            <div class="dropdown-content js-dropdown-content" id="project-dropdown-content-@project.ProjectId">
-                                <a class="btn js-modal-btn" data-target-id="edit-project-modal-@project.ProjectId">
-                                    Edit
-                                </a>
-                                <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@project.ProjectId">
-                                    <button class="btn" type="submit">Duplicate</button>
-                                </form>
-                                <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@project.ProjectId">
-                                    <button class="btn" type="submit">Remove</button>
-                                </form>
-                            </div>
-                        </li>
-                        @* modal (ajax request content) *@
-                        <div id="edit-project-modal-@project.ProjectId" class="modal">
-                            
-                        </div>
-                    }
-                </ul>
-            </nav>
-        </aside>
-        <main id="main">
-            <div class="main-header">
-                <div class="main-header-left">
-                    <div class="main-header-title">Today</div>
-                    <div class="main-header-buttons">
-                        <button class="btn btn-action js-modal-btn" data-target-id="add-task-modal">
-                            <span class="material-symbols-outlined md-30">
-                                add_task
-                            </span>
-                        </button>
-                        <div id="add-task-modal" class="modal">
-                            <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <p>Some text in the Modal..</p>
-                                @* <partial name="Partials/Projects/Create" model="new ToDoAndNotes3.Models.Project()" /> *@
-                            </div>
-                        </div>
-                        <button class="btn btn-action js-modal-btn" data-target-id="add-note-modal">
-                            <span class="material-symbols-outlined md-30">
-                                note_add
-                            </span>
-                        </button>
-                        <div id="add-note-modal" class="modal">
-                            <div class="modal-content">
-                                <span class="close">&times;</span>
-                                <p>Some text in the Modal..</p>
-                                @* <partial name="Task/Create" model="new ToDoAndNotes3.Models.Task()"/> *@
-                            </div>
-                        </div>
-                        <button class="btn btn-action">
-                            <span class="material-symbols-outlined md-30">
-                                filter_alt
-                            </span>
-                        </button>
+                <button class="btn btn-action js-modal-btn" data-target-id="add-note-modal">
+                    <span class="material-symbols-outlined md-30">
+                        note_add
+                    </span>
+                </button>
+                <div id="add-note-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p>Some text in the Modal..</p>
+                        @* <partial name="Task/Create" model="new ToDoAndNotes3.Models.Task()"/> *@
                     </div>
                 </div>
-                <div class="main-header-right">
-
-                </div>
+                <button class="btn btn-action">
+                    <span class="material-symbols-outlined md-30">
+                        filter_alt
+                    </span>
+                </button>
             </div>
-            <div class="main-container">
-                <ul class="tasks">
-                    @foreach (var task in Model.Tasks)
-                    {
-                        <li class="task nav-link dropdown">
-                            <a>
-                                <span class="material-symbols-outlined md-24 is-done-btn">
-                                    radio_button_unchecked
-                                </span>
-                                <div class="task-content">
-                                    <div class="nowrap-ellipsis">@task.Title</div>
-                                    <div class="tools-row">
-                                        <div class="d-flex min-width-0">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                date_range
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                6 nov
-                                            </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                label
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                Dev
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="task-@task.TaskId">
-                                    more_horiz
-                                </span>
-                            </a>
-                            <div class="dropdown-content js-dropdown-content" id="task-@task.TaskId">
-                                <a href="#Edit">Edit</a>
-                                <a href="#Remove">Remove</a>
-                            </div>
-                        </li>
-                    }
-                </ul>
-                <ul class="notes">
-                    @for (int i = 0; i < 30; i++)
-                    {
-                        <li class="note nav-link dropdown">
-                            <a>
-                                <div class="note-content">
-                                    <div class="nowrap-ellipsis">Note Lorem Ipsum is simply dummy text of the @i</div>
-                                    <div class="nowrap-ellipsis note-description">Lorem Ipsum is simply dummy text of the printing and typesetting</div>
-                                    <div class="tools-row">
-                                        <div class="d-flex min-width-0">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                date_range
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                6 nov
-                                            </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                label
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                Dev
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn" id="note-@i">
-                                    more_horiz
-                                </span>
-                            </a>
-                            <div class="dropdown-content js-dropdown-content" id="note-@i">
-                                <a href="#Edit">Edit</a>
-                                <a href="#Remove">Remove</a>
-                            </div>
-                        </li>
-                    }
-                </ul>
-                <ul class="tasks-with-notes">
-                    @for (int i = 0; i < 30; i++)
-                    {
-                        <li class="task nav-link dropdown">
-                            <a>
-                                <span class="material-symbols-outlined md-24 is-done-btn">
-                                    radio_button_unchecked
-                                </span>
-                                <div class="task-content">
-                                    <div class="nowrap-ellipsis">Task Lorem Ipsum is simply dummy text of the @i</div>
-                                    <div class="tools-row">
-                                        <div class="d-flex min-width-0">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                date_range
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                6 nov
-                                            </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                label
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                Dev
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn" id="task-@i">
-                                    more_horiz
-                                </span>
-                            </a>
-                            <div class="dropdown-content js-dropdown-content" id="task-@i">
-                                <a href="#Edit">Edit</a>
-                                <a href="#Remove">Remove</a>
-                            </div>
-                        </li>
-                        <li class="note nav-link dropdown">
-                            <a>
-                                <div class="note-content">
-                                    <div class="nowrap-ellipsis">Note Lorem Ipsum is simply dummy text of the @i</div>
-                                    <div class="nowrap-ellipsis note-description">Lorem Ipsum is simply dummy text of the printing and typesetting</div>
-                                    <div class="tools-row">
-                                        <div class="d-flex min-width-0">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                date_range
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                6 nov
-                                            </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <span class="material-symbols-outlined md-20 black">
-                                                label
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                Dev
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span class="material-symbols-outlined md-24 black js-dropdown-btn" id="note-@i">
-                                    more_horiz
-                                </span>
-                            </a>
-                            <div class="dropdown-content js-dropdown-content" id="note-@i">
-                                <a href="#Edit">Edit</a>
-                                <a href="#Remove">Remove</a>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </main>
+        </div>
+        <div class="main-header-right">
+        </div>
     </div>
-    <!-- Include jQuery from the Google CDN -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="~/scripts/general.js" type="text/javascript"></script>
-    <script src="~/scripts/main.js" type="text/javascript"></script>
-</body>
-
-</html>
+    <div class="main-container">
+        <ul class="tasks">
+            @foreach (var task in Model.Tasks)
+            {
+                <li class="task nav-link dropdown">
+                    <a>
+                        <span class="material-symbols-outlined md-24 is-done-btn">
+                            radio_button_unchecked
+                        </span>
+                        <div class="task-content">
+                            <div class="nowrap-ellipsis">@task.Title</div>
+                            <div class="tools-row">
+                                <div class="d-flex min-width-0">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        date_range
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        6 nov
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        label
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        Dev
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="task-@task.TaskId">
+                            more_horiz
+                        </span>
+                    </a>
+                    <div class="dropdown-content js-dropdown-content" id="task-@task.TaskId">
+                        <a href="#Edit">Edit</a>
+                        <a href="#Remove">Remove</a>
+                    </div>
+                </li>
+            }
+        </ul>
+        <ul class="notes">
+            @for (int i = 0; i < 30; i++)
+            {
+                <li class="note nav-link dropdown">
+                    <a>
+                        <div class="note-content">
+                            <div class="nowrap-ellipsis">Note Lorem Ipsum is simply dummy text of the @i</div>
+                            <div class="nowrap-ellipsis note-description">Lorem Ipsum is simply dummy text of the printing and typesetting</div>
+                            <div class="tools-row">
+                                <div class="d-flex min-width-0">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        date_range
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        6 nov
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        label
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        Dev
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" id="note-@i">
+                            more_horiz
+                        </span>
+                    </a>
+                    <div class="dropdown-content js-dropdown-content" id="note-@i">
+                        <a href="#Edit">Edit</a>
+                        <a href="#Remove">Remove</a>
+                    </div>
+                </li>
+            }
+        </ul>
+        <ul class="tasks-with-notes">
+            @for (int i = 0; i < 30; i++)
+            {
+                <li class="task nav-link dropdown">
+                    <a>
+                        <span class="material-symbols-outlined md-24 is-done-btn">
+                            radio_button_unchecked
+                        </span>
+                        <div class="task-content">
+                            <div class="nowrap-ellipsis">Task Lorem Ipsum is simply dummy text of the @i</div>
+                            <div class="tools-row">
+                                <div class="d-flex min-width-0">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        date_range
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        6 nov
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        label
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        Dev
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" id="task-@i">
+                            more_horiz
+                        </span>
+                    </a>
+                    <div class="dropdown-content js-dropdown-content" id="task-@i">
+                        <a href="#Edit">Edit</a>
+                        <a href="#Remove">Remove</a>
+                    </div>
+                </li>
+                <li class="note nav-link dropdown">
+                    <a>
+                        <div class="note-content">
+                            <div class="nowrap-ellipsis">Note Lorem Ipsum is simply dummy text of the @i</div>
+                            <div class="nowrap-ellipsis note-description">Lorem Ipsum is simply dummy text of the printing and typesetting</div>
+                            <div class="tools-row">
+                                <div class="d-flex min-width-0">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        date_range
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        6 nov
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="material-symbols-outlined md-20 black">
+                                        label
+                                    </span>
+                                    <div class="nowrap-ellipsis">
+                                        Dev
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" id="note-@i">
+                            more_horiz
+                        </span>
+                    </a>
+                    <div class="dropdown-content js-dropdown-content" id="note-@i">
+                        <a href="#Edit">Edit</a>
+                        <a href="#Remove">Remove</a>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</main>

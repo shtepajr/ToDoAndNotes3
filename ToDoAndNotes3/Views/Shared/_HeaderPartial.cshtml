@@ -1,0 +1,34 @@
+﻿<header>
+    <section class="header-left">
+        <button id="burger-menu-toggle" class="btn btn-icon">
+            <span class="material-symbols-outlined md-32 white">
+                menu
+            </span>
+        </button>
+        <button asp-controller="Home" asp-action="Main" class="btn btn-icon">
+            <span class="material-symbols-outlined md-32 white">
+                home
+            </span>
+        </button>
+        <form class="search-form">
+            <span class="material-symbols-outlined md-32 white search-icon">
+                search
+            </span>
+            <input type="search" />
+        </form>
+    </section>
+    <section class="header-right">
+        <div class="dropdown">
+            <span class="material-symbols-outlined md-32 white btn js-dropdown-btn" data-target-id="profile">
+                account_circle
+            </span>
+            <div class="dropdown-content js-dropdown-content" id="profile">
+                <a href="#Account">Account</a>
+                <a href="#RecycleBin">Recycle Bin</a>
+                <form asp-controller="Account" asp-action="LogOff" method="post">
+                    <button type="submit" class="btn">Log out</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</header>

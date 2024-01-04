@@ -67,6 +67,17 @@ namespace ToDoAndNotes3.Controllers
 
             return View(generalViewModel);
         }
+
+        public async Task<IActionResult> Labels()
+        {
+            ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
+            string? userId = _userManager.GetUserId(User);
+            var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
+            var labels = await _context.Labels.Where(p => p.UserId == userId).ToListAsync();
+            projectLabelViewModel.Projects = projects;
+            projectLabelViewModel.Labels = labels;
+            return View(projectLabelViewModel);
+        }
         public IActionResult Privacy()
         {
             return View();

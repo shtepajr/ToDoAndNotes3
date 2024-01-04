@@ -46,7 +46,7 @@ namespace ToDoAndNotes3.Controllers
         // GET: Projects/Create
         public IActionResult CreatePartial()
         {
-            return PartialView("Projects/_CreatePartial");
+            return PartialView("Projects/_CreatePartial", new Project());
         }
 
         // POST: Projects/Create
