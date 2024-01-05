@@ -211,6 +211,7 @@ main {
 .main-container {
     flex: 1;
     display: flex;
+    justify-content: center;
     min-width: 0;
     column-gap: 20px;
     height: calc(100% - var(--main-bar-height));
@@ -278,4 +279,35 @@ main {
 }
 .note-description {
     font-size: 12px;
+}
+
+/* Labels things */
+.main-header-center {
+    display: flex;
+    flex: 1;
+    column-gap: 10px;
+    justify-content: center;
+}
+.labels {
+    flex: 0.5;
+    border-radius: 10px;
+    background-color: var(--light-green-color);
+    padding: 8px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    row-gap: 6px;
+}
+@media (max-width: 700px) {
+    .labels {
+        flex: 1;
+    }
+}
+.label {
+    border-radius: 10px;
+    max-height: 34px;
+    flex: 1;
+}
+.label.nav-link a .nowrap-ellipsis {
+    flex: 1;
 }

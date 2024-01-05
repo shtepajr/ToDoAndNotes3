@@ -61,8 +61,28 @@ const partialsController = {
                     }
                 });
             }
+            // GET: CREATE LABEL modal
+            if (targetId.includes('create-label-modal')) {
+                $.ajax({
+                    url: '/Labels/CreatePartial',
+                    type: 'GET',
+                    success: function (result) {
+                        $(`#${targetId}`).html(result);
+                    }
+                });
+            }
+            if (targetId.includes('edit-label-modal')) {
+                let labelId = $(this).data("target-id").replace('edit-label-modal-', '');
+                $.ajax({
+                    url: '/Labels/EditPartial',
+                    type: 'GET',
+                    data: { id: labelId },
+                    success: function (result) {
+                        $(`#${targetId}`).html(result);
+                    }
+                });
+            }
         });
-
     },
     submitHandler() {
         let targetId = $(this).data('target-id');
@@ -75,6 +95,26 @@ const partialsController = {
                     let modalId = $(this).data('target-id').replace('create-project-form', 'create-project-modal');
                     $.ajax({
                         url: '/Projects/CreatePartial',
+                        type: 'POST',
+                        data: formData,
+                        headers: {
+                            RequestVerificationToken: token
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                location.reload(true);
+                            }
+                            else {
+                                $(`#${modalId}`).html(result);
+                            }
+                        }
+                    });
+                }
+                if (targetId.includes('create-label-form')) {
+                    let formData = $(`#${targetId}`).serialize();
+                    let modalId = $(this).data('target-id').replace('create-label-form', 'create-label-modal');
+                    $.ajax({
+                        url: '/Labels/CreatePartial',
                         type: 'POST',
                         data: formData,
                         headers: {
@@ -112,8 +152,31 @@ const partialsController = {
                         }
                     });
                 }
+                if (targetId.includes('edit-label-form')) {
+                    let formData = $(`#${targetId}`).serialize();
+                    let modalId = $(this).data('target-id').replace('edit-label-form-', 'edit-label-modal-');
+                    $.ajax({
+                        url: '/Labels/EditPartial',
+                        type: 'POST',
+                        data: formData,
+                        headers: {
+                            RequestVerificationToken: token
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                location.reload(true);
+                            }
+                            else {
+                                $(`#${modalId}`).html(result);
+                            }
+                        }
+                    });
+                }
                 break;
             case $(this).hasClass('js-delete-submit-btn'):
+                if (targetId.includes('delete-label-form')) {
+
+                }
                 // to do here or in bin.js
                 break;
             default:

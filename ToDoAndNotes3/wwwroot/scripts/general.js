@@ -16,10 +16,10 @@
     dropdown.style.left = event.clientX + "px";
     dropdown.classList.toggle('show');
 
-    if (event.clientY + dropdown.clientHeight > window.innerHeight) {
+    if (event.clientY + dropdown.clientHeight > window.visualViewport.height) {
         dropdown.style.top = event.clientY - dropdown.clientHeight + "px";
     }
-    if (event.clientX + dropdown.clientWidth > window.innerWidth) {
+    if (event.clientX + dropdown.clientWidth > window.visualViewport.width) {
         dropdown.style.left = event.clientX - dropdown.clientWidth + "px";
     }
 

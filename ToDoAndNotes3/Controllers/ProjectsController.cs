@@ -19,37 +19,18 @@ namespace ToDoAndNotes3.Controllers
             _userManager = userManager;
         }
 
-        // GET: Projects
         public async Task<IActionResult> Index()
         {
             return PartialView("Projects/_IndexPartial", await _context.Projects.ToListAsync());
         }
 
-        // GET: Projects/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-
-            return View(project);
-        }
-
-        // GET: Projects/Create
+        // GET: Projects/CreatePartial
         public IActionResult CreatePartial()
         {
             return PartialView("Projects/_CreatePartial", new Project());
         }
 
-        // POST: Projects/Create
+        // POST: Projects/CreatePartial
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePartial(Project project)
@@ -64,7 +45,7 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Projects/_CreatePartial", project);
         }
 
-        // GET: Projects/Edit/5
+        // GET: Projects/EditPartial/5
         public async Task<IActionResult> EditPartial(int? id)
         {
             if (id == null)
@@ -80,7 +61,7 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Projects/_EditPartial", project);
         }
 
-        // POST: Projects/Edit/5
+        // POST: Projects/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPartial(Project project)

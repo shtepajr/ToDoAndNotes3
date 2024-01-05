@@ -16,38 +16,46 @@
 
 <main id="main">
     <div class="main-header">
-        <div class="main-header-left">
+        <div class="main-header-center">
             <div class="main-header-title">@ViewData["Title"]</div>
             <div class="main-header-buttons">
-                <button class="btn btn-action js-modal-btn" data-target-id="add-task-modal">
+                <button class="btn btn-action js-modal-btn" data-target-id="create-label-modal">
                     <span class="material-symbols-outlined md-30">
                         new_label
                     </span>
                 </button>
-                <div id="add-task-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <p>Some text in the Modal..</p>
-                        @* <partial name="Partials/Projects/Create" model="new ToDoAndNotes3.Models.Project()" /> *@
-                    </div>
+                @* modal (ajax request content) *@
+                <div id="create-label-modal" class="modal">
+
                 </div>
             </div>
         </div>
-        <div class="main-header-right">
-        </div>
     </div>
     <div class="main-container">
-        <ul class="tasks">
+        <ul class="labels">
             @foreach (var label in Model.Labels)
             {
-                <div>@label.Title</div>
+                <li class="label nav-link dropdown">
+                    <a>
+                        <div class="nowrap-ellipsis">@label.Title</div>
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="label-dropdown-content-@label.LabelId">
+                            more_horiz
+                        </span>
+                    </a>
+                    <div class="dropdown-content js-dropdown-content" id="label-dropdown-content-@label.LabelId">
+                        <a class="btn js-modal-btn" data-target-id="edit-label-modal-@label.LabelId">
+                            Edit
+                        </a>
+                        <form asp-controller="Labels" asp-action="Delete" asp-route-id="@label.LabelId">
+                            <button class="btn" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </li>
+                @* modal (ajax request content) *@
+                <div id="edit-label-modal-@label.LabelId" class="modal">
+
+                </div>
             }
-        </ul>
-        <ul class="notes">
-            
-        </ul>
-        <ul class="tasks-with-notes">
-            
         </ul>
     </div>
 </main>

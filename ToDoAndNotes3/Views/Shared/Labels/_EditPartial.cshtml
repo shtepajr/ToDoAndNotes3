@@ -1,0 +1,40 @@
+﻿@model ToDoAndNotes3.Models.Label
+
+@{
+    Layout = "_ModalContentLayout";
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Edit</div>
+    </div>
+    <div class="dropdown">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-target-id="current-label-dropdown-content-@Model.LabelId">
+            more_horiz
+        </span>
+        <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content-@Model.LabelId">
+            <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@Model.LabelId">
+                <button class="btn" type="submit">Duplicate</button>
+            </form>
+            <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@Model.LabelId">
+                <button class="btn" type="submit">Remove</button>
+            </form>
+        </div>
+    </div>
+}
+
+<form id="edit-label-form-@Model.LabelId">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="LabelId" />
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="IsDeleted" />
+    <div>
+        <input asp-for="Title" placeholder="Project name" />
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok js-edit-submit-btn" type="button" data-target-id="edit-label-form-@Model.LabelId">Ok</button>
+    </div>
+</form>
