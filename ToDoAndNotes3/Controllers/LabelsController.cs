@@ -82,7 +82,41 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Labels/_EditPartial", label);
         }
 
+        // GET: : Labels/Delete/5
+        public async Task<IActionResult> DeletePartial(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+            var label = await _context.Labels.FindAsync(id);
+            if (label == null)
+            {
+                return NotFound();
+            }
+            return PartialView("Labels/_DeletePartial", label);
+        }
+
+        // POST: Labels/ConfirmDelete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var label = await _context.Labels.FindAsync(id);
+            if (label == null)
+            {
+                return NotFound();
+            }
+            _context.Labels.Remove(label);
+            await _context.SaveChangesAsync();
+            return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction(nameof(HomeController.Main), "Home");
+        }
         private bool LabelExists(int? id)
         {
             return _context.Labels.Any(e => e.LabelId == id);

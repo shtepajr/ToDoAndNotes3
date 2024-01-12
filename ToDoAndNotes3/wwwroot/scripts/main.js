@@ -71,10 +71,23 @@ const partialsController = {
                     }
                 });
             }
+            // GET: EDIT LABEL modal
             if (targetId.includes('edit-label-modal')) {
                 let labelId = $(this).data("target-id").replace('edit-label-modal-', '');
                 $.ajax({
                     url: '/Labels/EditPartial',
+                    type: 'GET',
+                    data: { id: labelId },
+                    success: function (result) {
+                        $(`#${targetId}`).html(result);
+                    }
+                });
+            }
+            // GET: DELETE LABEL modal
+            if (targetId.includes('delete-label-modal')) {
+                let labelId = $(this).data("target-id").replace('delete-label-modal-', '');
+                $.ajax({
+                    url: '/Labels/DeletePartial',
                     type: 'GET',
                     data: { id: labelId },
                     success: function (result) {

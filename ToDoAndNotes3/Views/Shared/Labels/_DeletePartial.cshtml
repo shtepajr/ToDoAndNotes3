@@ -1,0 +1,19 @@
+﻿@model Label
+
+@{
+    Layout = "_ModalContentLayout";
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Delete</div>
+    </div>
+}
+
+<div>Are you sure you want to delete <strong>"@Model.Title"</strong> label?</div>
+<form asp-controller="Labels" asp-action="Delete" asp-route-id="@Model.LabelId" asp-route-returnUrl="@Url.Action("Labels", "Home")">
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok" type="submit">Ok</button>
+    </div>
+</form>

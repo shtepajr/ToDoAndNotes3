@@ -46,14 +46,16 @@
                         <a class="btn js-modal-btn" data-target-id="edit-label-modal-@label.LabelId">
                             Edit
                         </a>
-                        <form asp-controller="Labels" asp-action="Delete" asp-route-id="@label.LabelId">
-                            <button class="btn" type="submit">Remove</button>
-                        </form>
+                        <a class="btn js-modal-btn" data-target-id="delete-label-modal-@label.LabelId">
+                            Delete
+                        </a>
                     </div>
                 </li>
                 @* modal (ajax request content) *@
                 <div id="edit-label-modal-@label.LabelId" class="modal">
-
+                </div>
+                @* modal (ajax request content) *@
+                <div id="delete-label-modal-@label.LabelId" class="modal">
                 </div>
             }
         </ul>
