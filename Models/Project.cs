@@ -11,6 +11,7 @@ namespace ToDoAndNotes3.Models
         public string? Title { get; set; }
         public DateTime? CreatedDate { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
+        public bool IsDefault { get; set; } = false;
         public ICollection<Task>? Tasks { get; set; } = new List<Task>();
         public ICollection<Note>? Notes { get; set; } = new List<Note>();
 

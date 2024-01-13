@@ -25,6 +25,7 @@ namespace ToDoAndNotes3.Controllers
         {
             // provide authorization
             var currentProjectId = TempData["CurrentProjectId"] as int?;
+
             return PartialView("Tasks/_CreatePartial", new Models.Task()
             {
                 ProjectId = currentProjectId
@@ -134,7 +135,7 @@ namespace ToDoAndNotes3.Controllers
         }
         private bool ProjectExists(int? id)
         {
-            return _context.Projects.Any(e => e.ProjectId == id);
+            return _context.Projects.IgnoreQueryFilters().Any(e => e.ProjectId == id);
         }
 
     }

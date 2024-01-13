@@ -31,29 +31,46 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Main
-        public async Task<IActionResult> Main(int? currentProjectId = null)
+        public async Task<IActionResult> Main(int? currentProjectId = null, DaysViewName? daysViewName = null)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
 
             if (currentProjectId == null)
             {
-                TempData["CurrentProjectId"] = null;
-                SeedDbData();
+                var defaultProject = GetOrCreateDefaultProject();
+                TempData["CurrentProjectId"] = defaultProject.ProjectId;
 
-                var projectsInclude = await _context.Projects.Where(p => p.UserId == userId)
-                    .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
-                generalViewModel.Projects = projectsInclude;
-
-                foreach (var project in projectsInclude)
+                if (daysViewName == DaysViewName.Upcoming)
                 {
-                    generalViewModel.Tasks.AddRange(project.Tasks);
-                    generalViewModel.Notes.AddRange(project.Notes);
+                    var projectsUpcomingInclude = await _context.Projects.Where(p => p.UserId == userId)
+                        .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
+                    generalViewModel.Projects = projectsUpcomingInclude;
+
+                    foreach (var project in projectsUpcomingInclude)
+                    {
+                        generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.DueDate != null));
+                        generalViewModel.Notes.AddRange(project.Notes.Where(t => t.DueDate != null));
+                    }
+                }
+                else // today data by default
+                {
+                    var projectsTodayInclude = await _context.Projects.Where(p => p.UserId == userId)
+                        .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
+                    generalViewModel.Projects = projectsTodayInclude;
+
+                    foreach (var project in projectsTodayInclude)
+                    {
+                        var today = DateOnly.FromDateTime(DateTime.Now);
+                        generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.DueDate == today));
+                        generalViewModel.Notes.AddRange(project.Notes.Where(t => t.DueDate == today));
+                    }
                 }
             }
             else
             {
                 TempData["CurrentProjectId"] = currentProjectId;
+                // authorization
                 var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
                 generalViewModel.Projects = projects;
 
@@ -65,7 +82,7 @@ namespace ToDoAndNotes3.Controllers
                 generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
                 generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
             }
-
+           
             return View(generalViewModel);
         }
 
@@ -95,6 +112,24 @@ namespace ToDoAndNotes3.Controllers
         }
 
         #region Helpers
+        Project GetOrCreateDefaultProject()
+        {
+            var checkDefault = _context.Projects.Where(p => p.IsDefault == true).FirstOrDefault();
+            if (checkDefault == null)
+            {
+                var defaultProject = new Project()
+                {
+                    IsDefault = true,
+                    Title = "Unsorted",
+                    UserId = _userManager.GetUserId(User),
+                };
+                _context.Add(defaultProject);
+                _context.SaveChanges();
+                return defaultProject;
+            }
+            return checkDefault;
+        }
+        // test
         void SeedDbData()
         {
             if (_context.Projects.Any() || _context.Labels.Any())

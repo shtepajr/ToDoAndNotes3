@@ -108,7 +108,7 @@ namespace ToDoAndNotes3.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
-                    return returnUrl == null ? RedirectToAction("Main", "Home") : RedirectToLocal(returnUrl);
+                    return returnUrl == null ? RedirectToAction("Main", "Home", new { daysViewName = DaysViewName.Today }) : RedirectToLocal(returnUrl);
                 }
                 else
                 {

@@ -1,10 +1,13 @@
 ﻿@model IEnumerable<ToDoAndNotes3.Models.Project>
-
+@{
+    var currentProjectId = TempData["CurrentProjectId"];
+    TempData.Keep("CurrentProjectId");
+}
 <aside class="sidebar" id="sidebar">
     <nav class="days">
         <ul class="days-list">
             <li class="nav-link">
-                <a asp-controller="Home" asp-action="Main">
+                <a asp-controller="Home" asp-action="Main" asp-route-daysViewName="@DaysViewName.Today">
                     <span class="material-symbols-outlined md-24 black">
                         calendar_today
                     </span>
@@ -12,11 +15,19 @@
                 </a>
             </li>
             <li class="nav-link">
-                <a asp-controller="Home" asp-action="Main">
+                <a asp-controller="Home" asp-action="Main" asp-route-daysViewName="@DaysViewName.Upcoming">
                     <span class="material-symbols-outlined md-24 black">
                         calendar_month
                     </span>
                     Upcoming
+                </a>
+            </li>
+            <li class="nav-link">
+                <a asp-controller="Home" asp-action="Main" asp-route-currentProjectId="@currentProjectId">
+                    <span class="material-symbols-outlined md-24 black">
+                        unfold_more
+                    </span>
+                    Unsorted
                 </a>
             </li>
             <li class="nav-link">
