@@ -95,6 +95,16 @@ const partialsController = {
                     }
                 });
             }
+            // GET: CREATE TASK modal
+            if (targetId.includes('create-task-modal')) {
+                $.ajax({
+                    url: '/Tasks/CreatePartial',
+                    type: 'GET',
+                    success: function (result) {
+                        $(`#${targetId}`).html(result);
+                    }
+                });
+            }
         });
     },
     submitHandler() {
@@ -128,6 +138,26 @@ const partialsController = {
                     let modalId = $(this).data('target-id').replace('create-label-form', 'create-label-modal');
                     $.ajax({
                         url: '/Labels/CreatePartial',
+                        type: 'POST',
+                        data: formData,
+                        headers: {
+                            RequestVerificationToken: token
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                location.reload(true);
+                            }
+                            else {
+                                $(`#${modalId}`).html(result);
+                            }
+                        }
+                    });
+                }
+                if (targetId.includes('create-task-form')) {
+                    let formData = $(`#${targetId}`).serialize();
+                    let modalId = $(this).data('target-id').replace('create-task-form', 'create-task-modal');
+                    $.ajax({
+                        url: '/Tasks/CreatePartial',
                         type: 'POST',
                         data: formData,
                         headers: {
@@ -185,12 +215,6 @@ const partialsController = {
                         }
                     });
                 }
-                break;
-            case $(this).hasClass('js-delete-submit-btn'):
-                if (targetId.includes('delete-label-form')) {
-
-                }
-                // to do here or in bin.js
                 break;
             default:
         }    

@@ -19,17 +19,13 @@
         <div class="main-header-left">
             <div class="main-header-title">Today</div>
             <div class="main-header-buttons">
-                <button class="btn btn-action js-modal-btn" data-target-id="add-task-modal">
+                <button class="btn btn-action js-modal-btn" data-target-id="create-task-modal">
                     <span class="material-symbols-outlined md-30">
                         add_task
                     </span>
                 </button>
-                <div id="add-task-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <p>Some text in the Modal..</p>
-                        @* <partial name="Partials/Projects/Create" model="new ToDoAndNotes3.Models.Project()" /> *@
-                    </div>
+                @* modal (ajax request content) *@
+                <div id="create-task-modal" class="modal">
                 </div>
                 <button class="btn btn-action js-modal-btn" data-target-id="add-note-modal">
                     <span class="material-symbols-outlined md-30">

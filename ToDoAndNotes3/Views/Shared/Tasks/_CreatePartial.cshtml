@@ -1,0 +1,39 @@
+﻿@model ToDoAndNotes3.Models.Task
+
+@{
+    Layout = "_ModalContentLayout";
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Create</div>
+    </div>
+}
+
+<form id="create-task-form">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="IsDeleted" />
+    <input type="hidden" asp-for="ProjectId" />
+    <div>
+        <input asp-for="Title" placeholder="Task name" />
+        <span asp-validation-for="Title"></span>
+    </div>
+    <div>
+        <input asp-for="Description" placeholder="Description" />
+        <span asp-validation-for="Description"></span>
+    </div>
+    <div>
+        <input asp-for="DueDate"/>
+        <span asp-validation-for="DueDate"></span>
+    </div>
+    <div>
+        <input asp-for="DueTime" />
+        <span asp-validation-for="DueTime"></span>
+    </div>
+
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok js-create-submit-btn" type="button" data-target-id="create-task-form">Ok</button>
+    </div>
+</form>

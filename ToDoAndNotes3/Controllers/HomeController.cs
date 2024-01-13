@@ -23,22 +23,22 @@ namespace ToDoAndNotes3.Controllers
             _context = context;
             _userManager = userManager;
         }
-        [HttpGet]
+        // GET: /Home
         [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
         }
 
-        [HttpGet]
+        // GET: /Home/Main
         public async Task<IActionResult> Main(int? currentProjectId = null)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
 
-
             if (currentProjectId == null)
             {
+                TempData["CurrentProjectId"] = null;
                 SeedDbData();
 
                 var projectsInclude = await _context.Projects.Where(p => p.UserId == userId)
@@ -53,6 +53,7 @@ namespace ToDoAndNotes3.Controllers
             }
             else
             {
+                TempData["CurrentProjectId"] = currentProjectId;
                 var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
                 generalViewModel.Projects = projects;
 
@@ -68,6 +69,7 @@ namespace ToDoAndNotes3.Controllers
             return View(generalViewModel);
         }
 
+        // GET: /Home/Labels
         public async Task<IActionResult> Labels()
         {
             ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
@@ -78,11 +80,14 @@ namespace ToDoAndNotes3.Controllers
             projectLabelViewModel.Labels = labels;
             return View(projectLabelViewModel);
         }
+
+        // GET: /Home/Privacy
         public IActionResult Privacy()
         {
             return View();
         }
 
+        // GET: /Home/Privacy
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
