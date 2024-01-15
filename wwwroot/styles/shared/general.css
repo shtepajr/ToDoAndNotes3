@@ -158,13 +158,15 @@ a.btn-default, button.btn-default {
 .modal-header-left {
     flex: 1;
 }
-.modal input {
-    width: 100%;
+
+.input-border {
     border-radius:  5px;
     padding: 5px;
     background-color: var(--transparent-color);
     outline: 0;
 }
+
+
 .modal-title {
     font-size: 20px;
 }
@@ -260,4 +262,7 @@ a.btn-default, button.btn-default {
 }
 .min-width-0 {
     min-width: 0;
+}
+.w-100 {
+    width: 100%;
 }

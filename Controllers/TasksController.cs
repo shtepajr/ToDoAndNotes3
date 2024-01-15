@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
+using ToDoAndNotes3.Models.MainViewModels;
 
 
 namespace ToDoAndNotes3.Controllers
@@ -26,28 +29,48 @@ namespace ToDoAndNotes3.Controllers
             // provide authorization
             var currentProjectId = TempData["CurrentProjectId"] as int?;
 
-            return PartialView("Tasks/_CreatePartial", new Models.Task()
+            return PartialView("Tasks/_CreatePartial", new TaskLabelsViewModel()
             {
-                ProjectId = currentProjectId
+                Task = new Models.Task()
+                {
+                    ProjectId = currentProjectId
+                },
+                Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList()
             });
         }
 
         // POST: Tasks/CreatePartial
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePartial(Models.Task task)
+        public async Task<IActionResult> CreatePartial(TaskLabelsViewModel taskLabels)
         {
             if (ModelState.IsValid)
             {
-                if (!ProjectExists(task.ProjectId))
+                if (!ProjectExists(taskLabels.Task.ProjectId))
                 {
                     return NotFound();
                 }
-                _context.Add(task);
+
+                // provide authorization
+                List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabels?.SelectedLabelsId);
+                List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
+
+                var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
+
+                taskLabels.Task.TaskLabels = new List<TaskLabel>();
+                foreach (var label in selected)
+                {
+                    taskLabels.Task.TaskLabels.Add(new TaskLabel()
+                    {
+                        Label = label,
+                    });
+                }
+
+                _context.Add(taskLabels.Task);
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Main") });
             }
-            return PartialView("Tasks/_CreatePartial", task);
+            return PartialView("Tasks/_CreatePartial", taskLabels);
         }
 
         // GET: Labels/EditPartial/5

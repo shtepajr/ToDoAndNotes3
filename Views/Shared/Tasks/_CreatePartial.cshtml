@@ -1,7 +1,9 @@
-﻿@model ToDoAndNotes3.Models.Task
+﻿@using ToDoAndNotes3.Models.MainViewModels
+@model TaskLabelsViewModel
 
 @{
     Layout = "_ModalContentLayout";
+    ViewData["SelectLabels"] = new SelectList(Model.Labels, "LabelId", "Title");
 }
 
 @section ModalHeaderContent {
@@ -10,27 +12,46 @@
     </div>
 }
 
+<script>
+    var options = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
+    VirtualSelect.init({
+        ele: '#sample-select',
+        options: options.map(option => ({ label: option.text, value: option.value })),
+        multiple: true,
+    });
+
+    /* Get selected labels ids */
+    document.querySelector('#sample-select').addEventListener('change', function () {
+        var selectedOptions = document.querySelector('#sample-select').getSelectedOptions();
+        var selectedValues = Array.from(selectedOptions).map(option => option.value);
+        document.querySelector('[name="SelectedLabelsId"]').value = JSON.stringify(selectedValues);
+    });
+</script>
+
 <form id="create-task-form">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
-    <input type="hidden" asp-for="IsDeleted" />
-    <input type="hidden" asp-for="ProjectId" />
+    <input type="hidden" asp-for="Task.IsDeleted" />
+    <input type="hidden" asp-for="Task.ProjectId" />
     <div>
-        <input asp-for="Title" placeholder="Task name" />
-        <span asp-validation-for="Title"></span>
+        <input asp-for="Task.Title" placeholder="Task name" />
+        <span asp-validation-for="Task.Title"></span>
     </div>
     <div>
-        <input asp-for="Description" placeholder="Description" />
-        <span asp-validation-for="Description"></span>
+        <input asp-for="Task.Description" placeholder="Description" />
+        <span asp-validation-for="Task.Description"></span>
     </div>
     <div>
-        <input asp-for="DueDate"/>
-        <span asp-validation-for="DueDate"></span>
+        <input asp-for="Task.DueDate" />
+        <span asp-validation-for="Task.DueDate"></span>
     </div>
     <div>
-        <input asp-for="DueTime" />
-        <span asp-validation-for="DueTime"></span>
+        <input asp-for="Task.DueTime" />
+        <span asp-validation-for="Task.DueTime"></span>
     </div>
+
+    <input type="hidden" asp-for="SelectedLabelsId" />
+    <div id="sample-select"></div>
 
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
