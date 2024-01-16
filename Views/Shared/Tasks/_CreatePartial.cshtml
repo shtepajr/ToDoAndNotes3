@@ -38,17 +38,32 @@
     document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
 
     /* Get selected labels ids */
-    document.querySelector('#select-labels').addEventListener('change', function () {
-        var selectedOptions = document.querySelector('#select-labels').getSelectedOptions();
+    $('#select-labels').on('change', function () {
+        var selectedOptions = $('#select-labels').getSelectedOptions();
         var selectedValues = Array.from(selectedOptions).map(option => option.value);
-        document.querySelector('[name="SelectedLabelsId"]').value = JSON.stringify(selectedValues);
+        $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));
     });
 
     /* Get selected project */
-    document.querySelector('#select-project').addEventListener('change', function () {
-        var selectedProject = document.querySelector('#select-project').value;
-        document.querySelector('[name="Task.ProjectId"]').value = selectedProject;
+    $('#select-project').on('change', function () {
+        var selectedProject = $('#select-project').val();
+        $('input[name="Task.ProjectId"]').val(selectedProject);
     });
+
+    toggleTimeInputVisibility();
+    $('#Task_DueDate').on('change', toggleTimeInputVisibility);
+
+    function toggleTimeInputVisibility() {
+        var dateInput = $('#Task_DueDate');
+        var timeInput = $('#Task_DueTime');
+
+        // Check if the date input value is not empty
+        if (dateInput.val() !== "") {
+            timeInput.removeAttr('hidden');
+        } else {
+            timeInput.attr("hidden", "true");
+        }
+    }
 </script>
 
 <form id="create-task-form">
@@ -70,7 +85,7 @@
         <span asp-validation-for="Task.DueDate"></span>
     </div>
     <div>
-        <input asp-for="Task.DueTime" />
+        <input asp-for="Task.DueTime" hidden="true"/>
         <span asp-validation-for="Task.DueTime"></span>
     </div>
 

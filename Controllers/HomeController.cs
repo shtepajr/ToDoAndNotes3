@@ -36,6 +36,16 @@ namespace ToDoAndNotes3.Controllers
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
 
+            if (daysViewName == null)
+            {
+                daysViewName = DaysViewName.Today;
+                TempData["DaysViewName"] = daysViewName;
+            }
+            else
+            {
+                TempData["DaysViewName"] = daysViewName;
+            }
+
             if (currentProjectId == null)
             {
                 var defaultProject = GetOrCreateDefaultProject();
@@ -43,7 +53,7 @@ namespace ToDoAndNotes3.Controllers
 
                 if (daysViewName == DaysViewName.Upcoming)
                 {
-                    var projectsUpcomingInclude = await _context.Projects.Where(p => p.UserId == userId)
+                    var projectsUpcomingInclude = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false)
                         .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
                     generalViewModel.Projects = projectsUpcomingInclude;
 
@@ -57,7 +67,7 @@ namespace ToDoAndNotes3.Controllers
                 {
                     var projectsTodayInclude = await _context.Projects.Where(p => p.UserId == userId)
                         .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
-                    generalViewModel.Projects = projectsTodayInclude;
+                    generalViewModel.Projects = projectsTodayInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
 
                     foreach (var project in projectsTodayInclude)
                     {
@@ -69,6 +79,7 @@ namespace ToDoAndNotes3.Controllers
             }
             else
             {
+                TempData["DaysViewName"] = null;
                 TempData["CurrentProjectId"] = currentProjectId;
                 // authorization
                 var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();

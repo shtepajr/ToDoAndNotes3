@@ -30,11 +30,20 @@ namespace ToDoAndNotes3.Controllers
             var currentProjectId = TempData["CurrentProjectId"] as int?;
             TempData.Keep("CurrentProjectId");
 
+            DateOnly? defaultDate = null;
+            // if days view
+            if (Enum.TryParse(TempData["DaysViewName"]?.ToString(), out DaysViewName daysViewName))
+            {
+                defaultDate = DateOnly.FromDateTime(DateTime.Now);
+            }
+            TempData.Keep("DaysViewName");
+
             return PartialView("Tasks/_CreatePartial", new TaskLabelsViewModel()
             {
                 Task = new Models.Task()
                 {
-                    ProjectId = currentProjectId
+                    ProjectId = currentProjectId,
+                    DueDate = defaultDate,
                 },
                 Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList(),
                 Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList(),
