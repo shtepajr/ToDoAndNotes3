@@ -4,27 +4,50 @@
 @{
     Layout = "_ModalContentLayout";
     ViewData["SelectLabels"] = new SelectList(Model.Labels, "LabelId", "Title");
+    ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
 }
 
 @section ModalHeaderContent {
     <div class="modal-header-left">
         <div class="modal-title">Create</div>
+        <div class="select-container">
+            <span class="material-symbols-outlined md-24 black select-togle-icon">
+                arrow_drop_down
+            </span>
+            <div id="select-project"></div>
+        </div>
     </div>
 }
 
 <script>
-    var options = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
+    var labelsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
     VirtualSelect.init({
-        ele: '#sample-select',
-        options: options.map(option => ({ label: option.text, value: option.value })),
+        ele: '#select-labels',
+        options: labelsOptions.map(option => ({ label: option.text, value: option.value })),
         multiple: true,
+        placeholder: "Labels",
+        optionsSelectedText: "labels selected",
     });
 
+    var projectsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectProjects));
+    VirtualSelect.init({
+        ele: '#select-project',
+        options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
+        hideClearButton: true,
+    });
+    document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
+
     /* Get selected labels ids */
-    document.querySelector('#sample-select').addEventListener('change', function () {
-        var selectedOptions = document.querySelector('#sample-select').getSelectedOptions();
+    document.querySelector('#select-labels').addEventListener('change', function () {
+        var selectedOptions = document.querySelector('#select-labels').getSelectedOptions();
         var selectedValues = Array.from(selectedOptions).map(option => option.value);
         document.querySelector('[name="SelectedLabelsId"]').value = JSON.stringify(selectedValues);
+    });
+
+    /* Get selected project */
+    document.querySelector('#select-project').addEventListener('change', function () {
+        var selectedProject = document.querySelector('#select-project').value;
+        document.querySelector('[name="Task.ProjectId"]').value = selectedProject;
     });
 </script>
 
@@ -33,6 +56,7 @@
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Task.IsDeleted" />
     <input type="hidden" asp-for="Task.ProjectId" />
+
     <div>
         <input asp-for="Task.Title" placeholder="Task name" />
         <span asp-validation-for="Task.Title"></span>
@@ -50,8 +74,13 @@
         <span asp-validation-for="Task.DueTime"></span>
     </div>
 
-    <input type="hidden" asp-for="SelectedLabelsId" />
-    <div id="sample-select"></div>
+    <div class="select-container">
+        <input type="hidden" asp-for="SelectedLabelsId" />
+        <span class="material-symbols-outlined md-24 black select-togle-icon">
+            label
+        </span>
+        <div id="select-labels"></div>
+    </div>
 
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>

@@ -71,7 +71,7 @@ namespace ToDoAndNotes3.Controllers
             {
                 TempData["CurrentProjectId"] = currentProjectId;
                 // authorization
-                var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
+                var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
                 generalViewModel.Projects = projects;
 
                 var currentProjectInclude = _context.Projects

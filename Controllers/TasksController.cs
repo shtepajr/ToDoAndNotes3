@@ -28,6 +28,7 @@ namespace ToDoAndNotes3.Controllers
         {
             // provide authorization
             var currentProjectId = TempData["CurrentProjectId"] as int?;
+            TempData.Keep("CurrentProjectId");
 
             return PartialView("Tasks/_CreatePartial", new TaskLabelsViewModel()
             {
@@ -35,7 +36,8 @@ namespace ToDoAndNotes3.Controllers
                 {
                     ProjectId = currentProjectId
                 },
-                Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList()
+                Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList(),
+                Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList(),
             });
         }
 
@@ -52,18 +54,21 @@ namespace ToDoAndNotes3.Controllers
                 }
 
                 // provide authorization
-                List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabels?.SelectedLabelsId);
-                List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
-
-                var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
-
-                taskLabels.Task.TaskLabels = new List<TaskLabel>();
-                foreach (var label in selected)
+                if (taskLabels?.SelectedLabelsId != null)
                 {
-                    taskLabels.Task.TaskLabels.Add(new TaskLabel()
+                    List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabels?.SelectedLabelsId);
+                    List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
+
+                    var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
+
+                    taskLabels.Task.TaskLabels = new List<TaskLabel>();
+                    foreach (var label in selected)
                     {
-                        Label = label,
-                    });
+                        taskLabels.Task.TaskLabels.Add(new TaskLabel()
+                        {
+                            Label = label,
+                        });
+                    }
                 }
 
                 _context.Add(taskLabels.Task);

@@ -131,6 +131,7 @@ a.btn-default, button.btn-default {
     border-radius: 10px;
     margin: auto;
     padding: 20px;
+    padding-top: 10px;
     border: 1px solid #888;
     width: 30%;
 }
@@ -151,22 +152,22 @@ a.btn-default, button.btn-default {
 }
 .modal-header {
     display: flex;
+    align-items: center;
 }
 .modal-body {
 
 }
 .modal-header-left {
     flex: 1;
+    display: flex;
+    align-items: center;
 }
-
 .input-border {
     border-radius:  5px;
     padding: 5px;
     background-color: var(--transparent-color);
     outline: 0;
 }
-
-
 .modal-title {
     font-size: 20px;
 }
@@ -198,6 +199,25 @@ a.btn-default, button.btn-default {
     opacity: 0.9;
 }
 
+/* Visual Select custom */
+.modal .vscomp-toggle-button {
+    padding-left: 20px;
+    background-color: var(--transparent-color);
+    border: 0;
+}
+.modal .vscomp-arrow {
+    display: none;
+}
+.select-container {
+    position: relative;
+    width: 100%;
+    margin-left: 10px;
+}
+.select-togle-icon {
+    position: absolute;
+    left: -3px;
+    top: 5px;
+}
 
 /* Dropdown */
 .dropdown {

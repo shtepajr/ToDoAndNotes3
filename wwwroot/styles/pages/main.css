@@ -70,7 +70,6 @@ main {
     color: var(--dark-blue-color);
     z-index: 1;
     position: absolute;
-    left: 10px;
     left: 5px;
 }
 .search:hover, search:focus{
