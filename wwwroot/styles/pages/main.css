@@ -310,7 +310,3 @@ main {
 .label.nav-link a .nowrap-ellipsis {
     flex: 1;
 }
-
-.label-select{
-    width: 20em;
-}

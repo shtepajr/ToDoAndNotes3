@@ -49,3 +49,53 @@ $(document).on('click', function (event) {
         }
     }
 });
+
+
+function autoGrow(event) {   
+    event.currentTarget.style.height = "5px"; //this.
+    event.currentTarget.style.height = (event.currentTarget.scrollHeight) + "px";
+}
+
+function setAutoTextAreaHandlers() {
+    let areas = document.getElementsByClassName('js-textarea-auto');
+    Array.from(areas).forEach(function (area) {
+        //area.setAttribute('rows', 1);
+        area.addEventListener('focus', autoGrow);
+        area.addEventListener('input', autoGrow);
+        //area.addEventListener('load', autoGrow);
+    });
+}
+
+// MutationObserver to detect changes in the DOM
+var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        // Check if nodes are added
+        if (mutation.addedNodes.length > 0) {
+            // Call setRows after a short delay to ensure the elements are rendered
+            setTimeout(setAutoTextAreaHandlers, 100);
+        }
+    });
+});
+// Configure and start the MutationObserver
+var observerConfig = {
+    childList: true,  // Listen for changes to the child nodes of the target
+    subtree: true     // Look at descendants as well
+};
+// Start observing the document body
+observer.observe(document.body, observerConfig);
+
+// Date, time js-picker
+$(document).on('focus', '.js-picker', function (event) {
+    if (event.currentTarget.getAttribute('name').includes('Time')) {
+        event.currentTarget.type = "time";
+    }
+    else if (event.currentTarget.getAttribute('name').includes('Date')) {
+        event.currentTarget.type = "date";
+    }
+    event.currentTarget.showPicker();
+});
+$(document).on('blur', '.js-picker', function (event) {
+    if (!event.currentTarget.value) {
+        event.currentTarget.type = "text";
+    }
+});

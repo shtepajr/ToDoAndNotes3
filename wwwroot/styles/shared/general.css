@@ -162,12 +162,28 @@ a.btn-default, button.btn-default {
     display: flex;
     align-items: center;
 }
-.input-border {
-    border-radius:  5px;
+
+.modal .input-border {
+    border-radius: 5px;
     padding: 5px;
     background-color: var(--transparent-color);
     outline: 0;
 }
+.modal .input-borderless {
+    width: 100%;
+    border: 0;
+    padding: 5px;
+    background-color: var(--transparent-color);
+    outline: 0;
+}
+.modal textarea {
+    resize: none;
+}
+.modal .picker {
+    max-width: 150px;
+}
+
+
 .modal-title {
     font-size: 20px;
 }

@@ -21,6 +21,7 @@
 
 <script>
     var labelsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
+    // VirtualSelect config
     VirtualSelect.init({
         ele: '#select-labels',
         options: labelsOptions.map(option => ({ label: option.text, value: option.value })),
@@ -38,32 +39,46 @@
     document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
 
     /* Get selected labels ids */
-    $('#select-labels').on('change', function () {
-        var selectedOptions = $('#select-labels').getSelectedOptions();
+    document.querySelector('#select-labels').addEventListener('change', function () {
+        var selectedOptions = document.querySelector('#select-labels').getSelectedOptions();
         var selectedValues = Array.from(selectedOptions).map(option => option.value);
-        $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));
+        document.querySelector('[name="SelectedLabelsId"]').value = JSON.stringify(selectedValues);
     });
 
     /* Get selected project */
-    $('#select-project').on('change', function () {
-        var selectedProject = $('#select-project').val();
-        $('input[name="Task.ProjectId"]').val(selectedProject);
+    document.querySelector('#select-project').addEventListener('change', function () {
+        var selectedProject = document.querySelector('#select-project').value;
+        document.querySelector('[name="Task.ProjectId"]').value = selectedProject;
     });
 
     toggleTimeInputVisibility();
-    $('#Task_DueDate').on('change', toggleTimeInputVisibility);
-
+    document.getElementById("Task_DueDate").addEventListener('change', toggleTimeInputVisibility);
     function toggleTimeInputVisibility() {
-        var dateInput = $('#Task_DueDate');
-        var timeInput = $('#Task_DueTime');
+        var dateInput = document.getElementById("Task_DueDate");
+        var timeInput = document.getElementById("Task_DueTime");
 
         // Check if the date input value is not empty
-        if (dateInput.val() !== "") {
-            timeInput.removeAttr('hidden');
+        if (dateInput.value !== "") {
+            // Show the time input
+            timeInput.removeAttribute("hidden");
         } else {
-            timeInput.attr("hidden", "true");
+            // Hide the time input
+            timeInput.setAttribute("hidden", "true");
         }
     }
+
+    // is done toggle
+    $('#task-is-done').on('click', function () {
+        if (this.innerHTML.includes('radio_button_unchecked')) {
+            this.innerHTML = 'radio_button_checked';
+            $('#Task_IsCompleted').val(true);
+
+        }
+        else if (this.innerHTML.includes('radio_button_checked')) {
+            this.innerHTML = 'radio_button_unchecked';
+            $('#Task_IsCompleted').val(false);
+        }
+    });
 </script>
 
 <form id="create-task-form">
@@ -71,32 +86,45 @@
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Task.IsDeleted" />
     <input type="hidden" asp-for="Task.ProjectId" />
+    <input type="hidden" asp-for="Task.IsCompleted" />
 
-    <div>
-        <input asp-for="Task.Title" placeholder="Task name" />
-        <span asp-validation-for="Task.Title"></span>
-    </div>
-    <div>
-        <input asp-for="Task.Description" placeholder="Description" />
-        <span asp-validation-for="Task.Description"></span>
-    </div>
-    <div>
-        <input asp-for="Task.DueDate" />
-        <span asp-validation-for="Task.DueDate"></span>
-    </div>
-    <div>
-        <input asp-for="Task.DueTime" hidden="true"/>
-        <span asp-validation-for="Task.DueTime"></span>
-    </div>
+    <div style="display: flex;">
+        <div>
+            <span class="material-symbols-outlined md-24 is-done-btn" id="task-is-done">
+                radio_button_unchecked
+            </span>
+        </div>
+        <div style="flex: 1;">
+            <div>
+                <textarea asp-for="Task.Title" placeholder="Task name" class="input-borderless js-textarea-auto" rows="1"></textarea>
+                <span asp-validation-for="Task.Title"></span>
+            </div>
+            <div>
+                <textarea asp-for="Task.Description" placeholder="Description" class="input-borderless js-textarea-auto" rows="1"></textarea>
+                <span asp-validation-for="Task.Description"></span>
+            </div>
 
-    <div class="select-container">
-        <input type="hidden" asp-for="SelectedLabelsId" />
-        <span class="material-symbols-outlined md-24 black select-togle-icon">
-            label
-        </span>
-        <div id="select-labels"></div>
+            <div style="display: flex;">
+                <div>
+                    <div>
+                        <input asp-for="Task.DueDate" class="picker js-picker" placeholder="Date" type="text" />
+                        <span asp-validation-for="Task.DueDate"></span>
+                    </div>
+                    <div>
+                        <input asp-for="Task.DueTime" hidden="true" class="picker js-picker" placeholder="Time" type="text" />
+                        <span asp-validation-for="Task.DueTime"></span>
+                    </div>
+                </div>
+                <div class="select-container">
+                    <input type="hidden" asp-for="SelectedLabelsId" />
+                    <span class="material-symbols-outlined md-24 black select-togle-icon">
+                        label
+                    </span>
+                    <div id="select-labels"></div>
+                </div>
+            </div>
+        </div>
     </div>
-
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
         <button class="btn btn-ok js-create-submit-btn" type="button" data-target-id="create-task-form">Ok</button>

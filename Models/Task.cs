@@ -8,7 +8,9 @@ namespace ToDoAndNotes3.Models
         public int? TaskId { get; set; }
         public int? ProjectId { get; set; }
         [Required]
+        [MaxLength(150)]
         public string? Title { get; set; }
+        [MaxLength(1000)]
         public string? Description { get; set; } = default!;
         public bool IsCompleted { get; set; } = false;
         public bool IsDeleted { get; set; } = false;
