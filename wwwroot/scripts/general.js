@@ -84,18 +84,40 @@ var observerConfig = {
 // Start observing the document body
 observer.observe(document.body, observerConfig);
 
-// Date, time js-picker
-$(document).on('focus', '.js-picker', function (event) {
-    if (event.currentTarget.getAttribute('name').includes('Time')) {
-        event.currentTarget.type = "time";
+$(document).on('click', '.js-picker-preview', function (event) {
+    var dateSubstring = 'DueDate';
+    var datePickerElem = $(this).find('[name*="' + dateSubstring + '"]');
+
+    var timeSubstring = 'DueTime';
+    var timePickerElem = $(this).find('[name*="' + timeSubstring + '"]');
+
+    // if picker exists -> show
+    if (datePickerElem.length > 0) {
+        datePickerElem.attr('type', 'date');
+        datePickerElem.get(0).showPicker();
     }
-    else if (event.currentTarget.getAttribute('name').includes('Date')) {
-        event.currentTarget.type = "date";
+    else if (timePickerElem.length > 0) {
+        timePickerElem.attr('type', 'time');
+        timePickerElem.get(0).showPicker();
     }
-    event.currentTarget.showPicker();
 });
-$(document).on('blur', '.js-picker', function (event) {
-    if (!event.currentTarget.value) {
-        event.currentTarget.type = "text";
+
+$(document).on('blur', '.js-picker-preview', function (event) {
+    var dateSubstring = 'DueDate';
+    var datePickerElem = $(this).find('[name*="' + dateSubstring + '"]')
+
+    var timeSubstring = 'DueTime';
+    var timePickerElem = $(this).find('[name*="' + timeSubstring + '"]')
+
+    // if picker exists and empty -> to text type (to see placeholder)
+    if (datePickerElem.length > 0) {
+        if (datePickerElem.get(0).value.length < 1) {
+            datePickerElem.attr('type', 'text');
+        }
+    }
+    else if (timePickerElem.length > 0) {
+        if (timePickerElem.get(0).value.length < 1) {
+            timePickerElem.attr('type', 'text');
+        }
     }
 });

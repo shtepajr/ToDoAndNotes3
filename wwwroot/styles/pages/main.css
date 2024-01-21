@@ -6,9 +6,7 @@
     font-size: 16px;
 }
 
-::-webkit-scrollbar {
-    display: none;
-}
+
 
 html, body {
     height: 100%;
@@ -268,7 +266,7 @@ main {
     flex: 1;
     min-width: 0;
 }
-.tools-row{
+.tools-row {
     display: flex;
     margin-top: 2px;
     column-gap: 3px;

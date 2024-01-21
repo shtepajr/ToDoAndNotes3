@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -84,6 +85,9 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
                 return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Main") });
             }
+            // get data for select lists (asp-for approach for each field uncomfortable on view)
+            taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
+            taskLabels.Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList();
             return PartialView("Tasks/_CreatePartial", taskLabels);
         }
 

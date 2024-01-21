@@ -28,6 +28,7 @@
         multiple: true,
         placeholder: "Labels",
         optionsSelectedText: "labels selected",
+        hideClearButton: true,
     });
 
     var projectsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectProjects));
@@ -35,6 +36,7 @@
         ele: '#select-project',
         options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
         hideClearButton: true,
+        maxWidth: "100%",
     });
     document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
 
@@ -52,18 +54,17 @@
     });
 
     toggleTimeInputVisibility();
-    document.getElementById("Task_DueDate").addEventListener('change', toggleTimeInputVisibility);
+    document.getElementById('Task_DueDate').addEventListener('change', toggleTimeInputVisibility);
     function toggleTimeInputVisibility() {
-        var dateInput = document.getElementById("Task_DueDate");
-        var timeInput = document.getElementById("Task_DueTime");
+        var dateInput = document.getElementById('Task_DueDate');
+        var timePreview = document.querySelector('.js-time-preview');
 
-        // Check if the date input value is not empty
-        if (dateInput.value !== "") {
-            // Show the time input
-            timeInput.removeAttribute("hidden");
-        } else {
-            // Hide the time input
-            timeInput.setAttribute("hidden", "true");
+        if (dateInput.value.length < 1) {
+            timePreview.classList.add('d-none');
+
+        }
+        else if (dateInput.value.length > -1) {
+            timePreview.classList.remove('d-none');
         }
     }
 
@@ -88,34 +89,40 @@
     <input type="hidden" asp-for="Task.ProjectId" />
     <input type="hidden" asp-for="Task.IsCompleted" />
 
-    <div style="display: flex;">
-        <div>
+    <div class="task-body">
+        <div class="task-toggler">
             <span class="material-symbols-outlined md-24 is-done-btn" id="task-is-done">
                 radio_button_unchecked
             </span>
         </div>
-        <div style="flex: 1;">
+        <div class="task-content">
             <div>
                 <textarea asp-for="Task.Title" placeholder="Task name" class="input-borderless js-textarea-auto" rows="1"></textarea>
                 <span asp-validation-for="Task.Title"></span>
             </div>
-            <div>
+            <div class="d-flex">
+                <span class="material-symbols-outlined md-20 task-description-icon">
+                    subject
+                </span>
                 <textarea asp-for="Task.Description" placeholder="Description" class="input-borderless js-textarea-auto" rows="1"></textarea>
                 <span asp-validation-for="Task.Description"></span>
             </div>
-
-            <div style="display: flex;">
-                <div>
-                    <div>
-                        <input asp-for="Task.DueDate" class="picker js-picker" placeholder="Date" type="text" />
-                        <span asp-validation-for="Task.DueDate"></span>
-                    </div>
-                    <div>
-                        <input asp-for="Task.DueTime" hidden="true" class="picker js-picker" placeholder="Time" type="text" />
-                        <span asp-validation-for="Task.DueTime"></span>
-                    </div>
+            <div class="task-tools mt-1">
+                <div class="picker-preview js-picker-preview">
+                    <span class="material-symbols-outlined md-20 black picker-preview-icon">
+                        date_range
+                    </span>
+                    <input asp-for="Task.DueDate" class="picker js-picker" placeholder="Date/time" type="text" />
                 </div>
-                <div class="select-container">
+                <span asp-validation-for="Task.DueDate"></span>
+                <div class="picker-preview js-time-preview js-picker-preview">
+                    <span class="material-symbols-outlined md-20 black picker-preview-icon">
+                        access_time
+                    </span>
+                    <input asp-for="Task.DueTime" class="picker js-picker" placeholder="Time" type="text" />
+                </div>
+                <span asp-validation-for="Task.DueTime"></span>
+                <div class="labels-section select-container">
                     <input type="hidden" asp-for="SelectedLabelsId" />
                     <span class="material-symbols-outlined md-24 black select-togle-icon">
                         label
