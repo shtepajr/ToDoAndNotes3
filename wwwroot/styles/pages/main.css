@@ -262,14 +262,23 @@ main {
     align-self: baseline;
     margin-top: 2px;
 }
-.task-content, .note-content {
-    flex: 1;
-    min-width: 0;
-}
-.tools-row {
+.task .task-content, .note-content {
+        flex: 1;
+        min-width: 0;
+    }
+.task .task-content .tools-row, .note .note-content .tools-row {
     display: flex;
     margin-top: 2px;
     column-gap: 3px;
+}
+.task .task-content .tools-row .date-tools{
+    color: var(--dark-blue-tr-color);
+    display: flex;
+    min-width: 0;
+}
+.task .task-content .tools-row .label-tools {
+    color: var(--coral-color);
+    display: flex;
 }
 .note {
     max-height: 64px;

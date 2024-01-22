@@ -55,27 +55,55 @@
             {
                 <li class="task nav-link dropdown">
                     <a>
-                        <span class="material-symbols-outlined md-24 is-done-btn">
-                            radio_button_unchecked
-                        </span>
+                        @if (task.IsCompleted)
+                        {
+                            <span class="material-symbols-outlined md-24 is-done-btn">
+                                radio_button_checked
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="material-symbols-outlined md-24 is-done-btn">
+                                radio_button_unchecked
+                            </span>
+                        }
                         <div class="task-content">
                             <div class="nowrap-ellipsis">@task.Title</div>
                             <div class="tools-row">
-                                <div class="d-flex min-width-0">
-                                    <span class="material-symbols-outlined md-20 black">
-                                        date_range
-                                    </span>
-                                    <div class="nowrap-ellipsis">
-                                        6 nov
-                                    </div>
+                                <div class="date-tools">
+                                    @if(task?.DueDate != null){
+                                        <span class="material-symbols-outlined md-20">
+                                            date_range
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @task.DueDate
+                                        </div>
+                                    }
+                                    @if (task?.DueTime != null)
+                                    {
+                                        <span>&nbsp</span>
+                                        <span class="material-symbols-outlined md-20">
+                                            access_time
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @task.DueTime
+                                        </div>
+                                    }
                                 </div>
-                                <div class="d-flex">
-                                    <span class="material-symbols-outlined md-20 black">
-                                        label
-                                    </span>
-                                    <div class="nowrap-ellipsis">
-                                        Dev
-                                    </div>
+                                <div class="label-tools">
+                                    @foreach (var taskLabel in task?.TaskLabels.ToList())
+                                    {
+                                        <span class="material-symbols-outlined md-20">
+                                            label
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @taskLabel?.Label?.Title
+                                        </div>
+                                        @if (taskLabel != task?.TaskLabels.Last())
+                                        {
+                                            <span>,&nbsp</span>
+                                        }
+                                    }
                                 </div>
                             </div>
                         </div>

@@ -53,27 +53,34 @@ namespace ToDoAndNotes3.Controllers
 
                 if (daysViewName == DaysViewName.Upcoming)
                 {
-                    var projectsUpcomingInclude = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false)
-                        .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
-                    generalViewModel.Projects = projectsUpcomingInclude;
+                    var projectsUpcomingInclude = await _context.Projects
+                        .Where(p => p.UserId == userId)
+                        .Include(t => t.Tasks.Where(t => t.DueDate != null)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                        .Include(n => n.Notes.Where(n => n.DueDate != null)).ThenInclude(t => t.NoteLabels).ThenInclude(l => l.Label)
+                        .ToListAsync();
+                    generalViewModel.Projects = projectsUpcomingInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
 
-                    foreach (var project in projectsUpcomingInclude)
+                    foreach (var project in projectsUpcomingInclude) // but here using default project
                     {
-                        generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.DueDate != null));
-                        generalViewModel.Notes.AddRange(project.Notes.Where(t => t.DueDate != null));
+                        generalViewModel.Tasks.AddRange(project.Tasks);
+                        generalViewModel.Notes.AddRange(project.Notes);
                     }
                 }
                 else // today data by default
                 {
-                    var projectsTodayInclude = await _context.Projects.Where(p => p.UserId == userId)
-                        .Include(t => t.Tasks).Include(n => n.Notes).ToListAsync();
+                    var today = DateOnly.FromDateTime(DateTime.Now);
+
+                    var projectsTodayInclude = await _context.Projects
+                        .Where(p => p.UserId == userId)
+                        .Include(t => t.Tasks.Where(t => t.DueDate == today)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                        .Include(n => n.Notes.Where(n => n.DueDate == today)).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
+                        .ToListAsync();
                     generalViewModel.Projects = projectsTodayInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
 
-                    foreach (var project in projectsTodayInclude)
+                    foreach (var project in projectsTodayInclude) // but here using default project
                     {
-                        var today = DateOnly.FromDateTime(DateTime.Now);
-                        generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.DueDate == today));
-                        generalViewModel.Notes.AddRange(project.Notes.Where(t => t.DueDate == today));
+                        generalViewModel.Tasks.AddRange(project.Tasks);
+                        generalViewModel.Notes.AddRange(project.Notes);
                     }
                 }
             }
@@ -87,7 +94,8 @@ namespace ToDoAndNotes3.Controllers
 
                 var currentProjectInclude = _context.Projects
                     .Where(p => p.UserId == userId && p.ProjectId == currentProjectId)
-                    .Include(t => t.Tasks).Include(n => n.Notes)
+                    .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                    .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
                     .First();
 
                 generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
