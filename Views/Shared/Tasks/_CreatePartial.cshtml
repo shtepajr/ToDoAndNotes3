@@ -53,21 +53,6 @@
         document.querySelector('[name="Task.ProjectId"]').value = selectedProject;
     });
 
-    toggleTimeInputVisibility();
-    document.getElementById('Task_DueDate').addEventListener('change', toggleTimeInputVisibility);
-    function toggleTimeInputVisibility() {
-        var dateInput = document.getElementById('Task_DueDate');
-        var timePreview = document.querySelector('.js-time-preview');
-
-        if (dateInput.value.length < 1) {
-            timePreview.classList.add('d-none');
-
-        }
-        else if (dateInput.value.length > -1) {
-            timePreview.classList.remove('d-none');
-        }
-    }
-
     // is done toggle
     $('#task-is-done').on('click', function () {
         if (this.innerHTML.includes('radio_button_unchecked')) {
@@ -112,16 +97,22 @@
                     <span class="material-symbols-outlined md-20 black picker-preview-icon">
                         date_range
                     </span>
-                    <input asp-for="Task.DueDate" class="picker js-picker" placeholder="Date/time" type="text" />
+                    <input asp-for="Task.DueDate" class="picker js-picker js-blurable" placeholder="Date/time" id="create-task-due-date" />
+                    <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input" data-target-id="create-task-due-date">
+                        close
+                    </span>
+                    <span asp-validation-for="Task.DueDate"></span>
                 </div>
-                <span asp-validation-for="Task.DueDate"></span>
                 <div class="picker-preview js-time-preview js-picker-preview">
                     <span class="material-symbols-outlined md-20 black picker-preview-icon">
                         access_time
                     </span>
-                    <input asp-for="Task.DueTime" class="picker js-picker" placeholder="Time" type="text" />
+                    <input asp-for="Task.DueTime" class="picker js-picker js-blurable" placeholder="Time" id="create-task-due-time" />
+                    <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input" data-target-id="create-task-due-time">
+                        close
+                    </span>
+                    <span asp-validation-for="Task.DueTime"></span>
                 </div>
-                <span asp-validation-for="Task.DueTime"></span>
                 <div class="labels-section select-container">
                     <input type="hidden" asp-for="SelectedLabelsId" />
                     <span class="material-symbols-outlined md-24 black select-togle-icon">

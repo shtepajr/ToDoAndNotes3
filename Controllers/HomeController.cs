@@ -66,7 +66,7 @@ namespace ToDoAndNotes3.Controllers
                         generalViewModel.Notes.AddRange(project.Notes);
                     }
                 }
-                else // today data by default
+                else if (daysViewName == DaysViewName.Today)
                 {
                     var today = DateOnly.FromDateTime(DateTime.Now);
 
@@ -75,13 +75,28 @@ namespace ToDoAndNotes3.Controllers
                         .Include(t => t.Tasks.Where(t => t.DueDate == today)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
                         .Include(n => n.Notes.Where(n => n.DueDate == today)).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
                         .ToListAsync();
-                    generalViewModel.Projects = projectsTodayInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
+                    generalViewModel.Projects = projectsTodayInclude.Where(p => p.IsDefault == false).ToList();
 
-                    foreach (var project in projectsTodayInclude) // but here using default project
+                    foreach (var project in projectsTodayInclude)
                     {
                         generalViewModel.Tasks.AddRange(project.Tasks);
                         generalViewModel.Notes.AddRange(project.Notes);
                     }
+                }
+                else if (daysViewName == DaysViewName.Unsorted)
+                {
+                    // load projects list separately to save resources
+                    var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
+                    generalViewModel.Projects = projects.Where(p => p.IsDefault == false).ToList();
+
+                    var currentProjectInclude = _context.Projects
+                        .Where(p => p.UserId == userId && p.ProjectId == defaultProject.ProjectId)
+                        .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                        .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
+                        .First();
+
+                    generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
+                    generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
                 }
             }
             else
@@ -89,8 +104,9 @@ namespace ToDoAndNotes3.Controllers
                 TempData["DaysViewName"] = null;
                 TempData["CurrentProjectId"] = currentProjectId;
                 // authorization
-                var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
-                generalViewModel.Projects = projects;
+                // load projects list separately to save resources
+                var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
+                generalViewModel.Projects = projects.Where(p => p.IsDefault == false).ToList();
 
                 var currentProjectInclude = _context.Projects
                     .Where(p => p.UserId == userId && p.ProjectId == currentProjectId)

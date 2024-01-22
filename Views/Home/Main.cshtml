@@ -3,6 +3,18 @@
 @{
     Layout = "_MainLayout";
     ViewData["Title"] = "Main";
+
+
+    var viewName = TempData["DaysViewName"];
+    TempData.Keep("DaysViewName");
+
+    if (viewName == null)
+    {
+        var projectId = TempData["CurrentProjectId"] as int?;
+        TempData.Keep("CurrentProjectId");
+        var title = Model.Projects.FirstOrDefault(p => p.ProjectId == projectId)?.Title;
+        viewName = (title != null) ? title : "Unsorted";
+    }
 }
 
 @section Header 
@@ -17,7 +29,7 @@
 <main id="main">
     <div class="main-header">
         <div class="main-header-left">
-            <div class="main-header-title">Today</div>
+            <div class="main-header-title">@viewName</div>
             <div class="main-header-buttons">
                 <button class="btn btn-action js-modal-btn" data-target-id="create-task-modal">
                     <span class="material-symbols-outlined md-30">

@@ -268,20 +268,22 @@ a.btn-default, button.btn-default {
 .picker-preview.d-none{
     display: none;
 }
-.picker-preview-hide {
-    display: none;
-    position: relative;
-}
 .picker-preview .picker-preview-icon {
     position: absolute;
     left: 5px;
     top: 5px;
     cursor: pointer;
 }
+.picker-preview .picker-clear-icon {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
 .picker-preview .picker {
     max-width: 150px;
     padding: 3px;
     padding-left: 25px;
+    padding-right: 25px;
     background-color: var(--transparent-color);
     border-radius: 5px;
     border: 2px solid var(--light-green-color);
