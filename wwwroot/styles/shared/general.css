@@ -255,6 +255,12 @@ a.btn-default, button.btn-default {
     column-gap: 5px;
     row-gap: 5px;
 }
+.modal .modal-body .task-tools .date-time-picker {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 5px;
+    row-gap: 5px;
+}
 .modal .modal-body .task-tools .labels-section {
     border: 2px solid var(--coral-color);
     border-radius: 5px;
@@ -280,7 +286,7 @@ a.btn-default, button.btn-default {
     top: 5px;
 }
 .picker-preview .picker {
-    max-width: 150px;
+    width: 155px;
     padding: 3px;
     padding-left: 25px;
     padding-right: 25px;

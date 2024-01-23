@@ -229,22 +229,5 @@ $(function () {
             }, 200);
         }
     }
-    $(document).on('click', '.js-clear-input', function (event) {
-        let targetId = $(this).data('target-id');
-        if (targetId.includes('create-task-due-time') || targetId.includes('create-task-due-date')) {
-            let targetElem = $(`#${targetId}`);
-            targetElem.val('');
-            targetElem.trigger('change')
-            targetElem.trigger('blur');
-        }
-        event.stopPropagation();
-    });
-    $(document).on('change', '#create-task-due-date', function () {
-        if ($(this).val() < 1) {
-            $('.js-time-preview').addClass('d-none');
-        }
-        else {
-            $('.js-time-preview').removeClass('d-none');
-        }
-    });
+
 });

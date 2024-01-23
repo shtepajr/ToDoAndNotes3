@@ -2,8 +2,8 @@
     var observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (mutation) {
             if (mutation.addedNodes.length > 0) {
-                setTimeout(setAutoTextAreaHandlers, 100);
-                setTimeout(triggerBlurable, 4);
+                setAutoTextAreaHandlers();
+                loadDateTimePicker();
             }
         });
     });
@@ -23,9 +23,6 @@
             area.addEventListener('focus', autoGrow);
             area.addEventListener('input', autoGrow);
         });
-    }
-    function triggerBlurable() {
-        $('.js-blurable').trigger('blur');
     }
 
     $(document).on('click', function (event) {
@@ -79,40 +76,65 @@
         let modal = document.getElementById($(this).attr('data-target-id'));
         modal.style.display = 'block';
     });
-    $(document).on('click', '.js-picker-preview', function (event) {
-        var dateSubstring = 'DueDate';
-        var datePickerElem = $(this).find('[name*="' + dateSubstring + '"]');
 
-        var timeSubstring = 'DueTime';
-        var timePickerElem = $(this).find('[name*="' + timeSubstring + '"]');
+    function loadDateTimePicker() {
+        let dateTimePicker = $('.js-date-time-picker');
 
-        // if picker exists -> show
-        if (datePickerElem.length > 0) {
-            datePickerElem.attr('type', 'date');
-            datePickerElem.get(0).showPicker();
-        }
-        else if (timePickerElem.length > 0) {
-            timePickerElem.attr('type', 'time');
-            timePickerElem.get(0).showPicker();
-        }
-    });
-    $(document).on('blur', '.js-picker-preview', function (event) {
-        var dateSubstring = 'DueDate';
-        var datePickerElem = $(this).find('[name*="' + dateSubstring + '"]')
+        let datePicker = dateTimePicker.find('.js-date-picker');
+        let datePickerInput = datePicker.find('.js-picker-input');
 
-        var timeSubstring = 'DueTime';
-        var timePickerElem = $(this).find('[name*="' + timeSubstring + '"]')
+        let timePicker = dateTimePicker.find('.js-time-picker');
+        let timePickerInput = timePicker.find('.js-picker-input');
 
-        // if picker exists and empty -> to text type (to see placeholder)
-        if (datePickerElem.length > 0) {
-            if (datePickerElem.get(0).value.length < 1) {
-                datePickerElem.attr('type', 'text');
+        dateTimePicker.trigger('blur');
+        dateTimePicker.find('.js-date-picker').on('change', function () {
+            dateTimePicker.trigger('blur');
+        }); 
+        dateTimePicker.on('blur', function () {
+            // if date is not selected -> hide time picker
+            if (datePickerInput.val() < 1) {
+                timePickerInput.val('');
+                timePicker.css('display', 'none');
+                datePickerInput.attr('type', 'text');
+                datePickerInput.prop('readonly', true);
             }
-        }
-        else if (timePickerElem.length > 0) {
-            if (timePickerElem.get(0).value.length < 1) {
-                timePickerElem.attr('type', 'text');
+            else { // if date is selected -> show time picker
+                timePicker.css('display', 'block');
+                timePickerInput.attr('type', 'text');
+                timePickerInput.prop('readonly', true);
             }
-        }
-    });
+        });
+
+        dateTimePicker.find('.js-date-picker').on('click', function () {
+            if (datePickerInput.length > 0) {
+                datePickerInput.prop('readonly', false);
+                datePickerInput.attr('type', 'date');
+                datePickerInput.get(0).showPicker();
+            }
+        });
+        dateTimePicker.find('.js-time-picker').on('click', function () {
+            if (timePickerInput.length > 0) {
+                timePickerInput.prop('readonly', false);
+                timePickerInput.attr('type', 'time');
+                timePickerInput.get(0).showPicker();
+            }
+        });
+
+        datePicker.find('.js-clear-input').on('click', function (event) {
+            event.stopPropagation();
+            datePickerInput.val('');
+            dateTimePicker.trigger('blur');
+        });
+        timePicker.find('.js-clear-input').on('click', function (event) {
+            event.stopPropagation();
+            timePickerInput.val('');
+            dateTimePicker.trigger('blur');
+        });
+        datePickerInput.on('blur', function () {
+            dateTimePicker.trigger('blur');
+        });
+        timePickerInput.on('blur', function () {
+            dateTimePicker.trigger('blur');
+        });
+    }
 });
