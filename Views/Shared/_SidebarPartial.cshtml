@@ -43,13 +43,15 @@
     <nav class="projects">
         <div class="projects-preview">
             <p>Projects</p>
-            <button class="btn btn-plus js-modal-btn" data-target-id="create-project-modal">
-                <span class="material-symbols-outlined md-24">
-                    add
-                </span>
-            </button>
+            <form asp-controller="Projects" asp-action="CreatePartial" method="get">
+                <button class="btn btn-plus js-modal-btn" data-target-modal-id="create-project-modal" type="button">
+                    <span class="material-symbols-outlined md-24">
+                        add
+                    </span>
+                </button>
+            </form>
             @* modal (ajax request content) *@
-            <div id="create-project-modal" class="modal">
+            <div id="create-project-modal" class="modal js-modal">
             </div>
         </div>
         <ul class="projects-list">
@@ -58,26 +60,29 @@
                 <li class="project nav-link dropdown">
                     <a asp-controller="Home" asp-action="Main" asp-route-currentProjectId="@project.ProjectId">
                         <div class="nowrap-ellipsis">@project.Title</div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="project-dropdown-content-@project.ProjectId">
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-dropdown-content-id="project-dropdown-content" data-target-id="@project.ProjectId">
                             more_horiz
                         </span>
                     </a>
-                    <div class="dropdown-content js-dropdown-content" id="project-dropdown-content-@project.ProjectId">
-                        <a class="btn js-modal-btn" data-target-id="edit-project-modal-@project.ProjectId">
-                            Edit
-                        </a>
-                        <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@project.ProjectId">
-                            <button class="btn" type="submit">Duplicate</button>
-                        </form>
-                        <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@project.ProjectId">
-                            <button class="btn" type="submit">Remove</button>
-                        </form>
-                    </div>
                 </li>
                 @* modal (ajax request content) *@
-                <div id="edit-project-modal-@project.ProjectId" class="modal">
+                <div id="edit-project-modal" class="modal">
                 </div>
             }
+            <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
+                <form asp-controller="Projects" asp-action="EditPartial" method="get">
+                    <input name="id" hidden />
+                    <button class="btn js-modal-btn" data-target-modal-id="edit-project-modal" type="button">Edit</button>
+                </form>
+                <form asp-controller="Projects" asp-action="Duplicate">
+                    <input name="id" hidden />
+                    <button class="btn" type="submit">Duplicate</button>
+                </form>
+                <form asp-controller="Projects" asp-action="SoftDelete">
+                    <input name="id" hidden />
+                    <button class="btn" type="submit">Remove</button>
+                </form>
+            </div>
         </ul>
     </nav>
 </aside>

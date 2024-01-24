@@ -302,8 +302,8 @@ a.btn-default, button.btn-default {
 
 /* Dropdown */
 .dropdown {
-    position: relative;
-    float: right;
+    /*position: relative;*/
+    /*float: left;*/
 }
 .dropdown-content {
     display: none;

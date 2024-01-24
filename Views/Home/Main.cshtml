@@ -31,13 +31,15 @@
         <div class="main-header-left">
             <div class="main-header-title">@viewName</div>
             <div class="main-header-buttons">
-                <button class="btn btn-action js-modal-btn" data-target-id="create-task-modal">
-                    <span class="material-symbols-outlined md-30">
-                        add_task
-                    </span>
-                </button>
+                <form asp-controller="Tasks" asp-action="CreatePartial" method="get">
+                    <button class="btn btn-action js-modal-btn" data-target-modal-id="create-task-modal" type="button">
+                        <span class="material-symbols-outlined md-30">
+                            add_task
+                        </span>
+                    </button>
+                </form>
                 @* modal (ajax request content) *@
-                <div id="create-task-modal" class="modal">
+                <div id="create-task-modal" class="modal js-modal">
                 </div>
                 <button class="btn btn-action js-modal-btn" data-target-id="add-note-modal">
                     <span class="material-symbols-outlined md-30">
@@ -119,16 +121,16 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-target-id="task-@task.TaskId">
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-dropdown-content-id="task-dropdown-content" data-target-id="@task?.TaskId">
                             more_horiz
                         </span>
                     </a>
-                    <div class="dropdown-content js-dropdown-content" id="task-@task.TaskId">
-                        <a href="#Edit">Edit</a>
-                        <a href="#Remove">Remove</a>
-                    </div>
                 </li>
             }
+            <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
+                <a href="#Edit">Edit</a>
+                <a href="#Remove">Remove</a>
+            </div>
         </ul>
         <ul class="notes">
             @for (int i = 0; i < 30; i++)

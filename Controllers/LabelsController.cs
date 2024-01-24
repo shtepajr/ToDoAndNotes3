@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 
@@ -101,21 +102,24 @@ namespace ToDoAndNotes3.Controllers
         // POST: Labels/ConfirmDelete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl)
+        public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var label = await _context.Labels.FindAsync(id);
-            if (label == null)
+            var labelInclude = _context.Labels.Where(l => l.LabelId == id).Include(tl => tl.TaskLabels).FirstOrDefault();
+
+            if (labelInclude == null)
             {
                 return NotFound();
             }
-            _context.Labels.Remove(label);
+
+            _context.Labels.Remove(labelInclude);
             await _context.SaveChangesAsync();
-            return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction(nameof(HomeController.Main), "Home");
+
+            return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Labels), "Home") });
         }
         private bool LabelExists(int? id)
         {

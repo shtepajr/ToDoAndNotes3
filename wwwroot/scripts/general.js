@@ -41,39 +41,40 @@
     });
 
     $(document).on('click', '.js-dropdown-btn', function (event) {
-        // move dropdown-content to the body because parent container has overflow: auto (doesn't allow dropdown overlap parent)
-        event.preventDefault(); // parent <a> will not work
-        let dropdowns = document.getElementsByClassName('js-dropdown-content');
-        Array.from(dropdowns).forEach(function (dropdown) {
-            var oldParent = dropdown.parentNode;
-            if (oldParent) {
-                oldParent.removeChild(dropdown);
-            }
-            document.body.appendChild(dropdown);
+        event.preventDefault(); // parent <a> will not work  
+
+        let dropContentId = $(this).data('dropdown-content-id');
+
+        // get target id (e.g ProjectId)
+        let targetId = $(this).data('target-id');
+        let dropContent = $(`#${dropContentId}`);
+
+        // set target id (e.g <form asp-controller="Projects" asp-action="Duplicate"> <input name="id" hidden />)
+        let forms = dropContent.find('form');
+        forms.each(function () {
+            var formTargetInput = $(this).find('input[name="id"]');
+            formTargetInput.val(targetId);
         });
 
         // show
-        let dropdown = document.getElementById($(this).attr('data-target-id'));
-        dropdown.style.top = event.clientY + 10 + "px";
-        dropdown.style.left = event.clientX + "px";
-        dropdown.classList.toggle('show');
+        dropContent.css('top', event.clientY + 10 + "px");
+        dropContent.css('left', event.clientX + "px");
 
-        if (event.clientY + dropdown.clientHeight > window.visualViewport.height) {
-            dropdown.style.top = event.clientY - dropdown.clientHeight + "px";
+        if (event.clientY + dropContent.outerHeight() > window.visualViewport.height) {
+            dropContent.css('top', event.clientY - dropContent.outerHeight() + "px");
         }
-        if (event.clientX + dropdown.clientWidth > window.visualViewport.width) {
-            dropdown.style.left = event.clientX - dropdown.clientWidth + "px";
+        if (event.clientX + dropContent.outerWidth() > window.visualViewport.width) {
+            dropContent.css('left', event.clientX - dropContent.outerWidth() + "px");
         }
 
-        // hide previous dropdown
-        for (let olddropdown of dropdowns) {
-            if (olddropdown.id !== dropdown.id) {
-                olddropdown.classList.remove('show');
-            }
-        }
+        dropContent.toggleClass('show');
+
+        $(document).find('.js-dropdown-content').not(dropContent).each(function () {
+            $(this).removeClass('show');
+        });
     });
     $(document).on('click', '.js-modal-btn', function () {
-        let modal = document.getElementById($(this).attr('data-target-id'));
+        let modal = document.getElementById($(this).attr('data-target-modal-id'));
         modal.style.display = 'block';
     });
 

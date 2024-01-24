@@ -11,7 +11,7 @@
     </div>
 }
 
-<form id="create-project-form">
+<form asp-controller="Projects" asp-action="CreatePartial" method="post">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="IsDeleted"/>
@@ -23,6 +23,6 @@
     </div>
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
-        <button class="btn btn-ok js-create-submit-btn" type="button" data-target-id="create-project-form">Ok</button>
+        <button class="btn btn-ok js-submit-btn" type="button">Ok</button>
     </div>
 </form>
