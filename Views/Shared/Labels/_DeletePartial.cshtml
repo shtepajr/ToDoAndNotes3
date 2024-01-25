@@ -11,10 +11,8 @@
 }
 
 <div>Are you sure you want to delete <strong>"@Model.Title"</strong> label?</div>
-<form asp-controller="Labels" asp-action="Delete" method="post">
+<form asp-controller="Labels" asp-action="Delete" method="post" asp-route-id="@Model.LabelId" asp-route-returnUrl="@Url.Action("Labels", "Home")">
     @Html.AntiForgeryToken()
-    <input name="id" value="@Model.LabelId" hidden />
-    <input name="returnUrl" value="@Url.Action("Labels", "Home")" hidden/>
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
         <button class="btn btn-ok js-submit-btn" type="button">Ok</button>

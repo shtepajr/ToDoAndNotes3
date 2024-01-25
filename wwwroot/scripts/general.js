@@ -49,11 +49,16 @@
         let targetId = $(this).data('target-id');
         let dropContent = $(`#${dropContentId}`);
 
-        // set target id (e.g <form asp-controller="Projects" asp-action="Duplicate"> <input name="id" hidden />)
         let forms = dropContent.find('form');
         forms.each(function () {
-            var formTargetInput = $(this).find('input[name="id"]');
-            formTargetInput.val(targetId);
+            let currentAction = $(this).attr('action');
+
+            if (currentAction.includes('id=')) {
+                let updatedAction = currentAction.replace(/id=[^\/]+/, 'id=' + targetId);
+                $(this).attr('action', updatedAction);
+            } else {
+                $(this).attr('action', currentAction + (currentAction.includes('?') ? '&' : '?') + 'id=' + targetId);
+            }
         });
 
         // show

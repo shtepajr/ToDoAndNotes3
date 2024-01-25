@@ -23,7 +23,6 @@ $(function () {
         let parentForm = $(this).closest('form');
         let formMethod = parentForm.attr('method');
         let formAction = parentForm.attr('action');
-        let targetId = parentForm.find('input[name="id"]').val();
 
         // GET: create/edit project partial
         // GET: create/edit/delete label partial
@@ -31,7 +30,6 @@ $(function () {
         $.ajax({
             url: formAction,
             type: formMethod,
-            data: { id: targetId },
             success: function (result) {
                 $(`#${targetModalId}`).html(result);
             }
