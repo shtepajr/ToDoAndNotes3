@@ -27,7 +27,8 @@
         options: labelsOptions.map(option => ({ label: option.text, value: option.value })),
         multiple: true,
         placeholder: "Labels",
-        optionsSelectedText: "labels selected",
+        optionsSelectedText: "labels",
+        optionSelectedText: "label",
         hideClearButton: true,
     });
 
@@ -36,7 +37,6 @@
         ele: '#select-project',
         options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
         hideClearButton: true,
-        maxWidth: "100%",
     });
     document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
 
@@ -94,21 +94,21 @@
             </div>
             <div class="task-tools mt-1">
                 <div class="date-time-picker js-date-time-picker">
-                    <div class="picker-preview js-date-picker">
+                    <div class="picker-preview date-picker js-date-picker">
                         <span class="material-symbols-outlined md-20 black picker-preview-icon">
                             date_range
                         </span>
-                        <input asp-for="Task.DueDate" class="picker js-picker-input" placeholder="Date/time"/>
+                        <input asp-for="Task.DueDate" class="picker-input js-picker-input" placeholder="Date/time"/>
                         <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
                             close
                         </span>
                         <span asp-validation-for="Task.DueDate"></span>
                     </div>
-                    <div class="picker-preview js-time-picker">
+                    <div class="picker-preview time-picker js-time-picker">
                         <span class="material-symbols-outlined md-20 black picker-preview-icon">
                             access_time
                         </span>
-                        <input asp-for="Task.DueTime" class="picker js-picker-input" placeholder="Time" />
+                        <input asp-for="Task.DueTime" class="picker-input js-picker-input" placeholder="Time" />
                         <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
                             close
                         </span>

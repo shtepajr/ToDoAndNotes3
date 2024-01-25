@@ -83,8 +83,15 @@
         modal.style.display = 'block';
     });
 
+    function hasEventHandler(element, eventType) {
+        let handlers = $._data(element.get(0), 'events');
+        return handlers && handlers[eventType] && handlers[eventType].length > 0;
+    }
     function loadDateTimePicker() {
         let dateTimePicker = $('.js-date-time-picker');
+        if (dateTimePicker.length === 0 || hasEventHandler(dateTimePicker, 'blur')) {
+            return;
+        }
 
         let datePicker = dateTimePicker.find('.js-date-picker');
         let datePickerInput = datePicker.find('.js-picker-input');

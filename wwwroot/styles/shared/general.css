@@ -69,22 +69,32 @@
 
 /* Visual Select custom */
 .modal .vscomp-toggle-button {
-    padding-left: 26px;
+    padding-left: 28px;
     background-color: var(--transparent-color);
-    border: 0;
+    border: 2px solid var(--transparent-color);
+    border-radius: 5px;
+    height: 35px;
+    max-width: 100%;
+}
+.modal .modal-body .task-tools .labels-section .vscomp-toggle-button {
+    border-color: var(--coral-color);
 }
 .modal .vscomp-arrow {
     display: none;
 }
 .select-container {
     position: relative;
-    max-width: 305px;
-    width: 75%;
 }
 .select-togle-icon {
     position: absolute;
-    left: 2px;
+    left: 5px;
     top: 5px;
+}
+.modal .modal-content .modal-header .modal-header-left .select-container {
+    width: 100%;
+}
+.modal .modal-body .task-tools .labels-section.select-container {
+    width: 150px;
 }
 
 /* Google material */
@@ -255,39 +265,33 @@ a.btn-default, button.btn-default {
     column-gap: 5px;
     row-gap: 5px;
 }
-.modal .modal-body .task-tools .date-time-picker {
+.modal .modal-body .task-tools .labels-section {
+}
+
+/* Picker */
+.date-time-picker {
     display: flex;
     flex-wrap: wrap;
     column-gap: 5px;
     row-gap: 5px;
 }
-.modal .modal-body .task-tools .labels-section {
-    border: 2px solid var(--coral-color);
-    border-radius: 5px;
-}
-
-/* Picker */
-.picker-preview {
+.date-time-picker .picker-preview {
     display: flex;
     position: relative;
 }
-.picker-preview.d-none{
-    display: none;
-}
-.picker-preview .picker-preview-icon {
+.date-time-picker .picker-preview .picker-preview-icon {
     position: absolute;
     left: 5px;
-    top: 5px;
+    top: 7px;
     cursor: pointer;
 }
-.picker-preview .picker-clear-icon {
+.date-time-picker .picker-preview .picker-clear-icon {
     position: absolute;
     right: 5px;
-    top: 5px;
+    top: 7px;
 }
-.picker-preview .picker {
-    width: 155px;
-    padding: 3px;
+.date-time-picker .picker-preview .picker-input {
+    height: 35px;
     padding-left: 25px;
     padding-right: 25px;
     background-color: var(--transparent-color);
@@ -296,7 +300,13 @@ a.btn-default, button.btn-default {
     outline: 0;
     cursor: pointer;
 }
-.picker-preview .picker::-webkit-calendar-picker-indicator {
+.date-time-picker .date-picker .picker-input {
+    width: 150px;
+}
+.date-time-picker .time-picker .picker-input {
+    width: 115px;
+}
+.date-time-picker .picker-preview .picker-input::-webkit-calendar-picker-indicator {
     display: none;
 }
 
