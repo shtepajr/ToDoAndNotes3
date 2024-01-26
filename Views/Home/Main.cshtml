@@ -83,13 +83,13 @@
                         }
                         <div class="task-content">
                             <div class="nowrap-ellipsis">@task.Title</div>
-                            <div class="tools-row">
+                            <div class="tools">
                                 <div class="date-tools">
                                     @if(task?.DueDate != null){
                                         <span class="material-symbols-outlined md-20">
                                             date_range
                                         </span>
-                                        <div class="nowrap-ellipsis">
+                                        <div>
                                             @task.DueDate
                                         </div>
                                     }
@@ -99,23 +99,35 @@
                                         <span class="material-symbols-outlined md-20">
                                             access_time
                                         </span>
-                                        <div class="nowrap-ellipsis">
+                                        <div>
                                             @task.DueTime
                                         </div>
                                     }
                                 </div>
                                 <div class="label-tools">
-                                    @foreach (var taskLabel in task?.TaskLabels.ToList())
+                                    @if (task?.TaskLabels?.ToList().Count > 1)
                                     {
                                         <span class="material-symbols-outlined md-20">
                                             label
                                         </span>
-                                        <div class="nowrap-ellipsis">
-                                            @taskLabel?.Label?.Title
+                                        <div>
+                                            @task?.TaskLabels.ToList().Count
                                         </div>
-                                        @if (taskLabel != task?.TaskLabels.Last())
+                                    }
+                                    else if (task?.TaskLabels?.ToList().Count == 1)
+                                    {
+                                        @foreach (var taskLabel in task?.TaskLabels?.ToList())
                                         {
-                                            <span>,&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                label
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @taskLabel?.Label?.Title
+                                            </div>
+                                            @if (taskLabel != task?.TaskLabels.Last())
+                                            {
+                                                <span>,&nbsp</span>
+                                            }
                                         }
                                     }
                                 </div>
@@ -140,7 +152,7 @@
                         <div class="note-content">
                             <div class="nowrap-ellipsis">Note Lorem Ipsum is simply dummy text of the @i</div>
                             <div class="nowrap-ellipsis note-description">Lorem Ipsum is simply dummy text of the printing and typesetting</div>
-                            <div class="tools-row">
+                            <div class="tools">
                                 <div class="d-flex min-width-0">
                                     <span class="material-symbols-outlined md-20 black">
                                         date_range

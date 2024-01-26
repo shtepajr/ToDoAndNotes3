@@ -1,30 +1,4 @@
 ﻿$(function () {
-    var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            if (mutation.addedNodes.length > 0) {
-                setAutoTextAreaHandlers();
-                loadDateTimePicker();
-            }
-        });
-    });
-    var observerConfig = {
-        childList: true,
-        subtree: true
-    };
-    observer.observe(document.body, observerConfig);
-
-    function setAutoTextAreaHandlers() {
-        function autoGrow(event) {
-            event.currentTarget.style.height = "5px";
-            event.currentTarget.style.height = (event.currentTarget.scrollHeight) + "px";
-        }
-        let areas = document.getElementsByClassName('js-textarea-auto');
-        Array.from(areas).forEach(function (area) {
-            area.addEventListener('focus', autoGrow);
-            area.addEventListener('input', autoGrow);
-        });
-    }
-
     $(document).on('click', function (event) {
         if (!event.target.classList.contains('js-dropdown-btn')) {
             let dropdowns = document.getElementsByClassName('js-dropdown-content');
@@ -39,7 +13,6 @@
             }
         }
     });
-
     $(document).on('click', '.js-dropdown-btn', function (event) {
         event.preventDefault(); // parent <a> will not work  
 
@@ -83,71 +56,59 @@
         modal.style.display = 'block';
     });
 
-    function hasEventHandler(element, eventType) {
-        let handlers = $._data(element.get(0), 'events');
-        return handlers && handlers[eventType] && handlers[eventType].length > 0;
+    // Text area auto grow
+    function autoGrow(event) {
+        var textarea = $(event.currentTarget);
+        textarea.css('height', textarea[0].scrollHeight + 'px');
     }
-    function loadDateTimePicker() {
-        let dateTimePicker = $('.js-date-time-picker');
-        if (dateTimePicker.length === 0 || hasEventHandler(dateTimePicker, 'blur')) {
-            return;
+    $(document).on('focus input', '.js-textarea-auto', autoGrow);
+    $(document).on('click', '.js-date-picker', function () {
+        let datePickerInput = $(this).find('.js-picker-input');
+
+        if (datePickerInput.length > 0) {
+            datePickerInput.prop('readonly', false);
+            datePickerInput.attr('type', 'date');
+            datePickerInput.get(0).showPicker();
         }
+    });
+    $(document).on('click', '.js-time-picker', function () {
+        let timePickerInput = $(this).find('.js-picker-input');
 
-        let datePicker = dateTimePicker.find('.js-date-picker');
-        let datePickerInput = datePicker.find('.js-picker-input');
+        if (timePickerInput.length > 0) {
+            timePickerInput.prop('readonly', false);
+            timePickerInput.attr('type', 'time');
+            timePickerInput.get(0).showPicker();
+        }
+    });
+    $(document).on('click', '.js-clear-input',  function (event) {
+        event.stopPropagation();
+        let currentInput = $(this).siblings('.js-picker-input');
+        currentInput.val('');
+        currentInput.trigger('change');
+        $(this).css('display', 'none');
+    });
+    $(document).on('blur change', '.js-picker-input', function () {
+        let closestClearBtn = $(this).siblings('.js-clear-input');
+        let currentDateTimePicker = $(this).closest('.js-date-time-picker');
 
-        let timePicker = dateTimePicker.find('.js-time-picker');
-        let timePickerInput = timePicker.find('.js-picker-input');
-
-        dateTimePicker.trigger('blur');
-        dateTimePicker.find('.js-date-picker').on('change', function () {
-            dateTimePicker.trigger('blur');
-        }); 
-        dateTimePicker.on('blur', function () {
-            // if date is not selected -> hide time picker
-            if (datePickerInput.val() < 1) {
-                timePickerInput.val('');
-                timePicker.css('display', 'none');
-                datePickerInput.attr('type', 'text');
-                datePickerInput.prop('readonly', true);
+        // if input empty
+        if ($(this).val() < 1 || $(this).val() === '') {
+            // check if it is date => then hide time picker + make input text to see placeholder
+            // check if it is time => make input text to see placeholder
+            if ($(this).attr('type') === 'date') {
+                currentDateTimePicker.find('.js-time-picker').css('display', 'none');
+                $(this).attr('type', 'text');
             }
-            else { // if date is selected -> show time picker
-                timePicker.css('display', 'block');
-                timePickerInput.attr('type', 'text');
-                timePickerInput.prop('readonly', true);
-            }
-        });
-
-        dateTimePicker.find('.js-date-picker').on('click', function () {
-            if (datePickerInput.length > 0) {
-                datePickerInput.prop('readonly', false);
-                datePickerInput.attr('type', 'date');
-                datePickerInput.get(0).showPicker();
-            }
-        });
-        dateTimePicker.find('.js-time-picker').on('click', function () {
-            if (timePickerInput.length > 0) {
-                timePickerInput.prop('readonly', false);
-                timePickerInput.attr('type', 'time');
-                timePickerInput.get(0).showPicker();
-            }
-        });
-
-        datePicker.find('.js-clear-input').on('click', function (event) {
-            event.stopPropagation();
-            datePickerInput.val('');
-            dateTimePicker.trigger('blur');
-        });
-        timePicker.find('.js-clear-input').on('click', function (event) {
-            event.stopPropagation();
-            timePickerInput.val('');
-            dateTimePicker.trigger('blur');
-        });
-        datePickerInput.on('blur', function () {
-            dateTimePicker.trigger('blur');
-        });
-        timePickerInput.on('blur', function () {
-            dateTimePicker.trigger('blur');
-        });
-    }
+            else if ($(this).attr('type') === 'time') {
+                $(this).attr('type', 'text');
+            }         
+           
+            $(this).prop('readonly', true);
+            closestClearBtn.css('display', 'none');
+        }
+        else {
+            closestClearBtn.css('display', 'block');
+            currentDateTimePicker.find('.js-time-picker').css('display', 'block');;
+        }
+    });
 });

@@ -126,7 +126,7 @@ namespace ToDoAndNotes3.Controllers
         {
             ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
             string? userId = _userManager.GetUserId(User);
-            var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
+            var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
             var labels = await _context.Labels.Where(p => p.UserId == userId).ToListAsync();
             projectLabelViewModel.Projects = projects;
             projectLabelViewModel.Labels = labels;

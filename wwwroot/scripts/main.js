@@ -32,6 +32,7 @@ $(function () {
             type: formMethod,
             success: function (result) {
                 $(`#${targetModalId}`).html(result);
+                $(`#${targetModalId}`).find('.js-picker-input').trigger('blur');
             }
         });
     });
