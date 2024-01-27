@@ -105,31 +105,46 @@
                                     }
                                 </div>
                                 <div class="label-tools">
-                                    @if (task?.TaskLabels?.ToList().Count > 1)
+                                    <span class="material-symbols-outlined md-20">
+                                        label
+                                    </span>
+                                    @foreach (var taskLabel in task?.TaskLabels?.ToList())
                                     {
-                                        <span class="material-symbols-outlined md-20">
-                                            label
-                                        </span>
-                                        <div>
-                                            @task?.TaskLabels.ToList().Count
+                                        <div class="tools-label">
+                                            <div class="nowrap-ellipsis">
+                                                @taskLabel?.Label?.Title
+                                            </div>
+                                        </div>
+                                    }
+@*                                     @if (task?.TaskLabels?.ToList().Count > 1)
+                                    {
+                                        <div class="tools-label">
+                                            <span class="material-symbols-outlined md-20">
+                                                label
+                                            </span>
+                                            <div>
+                                                @task?.TaskLabels.ToList().Count
+                                            </div>
                                         </div>
                                     }
                                     else if (task?.TaskLabels?.ToList().Count == 1)
                                     {
                                         @foreach (var taskLabel in task?.TaskLabels?.ToList())
                                         {
-                                            <span class="material-symbols-outlined md-20">
-                                                label
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                @taskLabel?.Label?.Title
+                                            <div class="tools-label">
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                                <div class="nowrap-ellipsis">
+                                                    @taskLabel?.Label?.Title
+                                                </div>
+                                                @if (taskLabel != task?.TaskLabels.Last())
+                                                {
+                                                    <span>,&nbsp</span>
+                                                }
                                             </div>
-                                            @if (taskLabel != task?.TaskLabels.Last())
-                                            {
-                                                <span>,&nbsp</span>
-                                            }
                                         }
-                                    }
+                                    } *@
                                 </div>
                             </div>
                         </div>
