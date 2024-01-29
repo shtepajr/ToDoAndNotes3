@@ -108,7 +108,7 @@ $(function () {
         labelsToHide.remove();  // if 1 + label
 
         if (labelsCount > 1) {
-            $(this).append('+' + labelsCount);
+            $(this).append('+' + (labelsCount - 1));
         }
         else {
             $(this).html(''); // empty if there is not labels

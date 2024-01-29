@@ -20,51 +20,54 @@
 }
 
 <script>
-    var labelsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
-    // VirtualSelect config
-    VirtualSelect.init({
-        ele: '#select-labels',
-        options: labelsOptions.map(option => ({ label: option.text, value: option.value })),
-        multiple: true,
-        placeholder: "Labels",
-        optionsSelectedText: "labels",
-        optionSelectedText: "label",
-        hideClearButton: true,
-    });
+    $(function () {
+        var labelsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
+        // VirtualSelect config
+        VirtualSelect.init({
+            ele: '#select-labels',
+            options: labelsOptions.map(option => ({ label: option.text, value: option.value })),
+            multiple: true,
+            placeholder: "Labels",
+            optionsSelectedText: "labels",
+            optionSelectedText: "label",
+            hideClearButton: true,
+        });
+        document.querySelector('#select-labels').setValue(@Html.Raw(Model.SelectedLabelsId));
 
-    var projectsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectProjects));
-    VirtualSelect.init({
-        ele: '#select-project',
-        options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
-        hideClearButton: true,
-    });
-    document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
+        var projectsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectProjects));
+        VirtualSelect.init({
+            ele: '#select-project',
+            options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
+            hideClearButton: true,
+        });
+        document.querySelector('#select-project').setValue(@Model.Task.ProjectId);
 
-    /* Get selected labels ids */
-    document.querySelector('#select-labels').addEventListener('change', function () {
-        var selectedOptions = document.querySelector('#select-labels').getSelectedOptions();
-        var selectedValues = Array.from(selectedOptions).map(option => option.value);
-        document.querySelector('[name="SelectedLabelsId"]').value = JSON.stringify(selectedValues);
-    });
+        /* Get selected labels ids */
+        $('#select-labels').on('change', function () {
+            let selectedOptions = $('#select-labels').get(0).getSelectedOptions();
+            let selectedValues = Array.from(selectedOptions).map(option => option.value);
+            $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));
+        });
 
-    /* Get selected project */
-    document.querySelector('#select-project').addEventListener('change', function () {
-        var selectedProject = document.querySelector('#select-project').value;
-        document.querySelector('[name="Task.ProjectId"]').value = selectedProject;
-    });
+        /* Get selected project */
+        $('#select-project').on('change', function () {
+            let selectedProject = $(this).val();
+            $('input[name="Task.ProjectId"]').val(selectedProject);
+        });
 
-    // is done toggle
-    $('#task-is-done').on('click', function () {
-        if (this.innerHTML.includes('radio_button_unchecked')) {
-            this.innerHTML = 'radio_button_checked';
-            $('#Task_IsCompleted').val(true);
+        // is done toggle
+        $('#task-is-done').on('click', function () {
+            var isChecked = this.innerHTML.includes('radio_button_checked');
 
-        }
-        else if (this.innerHTML.includes('radio_button_checked')) {
-            this.innerHTML = 'radio_button_unchecked';
-            $('#Task_IsCompleted').val(false);
-        }
-    });
+            if (isChecked) {
+                this.innerHTML = 'radio_button_unchecked';
+                $('#Task_IsCompleted').val(false);
+            } else {
+                this.innerHTML = 'radio_button_checked';
+                $('#Task_IsCompleted').val(true);
+            }
+        });
+    })
 </script>
 
 <form asp-controller="Tasks" asp-action="CreatePartial" method="post">

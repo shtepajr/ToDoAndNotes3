@@ -62,6 +62,7 @@
         textarea.css('height', textarea[0].scrollHeight + 'px');
     }
     $(document).on('focus input', '.js-textarea-auto', autoGrow);
+    // Date Time Picker
     $(document).on('click', '.js-date-picker', function () {
         let datePickerInput = $(this).find('.js-picker-input');
 

@@ -193,10 +193,12 @@ main {
     flex: 1;
     column-gap: 10px;
     justify-content: space-between;
+    min-width: 0;
 }
 .main-header-title {
     font-size: 24px;
     padding-left: 40px;
+    min-width: 150px;
 }
 .main-header-buttons {
     display: flex;

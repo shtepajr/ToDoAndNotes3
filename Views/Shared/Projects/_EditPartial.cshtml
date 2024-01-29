@@ -9,14 +9,14 @@
         <div class="modal-title">Edit</div>
     </div>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-target-id="current-project-dropdown-content-@Model.ProjectId">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-dropdown-content-id="current-project-dropdown-content" data-target-id="@Model.ProjectId">
             more_horiz
         </span>
-        <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content-@Model.ProjectId">
-            <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@Model.ProjectId">
+        <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
+            <form asp-controller="Projects" asp-action="Duplicate">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
-            <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@Model.ProjectId">
+            <form asp-controller="Projects" asp-action="SoftDelete">
                 <button class="btn" type="submit">Remove</button>
             </form>
         </div>

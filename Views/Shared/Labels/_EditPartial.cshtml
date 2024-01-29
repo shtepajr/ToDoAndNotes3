@@ -9,14 +9,14 @@
         <div class="modal-title">Edit</div>
     </div>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-target-id="current-label-dropdown-content-@Model.LabelId">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-dropdown-content-id="current-label-dropdown-content" data-target-id="@Model.LabelId">
             more_horiz
         </span>
-        <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content-@Model.LabelId">
-            <form asp-controller="Projects" asp-action="Duplicate" asp-route-id="@Model.LabelId">
+        <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content">
+            <form asp-controller="Projects" asp-action="Duplicate">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
-            <form asp-controller="Projects" asp-action="SoftDelete" asp-route-id="@Model.LabelId">
+            <form asp-controller="Projects" asp-action="SoftDelete">
                 <button class="btn" type="submit">Remove</button>
             </form>
         </div>
@@ -30,7 +30,7 @@
     <input type="hidden" asp-for="UserId" />
     <input type="hidden" asp-for="IsDeleted" />
     <div>
-        <input asp-for="Title" placeholder="Project name" />
+        <input asp-for="Title" placeholder="Project name" class="input-border w-100" />
         <span asp-validation-for="Title"></span>
     </div>
     <div class="btns-ok-cancel mt-3">
