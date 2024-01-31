@@ -64,22 +64,7 @@ namespace ToDoAndNotes3.Controllers
                 }
 
                 // provide authorization
-                if (taskLabels?.SelectedLabelsId != null)
-                {
-                    List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabels?.SelectedLabelsId);
-                    List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
-
-                    var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
-
-                    taskLabels.Task.TaskLabels = new List<TaskLabel>();
-                    foreach (var label in selected)
-                    {
-                        taskLabels.Task.TaskLabels.Add(new TaskLabel()
-                        {
-                            Label = label,
-                        });
-                    }
-                }
+                SetSelectedLabels(taskLabels);
 
                 _context.Add(taskLabels.Task);
                 await _context.SaveChangesAsync();
@@ -91,7 +76,7 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Tasks/_CreatePartial", taskLabels);
         }
 
-        // GET: Labels/EditPartial/5
+        // GET: Tasks/EditPartial/5
         public async Task<IActionResult> EditPartial(int? id)
         {
             if (id == null)
@@ -99,29 +84,44 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var label = await _context.Labels.FindAsync(id);
-            if (label == null)
+            var taskInclude = _context.Tasks
+                .Where(t => t.TaskId == id)
+                .Include(t => t.TaskLabels)?.ThenInclude(t => t.Label)
+                .FirstOrDefault();
+
+            if (taskInclude == null)
             {
                 return NotFound();
             }
-            return PartialView("Labels/_EditPartial", label);
+
+            IEnumerable<int?> selectedInt = taskInclude?.TaskLabels?.Select(tl => tl.Label.LabelId);
+            string selected = JsonSerializer.Serialize(selectedInt);
+
+            return PartialView("Tasks/_EditPartial", new TaskLabelsViewModel()
+            {
+                Task = taskInclude!,
+                SelectedLabelsId = selected,
+                Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList(),
+                Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList(),
+            });
         }
 
-        // POST: Labels/EditPartial/5
+        // POST: Tasks/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPartial(Label label)
+        public async Task<IActionResult> EditPartial(TaskLabelsViewModel taskLabels)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(label);
+                    SetSelectedLabels(taskLabels);
+                    _context.Update(taskLabels.Task);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TaskExists(label.LabelId))
+                    if (!ProjectExists(taskLabels.Task.TaskId))
                     {
                         return NotFound();
                     }
@@ -132,7 +132,7 @@ namespace ToDoAndNotes3.Controllers
                 }
                 return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
             }
-            return PartialView("Labels/_EditPartial", label);
+            return PartialView("Tasks/_EditPartial", taskLabels);
         }
 
         // GET: : Labels/Delete/5
@@ -178,6 +178,31 @@ namespace ToDoAndNotes3.Controllers
         {
             return _context.Projects.IgnoreQueryFilters().Any(e => e.ProjectId == id);
         }
+        private void SetSelectedLabels(TaskLabelsViewModel taskLabelsViewModel)
+        {
+            if (taskLabelsViewModel?.SelectedLabelsId != null)
+            {
+                List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabelsViewModel?.SelectedLabelsId);
+                List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
 
+                var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
+
+                if (TaskExists(taskLabelsViewModel.Task.TaskId))
+                {
+                    _context.Entry(taskLabelsViewModel.Task).Collection(t => t.TaskLabels).Load();
+                    _context.RemoveRange(taskLabelsViewModel.Task.TaskLabels);
+                }
+
+                List<TaskLabel> taskLabels = new List<TaskLabel>();
+                foreach (var label in selected)
+                {
+                    taskLabels.Add(new TaskLabel()
+                    {
+                        Label = label
+                    });
+                }
+                taskLabelsViewModel.Task.TaskLabels = taskLabels;
+            }
+        }
     }
 }

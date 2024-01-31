@@ -110,6 +110,9 @@ $(function () {
         if (labelsCount > 1) {
             $(this).append('+' + (labelsCount - 1));
         }
+        else if (labelsCount === 1) {
+            // do nothing
+        }
         else {
             $(this).html(''); // empty if there is not labels
         }

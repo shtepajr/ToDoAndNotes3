@@ -13,7 +13,7 @@
         var projectId = TempData["CurrentProjectId"] as int?;
         TempData.Keep("CurrentProjectId");
         var title = Model.Projects.FirstOrDefault(p => p.ProjectId == projectId)?.Title;
-        viewName = (title != null) ? title : "Unsorted";
+        viewName = (title == null) ? "not found" : title;
     }
 }
 
@@ -105,46 +105,23 @@
                                     }
                                 </div>
                                 <div class="label-tools">
-                                    <span class="material-symbols-outlined md-20">
-                                        label
-                                    </span>
-                                    @foreach (var taskLabel in task?.TaskLabels?.ToList())
-                                    {
-                                        <div class="tools-label">
-                                            <div class="nowrap-ellipsis">
-                                                @taskLabel?.Label?.Title
-                                            </div>
-                                        </div>
-                                    }
-@*                                     @if (task?.TaskLabels?.ToList().Count > 1)
-                                    {
-                                        <div class="tools-label">
-                                            <span class="material-symbols-outlined md-20">
-                                                label
-                                            </span>
-                                            <div>
-                                                @task?.TaskLabels.ToList().Count
-                                            </div>
-                                        </div>
-                                    }
-                                    else if (task?.TaskLabels?.ToList().Count == 1)
+                                    @if (task?.TaskLabels != null)
                                     {
                                         @foreach (var taskLabel in task?.TaskLabels?.ToList())
                                         {
-                                            <div class="tools-label">
+                                            if (taskLabel.Equals(task?.TaskLabels.First()))
+                                            {
                                                 <span class="material-symbols-outlined md-20">
                                                     label
                                                 </span>
+                                            }
+                                            <div class="tools-label">
                                                 <div class="nowrap-ellipsis">
                                                     @taskLabel?.Label?.Title
                                                 </div>
-                                                @if (taskLabel != task?.TaskLabels.Last())
-                                                {
-                                                    <span>,&nbsp</span>
-                                                }
                                             </div>
                                         }
-                                    } *@
+                                    }                                   
                                 </div>
                             </div>
                         </div>
@@ -154,11 +131,21 @@
                     </a>
                 </li>
             }
-            <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
-                <a href="#Edit">Edit</a>
-                <a href="#Remove">Remove</a>
-            </div>
         </ul>
+        <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
+            <form asp-controller="Tasks" asp-action="EditPartial" method="get">
+                <button class="btn js-modal-btn" data-target-modal-id="edit-task-modal" type="button">Edit</button>
+            </form>
+            <form asp-controller="Tasks" asp-action="Duplicate">
+                <button class="btn" type="submit">Duplicate</button>
+            </form>
+            <form asp-controller="Tasks" asp-action="SoftDelete">
+                <button class="btn" type="submit">Remove</button>
+            </form>
+        </div>
+        @* modal (ajax request content) *@
+        <div id="edit-task-modal" class="modal">
+        </div>
         <ul class="notes">
             @for (int i = 0; i < 30; i++)
             {

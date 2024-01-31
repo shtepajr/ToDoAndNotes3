@@ -35,6 +35,8 @@ namespace ToDoAndNotes3.Controllers
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
+            var defaultProject = GetOrCreateDefaultProject();
+            TempData["CurrentProjectId"] = defaultProject.ProjectId; // for select
 
             if (daysViewName == null)
             {
@@ -48,9 +50,6 @@ namespace ToDoAndNotes3.Controllers
 
             if (currentProjectId == null)
             {
-                var defaultProject = GetOrCreateDefaultProject();
-                TempData["CurrentProjectId"] = defaultProject.ProjectId;
-
                 if (daysViewName == DaysViewName.Upcoming)
                 {
                     var projectsUpcomingInclude = await _context.Projects

@@ -65,21 +65,21 @@
                         </span>
                     </a>
                 </li>
-                @* modal (ajax request content) *@
-                <div id="edit-project-modal" class="modal">
-                </div>
             }
-            <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
-                <form asp-controller="Projects" asp-action="EditPartial" method="get" >
-                    <button class="btn js-modal-btn" data-target-modal-id="edit-project-modal" type="button">Edit</button>
-                </form>
-                <form asp-controller="Projects" asp-action="Duplicate">
-                    <button class="btn" type="submit">Duplicate</button>
-                </form>
-                <form asp-controller="Projects" asp-action="SoftDelete">
-                    <button class="btn" type="submit">Remove</button>
-                </form>
-            </div>
         </ul>
+        @* modal (ajax request content) *@
+        <div id="edit-project-modal" class="modal">
+        </div>
+        <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
+            <form asp-controller="Projects" asp-action="EditPartial" method="get">
+                <button class="btn js-modal-btn" data-target-modal-id="edit-project-modal" type="button">Edit</button>
+            </form>
+            <form asp-controller="Projects" asp-action="Duplicate">
+                <button class="btn" type="submit">Duplicate</button>
+            </form>
+            <form asp-controller="Projects" asp-action="SoftDelete">
+                <button class="btn" type="submit">Remove</button>
+            </form>
+        </div>
     </nav>
 </aside>

@@ -5,18 +5,29 @@
     Layout = "_ModalContentLayout";
     ViewData["SelectLabels"] = new SelectList(Model.Labels, "LabelId", "Title");
     ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
-    var projectId = TempData["CurrentProjectId"] as int?;
-    TempData.Keep("CurrentProjectId");
 }
 
 @section ModalHeaderContent {
     <div class="modal-header-left">
-        <div class="modal-title">Create</div>
+        <div class="modal-title">Edit</div>
         <div class="select-container">
             <span class="material-symbols-outlined md-24 black select-togle-icon">
                 arrow_drop_down
             </span>
             <div id="select-project"></div>
+        </div>
+    </div>
+    <div class="dropdown">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-dropdown-content-id="current-task-dropdown-content" data-target-id="@Model.Task.TaskId">
+            more_horiz
+        </span>
+        <div class="dropdown-content js-dropdown-content" id="current-task-dropdown-content">
+            <form asp-controller="Tasks" asp-action="Duplicate">
+                <button class="btn" type="submit">Duplicate</button>
+            </form>
+            <form asp-controller="Tasks" asp-action="SoftDelete">
+                <button class="btn" type="submit">Remove</button>
+            </form>
         </div>
     </div>
 }
@@ -43,7 +54,7 @@
             options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
             hideClearButton: true,
         });
-        $('#select-project').get(0).setValue(@Html.Raw(@projectId));//!
+        $('#select-project').get(0).setValue(@Html.Raw(@Model.Task.ProjectId));
 
         /* Get selected labels ids */
         $('#select-labels').on('change', function () {
@@ -73,9 +84,10 @@
     })
 </script>
 
-<form asp-controller="Tasks" asp-action="CreatePartial" method="post">
+<form asp-controller="Tasks" asp-action="EditPartial" method="post">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="Task.TaskId" />
     <input type="hidden" asp-for="Task.IsDeleted" />
     <input type="hidden" asp-for="Task.ProjectId" />
     <input type="hidden" asp-for="Task.IsCompleted" />
@@ -104,7 +116,7 @@
                         <span class="material-symbols-outlined md-20 black picker-preview-icon">
                             date_range
                         </span>
-                        <input asp-for="Task.DueDate" class="picker-input js-picker-input" placeholder="Date/time"/>
+                        <input asp-for="Task.DueDate" class="picker-input js-picker-input" placeholder="Date/time" />
                         <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
                             close
                         </span>
