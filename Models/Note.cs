@@ -6,6 +6,7 @@ namespace ToDoAndNotes3.Models
     {
         public int? NoteId { get; set; }
         public int? ProjectId { get; set; }
+        public Project? Project { get; set; }
         [Required]
         public string? Title { get; set; }
         public string? Description { get; set; } = default!;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAndNotes3.Data;
 
@@ -11,9 +12,11 @@ using ToDoAndNotes3.Data;
 namespace ToDoAndNotes3.Migrations
 {
     [DbContext(typeof(TdnDbContext))]
-    partial class TdnDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240201142006_addCascadeDelete")]
+    partial class addCascadeDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -469,8 +472,7 @@ namespace ToDoAndNotes3.Migrations
                 {
                     b.HasOne("ToDoAndNotes3.Models.Label", "Label")
                         .WithMany("NoteLabels")
-                        .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("LabelId");
 
                     b.HasOne("ToDoAndNotes3.Models.Note", "Note")
                         .WithMany("NoteLabels")
@@ -496,8 +498,7 @@ namespace ToDoAndNotes3.Migrations
                 {
                     b.HasOne("ToDoAndNotes3.Models.Label", "Label")
                         .WithMany("TaskLabels")
-                        .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("LabelId");
 
                     b.HasOne("ToDoAndNotes3.Models.Task", "Task")
                         .WithMany("TaskLabels")

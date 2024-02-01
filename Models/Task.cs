@@ -7,6 +7,7 @@ namespace ToDoAndNotes3.Models
     {
         public int? TaskId { get; set; }
         public int? ProjectId { get; set; }
+        public Project? Project { get; set; }
         [Required]
         [MaxLength(150)]
         public string? Title { get; set; }

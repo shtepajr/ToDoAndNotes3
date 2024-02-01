@@ -135,7 +135,7 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Tasks/_EditPartial", taskLabels);
         }
 
-        // GET: : Labels/Delete/5
+        // GET: Tasks/Delete/5
         public async Task<IActionResult> DeletePartial(int? id)
         {
             if (id == null)
@@ -143,33 +143,91 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var label = await _context.Labels.FindAsync(id);
-            if (label == null)
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null)
             {
                 return NotFound();
             }
-            return PartialView("Labels/_DeletePartial", label);
+            return PartialView("Tasks/_DeletePartial", new TaskLabelsViewModel()
+            {
+                Task = task
+            });
         }
 
-        // POST: Labels/ConfirmDelete/5
+        // POST: Tasks/SoftDelete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SoftDelete(int? id)
+        {
+            var task = _context.Tasks.SingleOrDefault(p => p.TaskId == id);
+
+            if (task != null)
+            {
+                task.IsDeleted = true;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(HomeController.Main), "Home");
+        }
+
+        // POST: Tasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl)
+        public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var label = await _context.Labels.FindAsync(id);
-            if (label == null)
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == id);
+
+            if (task == null)
             {
                 return NotFound();
             }
-            _context.Labels.Remove(label);
+
+            _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
-            return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction(nameof(HomeController.Main), "Home");
+
+            return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
         }
+
+        // POST: Tasks/Duplicate/5
+        public async Task<IActionResult> Duplicate(int? id)
+        {
+            var task = await _context.Tasks
+                .Include(t => t.TaskLabels)
+                .ThenInclude(l => l.Label)
+                .FirstOrDefaultAsync(t => t.TaskId == id);
+
+            if (task != null)
+            {
+                Models.Task copy = new Models.Task()
+                {
+                    ProjectId = task.ProjectId,
+                    Title = "Copy of " + task.Title,
+                    Description = task.Description,
+                    DueDate = task.DueDate,
+                    DueTime = task.DueTime,
+                    TaskLabels = new List<TaskLabel>()
+                };
+
+                foreach (var old in task?.TaskLabels)
+                {
+                    copy?.TaskLabels?.Add(new TaskLabel()
+                    {
+                        Task = copy,
+                        Label = old.Label,
+                    });
+                }
+
+                await _context.Tasks.AddAsync(copy);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(HomeController.Main), "Home");
+            }
+            return RedirectToAction(nameof(HomeController.Main), "Home");
+        }
+
         private bool TaskExists(int? id)
         {
             return _context.Tasks.Any(e => e.TaskId == id);

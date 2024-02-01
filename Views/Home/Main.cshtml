@@ -105,23 +105,20 @@
                                     }
                                 </div>
                                 <div class="label-tools">
-                                    @if (task?.TaskLabels != null)
+                                    @foreach (var taskLabel in task?.TaskLabels?.ToList())
                                     {
-                                        @foreach (var taskLabel in task?.TaskLabels?.ToList())
+                                        if (taskLabel.Equals(task?.TaskLabels.First()))
                                         {
-                                            if (taskLabel.Equals(task?.TaskLabels.First()))
-                                            {
-                                                <span class="material-symbols-outlined md-20">
-                                                    label
-                                                </span>
-                                            }
-                                            <div class="tools-label">
-                                                <div class="nowrap-ellipsis">
-                                                    @taskLabel?.Label?.Title
-                                                </div>
-                                            </div>
+                                            <span class="material-symbols-outlined md-20">
+                                                label
+                                            </span>
                                         }
-                                    }                                   
+                                        <div class="tools-label">
+                                            <div class="nowrap-ellipsis">
+                                                @taskLabel?.Label?.Title
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -142,9 +139,16 @@
             <form asp-controller="Tasks" asp-action="SoftDelete">
                 <button class="btn" type="submit">Remove</button>
             </form>
+            @* TEST (to del) *@
+            <form asp-controller="Tasks" asp-action="DeletePartial" method="get">
+                <button class="btn js-modal-btn" data-target-modal-id="delete-task-modal" type="button">Delete</button>
+            </form>
         </div>
         @* modal (ajax request content) *@
         <div id="edit-task-modal" class="modal">
+        </div>
+        @* TEST (to del) *@
+        <div id="delete-task-modal" class="modal">
         </div>
         <ul class="notes">
             @for (int i = 0; i < 30; i++)

@@ -19,9 +19,40 @@ namespace ToDoAndNotes3.Data
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Project>(entityType => entityType.HasQueryFilter((Project e) => !e.IsDeleted));
-            builder.Entity<Models.Task>(entityType => entityType.HasQueryFilter((Models.Task e) => !e.IsDeleted));
-            builder.Entity<Note>(entityType => entityType.HasQueryFilter((Note e) => !e.IsDeleted));
+            builder.Entity<Project>()
+                .HasQueryFilter(p => !p.IsDeleted);
+            builder.Entity<Project>()
+                .HasMany(p => p.Tasks)
+                .WithOne(pt => pt.Project)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Project>()
+                .HasMany(p => p.Notes)
+                .WithOne(pn => pn.Project)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Models.Task>()
+                .HasQueryFilter(t => !t.IsDeleted);
+
+            builder.Entity<Models.Task>()
+                .HasMany(t => t.TaskLabels)
+                .WithOne(tl => tl.Task)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Models.Label>()
+                .HasMany(l => l.TaskLabels)
+                .WithOne(tl => tl.Label)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Note>()
+                .HasQueryFilter(n => !n.IsDeleted);
+
+            builder.Entity<Note>()
+                .HasMany(t => t.NoteLabels)
+                .WithOne(nl => nl.Note)
+                .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Models.Label>()
+                .HasMany(l => l.NoteLabels)
+                .WithOne(nl => nl.Label)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
         }

@@ -129,6 +129,7 @@ namespace ToDoAndNotes3.Controllers
             }
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
+       
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -143,6 +144,7 @@ namespace ToDoAndNotes3.Controllers
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
 
+        // POST: Projects/Duplicate/5
         public async Task<IActionResult> Duplicate(int? id)
         {
             var project = _context.Projects
@@ -185,6 +187,7 @@ namespace ToDoAndNotes3.Controllers
             // mb handle error somehow
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
+        
         private bool ProjectExists(int? id)
         {
             return _context.Projects.Any(e => e.ProjectId == id);

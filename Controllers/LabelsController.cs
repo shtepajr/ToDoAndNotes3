@@ -109,7 +109,7 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var labelInclude = _context.Labels.Where(l => l.LabelId == id).Include(tl => tl.TaskLabels).FirstOrDefault();
+            var labelInclude = _context.Labels.FirstOrDefault(l => l.LabelId == id);
 
             if (labelInclude == null)
             {
