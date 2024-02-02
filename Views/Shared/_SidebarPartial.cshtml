@@ -68,7 +68,10 @@
             }
         </ul>
         @* modal (ajax request content) *@
-        <div id="edit-project-modal" class="modal">
+        <div id="edit-project-modal" class="modal js-modal">
+        </div>
+        @* TEST (to del) *@
+        <div id="delete-project-modal" class="modal js-modal">
         </div>
         <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
             <form asp-controller="Projects" asp-action="EditPartial" method="get">
@@ -79,6 +82,10 @@
             </form>
             <form asp-controller="Projects" asp-action="SoftDelete">
                 <button class="btn" type="submit">Remove</button>
+            </form>
+            @* TEST (to del) *@
+            <form asp-controller="Projects" asp-action="DeletePartial" method="get">
+                <button class="btn js-modal-btn" data-target-modal-id="delete-project-modal" type="button">Delete</button>
             </form>
         </div>
     </nav>

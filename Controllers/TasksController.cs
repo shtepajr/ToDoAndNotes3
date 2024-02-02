@@ -132,10 +132,28 @@ namespace ToDoAndNotes3.Controllers
                 }
                 return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
             }
+            // get data for select lists (asp-for approach for each field uncomfortable on view)
+            taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
+            taskLabels.Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList();
             return PartialView("Tasks/_EditPartial", taskLabels);
         }
 
-        // GET: Tasks/Delete/5
+        // POST: Tasks/SoftDelete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SoftDelete(int? id)
+        {
+            var task = _context.Tasks.SingleOrDefault(p => p.TaskId == id);
+
+            if (task != null)
+            {
+                task.IsDeleted = true;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(HomeController.Main), "Home");
+        }
+       
+        // GET: Tasks/DeletePartial/5
         public async Task<IActionResult> DeletePartial(int? id)
         {
             if (id == null)
@@ -152,21 +170,6 @@ namespace ToDoAndNotes3.Controllers
             {
                 Task = task
             });
-        }
-
-        // POST: Tasks/SoftDelete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SoftDelete(int? id)
-        {
-            var task = _context.Tasks.SingleOrDefault(p => p.TaskId == id);
-
-            if (task != null)
-            {
-                task.IsDeleted = true;
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction(nameof(HomeController.Main), "Home");
         }
 
         // POST: Tasks/Delete/5
@@ -197,37 +200,49 @@ namespace ToDoAndNotes3.Controllers
         {
             var task = await _context.Tasks
                 .Include(t => t.TaskLabels)
-                .ThenInclude(l => l.Label)
+                .ThenInclude(tl => tl.Label)
                 .FirstOrDefaultAsync(t => t.TaskId == id);
 
             if (task != null)
             {
-                Models.Task copy = new Models.Task()
+                Models.Task? copy = TasksController.DeepCopy(task);
+                if (copy == null)
                 {
-                    ProjectId = task.ProjectId,
-                    Title = "Copy of " + task.Title,
-                    Description = task.Description,
-                    DueDate = task.DueDate,
-                    DueTime = task.DueTime,
-                    TaskLabels = new List<TaskLabel>()
-                };
-
-                foreach (var old in task?.TaskLabels)
-                {
-                    copy?.TaskLabels?.Add(new TaskLabel()
-                    {
-                        Task = copy,
-                        Label = old.Label,
-                    });
+                    return RedirectToAction(nameof(HomeController.Main), "Home");
                 }
-
                 await _context.Tasks.AddAsync(copy);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(HomeController.Main), "Home");
             }
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
+    
+        public static Models.Task? DeepCopy(Models.Task oldTask)
+        {
+            if (oldTask == null || oldTask.ProjectId == null)
+            {
+                return null;
+            }
 
+            Models.Task copy = new Models.Task()
+            {
+                ProjectId = oldTask.ProjectId,
+                Title = oldTask.Title,
+                Description = oldTask.Description,
+                DueDate = oldTask.DueDate,
+                DueTime = oldTask.DueTime,
+                TaskLabels = new List<TaskLabel>()
+            };
+
+            foreach (var old in oldTask?.TaskLabels)
+            {
+                copy?.TaskLabels?.Add(new TaskLabel()
+                {
+                    Task = copy,
+                    Label = old.Label,
+                });
+            }
+            return copy;
+        }
         private bool TaskExists(int? id)
         {
             return _context.Tasks.Any(e => e.TaskId == id);

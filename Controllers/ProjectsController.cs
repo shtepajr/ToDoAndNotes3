@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
+using ToDoAndNotes3.Models.MainViewModels;
 
 namespace ToDoAndNotes3.Controllers
 {
@@ -89,24 +90,6 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Projects/_EditPartial", project);
         }
 
-        // GET: Projects/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-
-            return View(project);
-        }
-
         // POST: Projects/SoftDelete/5
         public async Task<IActionResult> SoftDelete(int? id)
         {
@@ -117,11 +100,11 @@ namespace ToDoAndNotes3.Controllers
             if (project != null)
             {
                 project.IsDeleted = true;
-                foreach (var task in project.Tasks)
+                foreach (var task in project?.Tasks)
                 {
                     task.IsDeleted = true;
                 }
-                foreach (var note in project.Notes)
+                foreach (var note in project?.Notes)
                 {
                     note.IsDeleted = true;
                 }
@@ -129,65 +112,100 @@ namespace ToDoAndNotes3.Controllers
             }
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
-       
+
+        // GET: Projects/DeletePartial/5
+        public async Task<IActionResult> DeletePartial(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var project = await _context.Projects.FindAsync(id);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return PartialView("Projects/_DeletePartial", project);
+        }
+
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project != null)
+            if (id == null)
             {
-                _context.Projects.Remove(project);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            return RedirectToAction(nameof(HomeController.Main), "Home");
+
+            var project = await _context.Projects.FirstOrDefaultAsync(t => t.ProjectId == id);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            _context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
         }
 
         // POST: Projects/Duplicate/5
         public async Task<IActionResult> Duplicate(int? id)
         {
             var project = _context.Projects
-                .Include(t => t.Tasks)
-                .Include(n => n.Notes)
-                .SingleOrDefault(p => p.ProjectId == id);
+                .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(tl => tl.Label)
+                .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(nl => nl.Label)
+                .FirstOrDefault(p => p.ProjectId == id);
             if (project != null)
             {
-                Project copy = new Project()
-                {
-                    UserId = project.UserId,
-                    Title = "Copy of " +  project.Title                   
-                };
-                
-                foreach (var task in project.Tasks)
-                {
-                    copy.Tasks.Add(new Models.Task()
-                    {
-                        Description = task.Description,
-                        DueDate = task.DueDate,
-                        Title = task.Title,
-                        //TaskLabels = task.TaskLabels
-                    });
-                }
-                foreach (var note in project.Notes)
-                {
-                    copy.Notes.Add(new Note()
-                    {
-                        Description = note.Description,
-                        DueDate = note.DueDate,
-                        Title = note.Title,
-                        //TaskLabels = task.TaskLabels
-                    });
-                }
+                Project? copy = ProjectsController.DeepCopy(project);
 
+                if (copy == null)
+                {
+                    return RedirectToAction(nameof(HomeController.Main), "Home");
+                }
                 await _context.Projects.AddAsync(copy);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(HomeController.Main), "Home");
             }
             // mb handle error somehow
             return RedirectToAction(nameof(HomeController.Main), "Home");
         }
-        
+
+        public static Project? DeepCopy(Project oldProject)
+        {
+            if (oldProject == null || oldProject.UserId == null)
+            {
+                return null;
+            }
+
+            Project copy = new Project()
+            {
+                UserId = oldProject.UserId,
+                Title = "Copy of " + oldProject.Title
+            };
+
+            foreach (var task in oldProject?.Tasks)
+            {
+                var taskCopy = TasksController.DeepCopy(task);
+                if (taskCopy != null)
+                {
+                    copy?.Tasks?.Add(taskCopy);
+                }
+            }
+            // To do
+            //foreach (var note in oldProject?.Notes)
+            //{
+            //    var noteCopy = NotesController.DeepCopy(note);
+            //    if (noteCopy != null)
+            //    {
+            //        copy?.Notes?.Add(noteCopy);
+            //    }
+            //}
+            return copy;
+        }
         private bool ProjectExists(int? id)
         {
             return _context.Projects.Any(e => e.ProjectId == id);

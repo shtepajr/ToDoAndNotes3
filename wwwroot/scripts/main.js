@@ -7,19 +7,20 @@ $(function () {
     });
     $(document).on('click', '.js-modal-btn', function () {
         let targetModalId = $(this).data('target-modal-id');
+        let targetModal = $(`#${targetModalId}`);
         let parentForm = $(this).closest('form');
         let formMethod = parentForm.attr('method');
         let formAction = parentForm.attr('action');
 
-        // GET: create/edit project partial
+        // GET: create/edit/delete project partial
         // GET: create/edit/delete label partial
-        // GET: create task partial
+        // GET: create/edit/delete task partial
         $.ajax({
             url: formAction,
             type: formMethod,
             success: function (result) {
-                $(`#${targetModalId}`).html(result);
-                $(`#${targetModalId}`).find('.js-picker-input').trigger('blur');
+                targetModal.html(result);
+                targetModal.find('.js-picker-input').trigger('blur');
             }
         });
     });
@@ -31,9 +32,9 @@ $(function () {
         let formToken = parentForm.find('input[name="__RequestVerificationToken"]').val();
         let formData = parentForm.serialize();
 
-        // POST: create/edit project partial
-        // POST: create/edit/delete label partial
-        // POST: create task partial
+        // POST: create/edit/delete project
+        // POST: create/edit/delete label
+        // POST: create/edit/delete task
         $.ajax({
             url: formAction,
             type: formMethod,
@@ -43,10 +44,11 @@ $(function () {
             },
             success: function (result) {
                 if (result.success) {
-                    location.reload(true);
+                    window.location.href = result.redirectTo;
                 }
                 else {
                     parentModal.html(result);
+                    parentModal.find('.js-picker-input').trigger('blur');
                 }
             }
         });
