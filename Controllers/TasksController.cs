@@ -25,8 +25,10 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Tasks/CreatePartial
-        public IActionResult CreatePartial()
+        public IActionResult CreatePartial(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             // provide authorization
             var currentProjectId = TempData["CurrentProjectId"] as int?;
             TempData.Keep("CurrentProjectId");
@@ -54,7 +56,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Tasks/CreatePartial
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePartial(TaskLabelsViewModel taskLabels)
+        public async Task<IActionResult> CreatePartial(TaskLabelsViewModel taskLabels, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -68,7 +70,7 @@ namespace ToDoAndNotes3.Controllers
 
                 _context.Add(taskLabels.Task);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Main") });
+                return Json(new { success = true, redirectTo = returnUrl });
             }
             // get data for select lists (asp-for approach for each field uncomfortable on view)
             taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
@@ -77,8 +79,10 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Tasks/EditPartial/5
-        public async Task<IActionResult> EditPartial(int? id)
+        public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (id == null)
             {
                 return NotFound();
@@ -109,7 +113,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Tasks/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPartial(TaskLabelsViewModel taskLabels)
+        public async Task<IActionResult> EditPartial(TaskLabelsViewModel taskLabels, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -130,7 +134,7 @@ namespace ToDoAndNotes3.Controllers
                         throw;
                     }
                 }
-                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
+                return Json(new { success = true, redirectTo = returnUrl });
             }
             // get data for select lists (asp-for approach for each field uncomfortable on view)
             taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
@@ -275,6 +279,17 @@ namespace ToDoAndNotes3.Controllers
                     });
                 }
                 taskLabelsViewModel.Task.TaskLabels = taskLabels;
+            }
+        }
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
         }
     }

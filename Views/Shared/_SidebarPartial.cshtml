@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<ToDoAndNotes3.Models.Project>
 @{
-    // var currentProjectId = TempData["CurrentProjectId"];
-    // TempData.Keep("CurrentProjectId");
+
 }
 <aside class="sidebar" id="sidebar">
     <nav class="days">
@@ -58,7 +57,7 @@
             @foreach (var project in Model)
             {
                 <li class="project nav-link dropdown">
-                    <a asp-controller="Home" asp-action="Main" asp-route-currentProjectId="@project.ProjectId">
+                    <a asp-controller="Home" asp-action="Main" asp-route-projectId="@project.ProjectId">
                         <div class="nowrap-ellipsis">@project.Title</div>
                         <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-dropdown-content-id="project-dropdown-content" data-target-id="@project.ProjectId">
                             more_horiz

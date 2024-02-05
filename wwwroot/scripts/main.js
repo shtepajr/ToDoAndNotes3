@@ -12,6 +12,15 @@ $(function () {
         let formMethod = parentForm.attr('method');
         let formAction = parentForm.attr('action');
 
+        let formData = new FormData(parentForm[0]);
+        // create URL
+        let returnUrl = formData.get('returnUrl'); // => /Home/Main?projectId=1
+        let url = new URL(formAction, window.location.origin);
+        let params = new URLSearchParams(url.search);
+        params.set('returnUrl', returnUrl);
+        url.search = params.toString();
+        formAction = url.toString();
+
         // GET: create/edit/delete project partial
         // GET: create/edit/delete label partial
         // GET: create/edit/delete task partial

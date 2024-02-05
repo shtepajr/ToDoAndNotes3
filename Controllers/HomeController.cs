@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Diagnostics;
 using System.Security.Claims;
 using ToDoAndNotes3.Data;
@@ -31,92 +32,71 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Main
-        public async Task<IActionResult> Main(int? currentProjectId = null, DaysViewName? daysViewName = null)
+        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
-            TempData["CurrentProjectId"] = defaultProject.ProjectId; // for select
+            projectId ??= defaultProject.ProjectId;
 
-            if (daysViewName == null)
+            // provide authorization for projectId
+
+            TempData["CurrentProjectId"] = projectId; // => for select
+            TempData["DaysViewName"] = daysViewName;         // => for title
+
+            ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName, projectId });
+            Console.BackgroundColor = ConsoleColor.Green;
+            Console.WriteLine(Url.Action(nameof(HomeController.Main), "Home", new { daysViewName, projectId }));
+            Console.BackgroundColor = ConsoleColor.Black;
+
+            if (daysViewName == DaysViewName.Today)
             {
-                daysViewName = DaysViewName.Today;
-                TempData["DaysViewName"] = daysViewName;
-            }
-            else
-            {
-                TempData["DaysViewName"] = daysViewName;
-            }
+                var today = DateOnly.FromDateTime(DateTime.Now);
 
-            if (currentProjectId == null)
-            {
-                if (daysViewName == DaysViewName.Upcoming)
+                var projectsTodayInclude = await _context.Projects
+                    .Where(p => p.UserId == userId)
+                    .Include(t => t.Tasks.Where(t => t.DueDate == today)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                    .Include(n => n.Notes.Where(n => n.DueDate == today)).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
+                    .ToListAsync();
+                generalViewModel.Projects = projectsTodayInclude.Where(p => p.IsDefault == false).ToList();
+
+                foreach (var project in projectsTodayInclude)
                 {
-                    var projectsUpcomingInclude = await _context.Projects
-                        .Where(p => p.UserId == userId)
-                        .Include(t => t.Tasks.Where(t => t.DueDate != null)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
-                        .Include(n => n.Notes.Where(n => n.DueDate != null)).ThenInclude(t => t.NoteLabels).ThenInclude(l => l.Label)
-                        .ToListAsync();
-                    generalViewModel.Projects = projectsUpcomingInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
-
-                    foreach (var project in projectsUpcomingInclude) // but here using default project
-                    {
-                        generalViewModel.Tasks.AddRange(project.Tasks);
-                        generalViewModel.Notes.AddRange(project.Notes);
-                    }
-                }
-                else if (daysViewName == DaysViewName.Today)
-                {
-                    var today = DateOnly.FromDateTime(DateTime.Now);
-
-                    var projectsTodayInclude = await _context.Projects
-                        .Where(p => p.UserId == userId)
-                        .Include(t => t.Tasks.Where(t => t.DueDate == today)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
-                        .Include(n => n.Notes.Where(n => n.DueDate == today)).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
-                        .ToListAsync();
-                    generalViewModel.Projects = projectsTodayInclude.Where(p => p.IsDefault == false).ToList();
-
-                    foreach (var project in projectsTodayInclude)
-                    {
-                        generalViewModel.Tasks.AddRange(project.Tasks);
-                        generalViewModel.Notes.AddRange(project.Notes);
-                    }
-                }
-                else if (daysViewName == DaysViewName.Unsorted)
-                {
-                    // load projects list separately to save resources
-                    var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
-                    generalViewModel.Projects = projects.Where(p => p.IsDefault == false).ToList();
-
-                    var currentProjectInclude = _context.Projects
-                        .Where(p => p.UserId == userId && p.ProjectId == defaultProject.ProjectId)
-                        .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
-                        .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
-                        .First();
-
-                    generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
-                    generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
+                    generalViewModel.Tasks.AddRange(project.Tasks);
+                    generalViewModel.Notes.AddRange(project.Notes);
                 }
             }
-            else
+            else if (daysViewName == DaysViewName.Upcoming)
             {
-                TempData["DaysViewName"] = null;
-                TempData["CurrentProjectId"] = currentProjectId;
-                // authorization
-                // load projects list separately to save resources
-                var projects = await _context.Projects.Where(p => p.UserId == userId).ToListAsync();
-                generalViewModel.Projects = projects.Where(p => p.IsDefault == false).ToList();
+                var projectsUpcomingInclude = await _context.Projects
+                    .Where(p => p.UserId == userId)
+                    .Include(t => t.Tasks.Where(t => t.DueDate != null)).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                    .Include(n => n.Notes.Where(n => n.DueDate != null)).ThenInclude(t => t.NoteLabels).ThenInclude(l => l.Label)
+                    .ToListAsync();
+                generalViewModel.Projects = projectsUpcomingInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
 
+                foreach (var project in projectsUpcomingInclude) // but here using default project
+                {
+                    generalViewModel.Tasks.AddRange(project.Tasks);
+                    generalViewModel.Notes.AddRange(project.Notes);
+                }
+            }
+            else if (daysViewName == DaysViewName.Unsorted || projectId != null)
+            {
+                // 1/2 load projects list separately to save resources
+                generalViewModel.Projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
+                // 2/2 load current project content separately to save resources
                 var currentProjectInclude = _context.Projects
-                    .Where(p => p.UserId == userId && p.ProjectId == currentProjectId)
+                    .Where(p => p.UserId == userId && p.ProjectId == projectId)
                     .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
                     .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
                     .First();
 
                 generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
                 generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
+                TempData["DaysViewName"] = currentProjectInclude.Title;
             }
-           
+
             return View(generalViewModel);
         }
 
