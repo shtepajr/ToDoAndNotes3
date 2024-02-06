@@ -5,7 +5,7 @@ $(function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
-    $(document).on('click', '.js-modal-btn', function () {
+    $(document).on('click', '.js-modal-btn', function (event) {
         let targetModalId = $(this).data('target-modal-id');
         let targetModal = $(`#${targetModalId}`);
         let parentForm = $(this).closest('form');

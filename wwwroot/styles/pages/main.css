@@ -124,6 +124,10 @@ main {
 .btn-action:hover {
     background-color: var(--coral-color);
 }
+.btn-clean {
+    background-color: var(--transparent-color);
+    border: 0;
+}
 
 /* Tabs */
 .nav-link {
@@ -244,9 +248,17 @@ main {
 .task.nav-link a {
     padding-top: 2px;
 }
-.task .is-done-btn {
+.task .is-done-form {
     align-self: baseline;
     margin-top: 2px;
+}
+.task .is-done-form button {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+}
+.task .is-done-form button span:hover {
+    color: var(--light-green-color);
 }
 .task .task-content, .note-content {
     flex: 1;

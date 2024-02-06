@@ -222,6 +222,30 @@ namespace ToDoAndNotes3.Controllers
             return RedirectToLocal(returnUrl);
         }
 
+        // POST: Tasks/ToggleState/5
+        public async Task<IActionResult> ToggleState(int? id, string? returnUrl = null)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            task.IsCompleted = !task.IsCompleted;
+            await _context.SaveChangesAsync();
+
+            return RedirectToLocal(returnUrl);
+        }
+
+
+
+
         public static Models.Task? DeepCopy(Models.Task oldTask)
         {
             if (oldTask == null || oldTask.ProjectId == null)

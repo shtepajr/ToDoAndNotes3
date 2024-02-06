@@ -60,19 +60,24 @@
             @foreach (var task in Model.Tasks)
             {
                 <li class="task nav-link dropdown">
-                    <a>
-                        @if (task.IsCompleted)
-                        {
-                            <span class="material-symbols-outlined md-24 is-done-btn">
-                                radio_button_checked
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="material-symbols-outlined md-24 is-done-btn">
-                                radio_button_unchecked
-                            </span>
-                        }
+                    <a class="js-modal-btn">
+                        <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form">
+                            <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                            <button class="btn btn-clean" type="submit">
+                                @if (task.IsCompleted)
+                                {
+                                    <span class="material-symbols-outlined md-24">
+                                        radio_button_checked
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="material-symbols-outlined md-24">
+                                        radio_button_unchecked
+                                    </span>
+                                }
+                            </button>
+                        </form>
                         <div class="task-content">
                             <div class="nowrap-ellipsis">@task.Title</div>
                             <div class="tools">

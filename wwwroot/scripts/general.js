@@ -14,7 +14,8 @@
         }
     });
     $(document).on('click', '.js-dropdown-btn', function (event) {
-        event.preventDefault(); // parent <a> will not work  
+        event.stopPropagation(); // parent <a> task will not work  
+        event.preventDefault(); // parent <a> project will not work  
 
         let dropContentId = $(this).data('dropdown-content-id');
 
