@@ -14,16 +14,18 @@
         </span>
         <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
             <form asp-controller="Projects" asp-action="Duplicate">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
             <form asp-controller="Projects" asp-action="SoftDelete">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Remove</button>
             </form>
         </div>
     </div>
 }
 
-<form asp-controller="Projects" asp-action="EditPartial" method="post">
+<form asp-controller="Projects" asp-action="EditPartial" method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="ProjectId" />

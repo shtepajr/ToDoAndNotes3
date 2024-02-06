@@ -13,17 +13,15 @@
             more_horiz
         </span>
         <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content">
-            <form asp-controller="Projects" asp-action="Duplicate">
-                <button class="btn" type="submit">Duplicate</button>
-            </form>
-            <form asp-controller="Projects" asp-action="SoftDelete">
-                <button class="btn" type="submit">Remove</button>
+            <form asp-controller="Labels" asp-action="DeletePartial" method="get">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                <button class="btn js-modal-btn" data-target-modal-id="delete-label-modal" type="button">Delete</button>
             </form>
         </div>
     </div>
 }
 
-<form asp-controller="Labels" asp-action="EditPartial" method="post">
+<form asp-controller="Labels" asp-action="EditPartial" method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="LabelId" />

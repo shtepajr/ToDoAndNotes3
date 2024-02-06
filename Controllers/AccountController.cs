@@ -36,7 +36,7 @@ namespace ToDoAndNotes3.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (User?.Identity?.IsAuthenticated == true)
             {
-                return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
+                return RedirectToLocal(returnUrl);
             }
             return View();
         }
@@ -89,9 +89,10 @@ namespace ToDoAndNotes3.Controllers
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+
             if (User?.Identity?.IsAuthenticated == true)
             {
-                return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
+                return RedirectToLocal(returnUrl);
             }
             return View();
         }
@@ -101,14 +102,15 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            //ViewData["ReturnUrl"] = returnUrl;
+
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
-                    return returnUrl == null ? RedirectToAction("Main", "Home", new { daysViewName = DaysViewName.Today }) : RedirectToLocal(returnUrl);
+                    return RedirectToLocal(returnUrl);
                 }
                 else
                 {
@@ -300,7 +302,7 @@ namespace ToDoAndNotes3.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             }
         }
 

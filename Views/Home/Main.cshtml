@@ -6,10 +6,6 @@
 
     var viewName = TempData["DaysViewName"];
     TempData.Keep("DaysViewName");
-
-    // Console.BackgroundColor = ConsoleColor.Green;
-    // Console.WriteLine(ViewData["ReturnUrl"]);
-    // Console.BackgroundColor = ConsoleColor.Black;
 }
 
 @section Header 
@@ -128,17 +124,19 @@
         <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
             <form asp-controller="Tasks" asp-action="EditPartial" method="get">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-
                 <button class="btn js-modal-btn" data-target-modal-id="edit-task-modal" type="button">Edit</button>
             </form>
             <form asp-controller="Tasks" asp-action="Duplicate">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
             <form asp-controller="Tasks" asp-action="SoftDelete">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Remove</button>
             </form>
             @* TEST (to del) *@
             <form asp-controller="Tasks" asp-action="DeletePartial" method="get">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn js-modal-btn" data-target-modal-id="delete-task-modal" type="button">Delete</button>
             </form>
         </div>

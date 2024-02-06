@@ -20,35 +20,33 @@ namespace ToDoAndNotes3.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            return PartialView("Projects/_IndexPartial", await _context.Projects.ToListAsync());
-        }
-
         // GET: Projects/CreatePartial
-        public IActionResult CreatePartial()
+        public IActionResult CreatePartial(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return PartialView("Projects/_CreatePartial", new Project());
         }
 
         // POST: Projects/CreatePartial
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePartial(Project project)
+        public async Task<IActionResult> CreatePartial(Project project, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
                 project.UserId = _userManager.GetUserId(User);
                 _context.Add(project);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
+                return Json(new { success = true, redirectTo = returnUrl });
             }
             return PartialView("Projects/_CreatePartial", project);
         }
 
         // GET: Projects/EditPartial/5
-        public async Task<IActionResult> EditPartial(int? id)
+        public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (id == null)
             {
                 return NotFound();
@@ -65,7 +63,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Projects/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPartial(Project project)
+        public async Task<IActionResult> EditPartial(Project project, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -85,13 +83,13 @@ namespace ToDoAndNotes3.Controllers
                         throw;
                     }
                 }
-                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
+                return Json(new { success = true, redirectTo = returnUrl });
             }
             return PartialView("Projects/_EditPartial", project);
         }
 
         // POST: Projects/SoftDelete/5
-        public async Task<IActionResult> SoftDelete(int? id)
+        public async Task<IActionResult> SoftDelete(int? id, string? returnUrl = null)
         {
             var project = _context.Projects
                 .Include(t => t.Tasks)
@@ -110,12 +108,14 @@ namespace ToDoAndNotes3.Controllers
                 }
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(HomeController.Main), "Home");
+            return RedirectToLocal(returnUrl);
         }
 
         // GET: Projects/DeletePartial/5
-        public async Task<IActionResult> DeletePartial(int? id)
+        public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (id == null)
             {
                 return NotFound();
@@ -132,7 +132,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
+        public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
             if (id == null)
             {
@@ -149,11 +149,12 @@ namespace ToDoAndNotes3.Controllers
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
+            returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // POST: Projects/Duplicate/5
-        public async Task<IActionResult> Duplicate(int? id)
+        public async Task<IActionResult> Duplicate(int? id, string? returnUrl = null)
         {
             var project = _context.Projects
                 .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(tl => tl.Label)
@@ -165,13 +166,13 @@ namespace ToDoAndNotes3.Controllers
 
                 if (copy == null)
                 {
-                    return RedirectToAction(nameof(HomeController.Main), "Home");
+                    return RedirectToLocal(returnUrl);
                 }
                 await _context.Projects.AddAsync(copy);
                 await _context.SaveChangesAsync();
             }
             // mb handle error somehow
-            return RedirectToAction(nameof(HomeController.Main), "Home");
+            return RedirectToLocal(returnUrl);
         }
 
         public static Project? DeepCopy(Project oldProject)
@@ -209,6 +210,17 @@ namespace ToDoAndNotes3.Controllers
         private bool ProjectExists(int? id)
         {
             return _context.Projects.Any(e => e.ProjectId == id);
+        }
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
+            }
         }
     }
 }

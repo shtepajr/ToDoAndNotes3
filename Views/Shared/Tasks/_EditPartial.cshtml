@@ -22,9 +22,11 @@
         </span>
         <div class="dropdown-content js-dropdown-content" id="current-task-dropdown-content">
             <form asp-controller="Tasks" asp-action="Duplicate">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
             <form asp-controller="Tasks" asp-action="SoftDelete">
+                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Remove</button>
             </form>
         </div>

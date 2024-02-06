@@ -6,10 +6,6 @@
     ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
     var projectId = TempData["CurrentProjectId"] as int?;
     TempData.Keep("CurrentProjectId");
-
-    Console.BackgroundColor = ConsoleColor.Green;
-    Console.WriteLine(ViewData["ReturnUrl"]);
-    Console.BackgroundColor = ConsoleColor.Black;
 }
 
 @section ModalHeaderContent {

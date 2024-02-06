@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Diagnostics;
@@ -28,6 +29,10 @@ namespace ToDoAndNotes3.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction(nameof(Main), new { daysViewName = DaysViewName.Today });
+            }
             return View();
         }
 
@@ -41,13 +46,17 @@ namespace ToDoAndNotes3.Controllers
 
             // provide authorization for projectId
 
-            TempData["CurrentProjectId"] = projectId; // => for select
-            TempData["DaysViewName"] = daysViewName;         // => for title
+            TempData["CurrentProjectId"] = projectId; // => for select on the view
+            TempData["DaysViewName"] = daysViewName;  // => for title on the view
 
-            ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName, projectId });
-            Console.BackgroundColor = ConsoleColor.Green;
-            Console.WriteLine(Url.Action(nameof(HomeController.Main), "Home", new { daysViewName, projectId }));
-            Console.BackgroundColor = ConsoleColor.Black;
+            if (daysViewName == null)
+            {
+                ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { projectId });
+            }
+            else
+            {
+                ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
+            }
 
             if (daysViewName == DaysViewName.Today)
             {
@@ -103,6 +112,8 @@ namespace ToDoAndNotes3.Controllers
         // GET: /Home/Labels
         public async Task<IActionResult> Labels()
         {
+            ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Labels), "Home");
+
             ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
             string? userId = _userManager.GetUserId(User);
             var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
@@ -126,12 +137,13 @@ namespace ToDoAndNotes3.Controllers
         }
 
         #region Helpers
-        Project GetOrCreateDefaultProject()
+        Models.Project GetOrCreateDefaultProject()
         {
-            var checkDefault = _context.Projects.Where(p => p.IsDefault == true).FirstOrDefault();
+            var checkDefault = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User) 
+                                                                && p.IsDefault == true).FirstOrDefault();
             if (checkDefault == null)
             {
-                var defaultProject = new Project()
+                var defaultProject = new Models.Project()
                 {
                     IsDefault = true,
                     Title = "Unsorted",
@@ -166,7 +178,7 @@ namespace ToDoAndNotes3.Controllers
 
             for (int i = 0; i < 10; i++)
             {
-                _context.Projects.Add(new Project()
+                _context.Projects.Add(new Models.Project()
                 {
                     UserId = _userManager.GetUserId(User),
                     CreatedDate = DateTime.UtcNow,

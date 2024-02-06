@@ -20,6 +20,7 @@
             <div class="main-header-title">@ViewData["Title"]</div>
             <div class="main-header-buttons">
                 <form asp-controller="Labels" asp-action="CreatePartial" method="get">
+                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn btn-action js-modal-btn" data-target-modal-id="create-label-modal" type="button">
                         <span class="material-symbols-outlined md-30">
                             new_label
@@ -54,9 +55,11 @@
             </div>
             <div class="dropdown-content js-dropdown-content" id="label-dropdown-content">
                 <form asp-controller="Labels" asp-action="EditPartial" method="get">
+                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn js-modal-btn" data-target-modal-id="edit-label-modal" type="button">Edit</button>
                 </form>
                 <form asp-controller="Labels" asp-action="DeletePartial" method="get">
+                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn js-modal-btn" data-target-modal-id="delete-label-modal" type="button">Delete</button>
                 </form>
             </div>

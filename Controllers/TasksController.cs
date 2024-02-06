@@ -145,7 +145,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Tasks/SoftDelete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SoftDelete(int? id)
+        public async Task<IActionResult> SoftDelete(int? id, string? returnUrl = null)
         {
             var task = _context.Tasks.SingleOrDefault(p => p.TaskId == id);
 
@@ -154,12 +154,14 @@ namespace ToDoAndNotes3.Controllers
                 task.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(HomeController.Main), "Home");
+            return RedirectToLocal(returnUrl);
         }
        
         // GET: Tasks/DeletePartial/5
-        public async Task<IActionResult> DeletePartial(int? id)
+        public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (id == null)
             {
                 return NotFound();
@@ -196,11 +198,11 @@ namespace ToDoAndNotes3.Controllers
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // POST: Tasks/Duplicate/5
-        public async Task<IActionResult> Duplicate(int? id)
+        public async Task<IActionResult> Duplicate(int? id, string? returnUrl = null)
         {
             var task = await _context.Tasks
                 .Include(t => t.TaskLabels)
@@ -212,14 +214,14 @@ namespace ToDoAndNotes3.Controllers
                 Models.Task? copy = TasksController.DeepCopy(task);
                 if (copy == null)
                 {
-                    return RedirectToAction(nameof(HomeController.Main), "Home");
+                    return RedirectToLocal(returnUrl);
                 }
                 await _context.Tasks.AddAsync(copy);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(HomeController.Main), "Home");
+            return RedirectToLocal(returnUrl);
         }
-    
+
         public static Models.Task? DeepCopy(Models.Task oldTask)
         {
             if (oldTask == null || oldTask.ProjectId == null)
@@ -289,7 +291,7 @@ namespace ToDoAndNotes3.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             }
         }
     }

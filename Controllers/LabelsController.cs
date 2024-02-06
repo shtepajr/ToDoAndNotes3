@@ -19,29 +19,32 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Labels/CreatePartial
-        public IActionResult CreatePartial()
+        public IActionResult CreatePartial(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return PartialView("Labels/_CreatePartial", new Label());
         }
 
         // POST: Labels/CreatePartial
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePartial(Label label)
+        public async Task<IActionResult> CreatePartial(Label label, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
                 label.UserId = _userManager.GetUserId(User);
                 _context.Add(label);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Labels") });
+                return Json(new { success = true, redirectTo = returnUrl });
             }
             return PartialView("Labels/_CreatePartial", label);
         }
 
         // GET: Labels/EditPartial/5
-        public async Task<IActionResult> EditPartial(int? id)
+        public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (id == null)
             {
                 return NotFound();
@@ -58,7 +61,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Labels/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPartial(Label label)
+        public async Task<IActionResult> EditPartial(Label label, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -78,14 +81,16 @@ namespace ToDoAndNotes3.Controllers
                         throw;
                     }
                 }
-                return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Main), "Home") });
+                return Json(new { success = true, redirectTo = returnUrl });
             }
             return PartialView("Labels/_EditPartial", label);
         }
 
         // GET: : Labels/Delete/5
-        public async Task<IActionResult> DeletePartial(int? id)
+        public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (id == null)
             {
                 return NotFound();
@@ -119,11 +124,22 @@ namespace ToDoAndNotes3.Controllers
             _context.Labels.Remove(labelInclude);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, redirectTo = Url.Action(nameof(HomeController.Labels), "Home") });
+            return Json(new { success = true, redirectTo = returnUrl });
         }
         private bool LabelExists(int? id)
         {
             return _context.Labels.Any(e => e.LabelId == id);
+        }
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Labels), "Home");
+            }
         }
     }
 }
