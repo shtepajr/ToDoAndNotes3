@@ -5,19 +5,28 @@ $(function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
-    $(document).on('click', '.js-modal-btn', function (event) {
+
+    $(document).on('submit', '.js-partial-form', function (event) {
+        event.preventDefault();
+        //event.stopPropagation();
+
         let targetModalId = $(this).data('target-modal-id');
         let targetModal = $(`#${targetModalId}`);
-        let parentForm = $(this).closest('form');
-        let formMethod = parentForm.attr('method');
-        let formAction = parentForm.attr('action');
+        let formMethod = $(this).attr('method');
+        let formAction = $(this).attr('action');
 
-        let formData = new FormData(parentForm[0]);
+        let formData = new FormData($(this)[0]);
+        let returnUrl = formData.get('returnUrl');
+        let targetId = formData.get('id');
         // create URL
-        let returnUrl = formData.get('returnUrl'); // => /Home/Main?projectId=1
         let url = new URL(formAction, window.location.origin);
         let params = new URLSearchParams(url.search);
-        params.set('returnUrl', returnUrl);
+        if (!params.has('returnUrl')) {
+            params.set('returnUrl', returnUrl);
+        }
+        if (!params.has('id')) {
+            params.set('id', targetId);
+        }
         url.search = params.toString();
         formAction = url.toString();
 
@@ -30,9 +39,16 @@ $(function () {
             success: function (result) {
                 targetModal.html(result);
                 targetModal.find('.js-picker-input').trigger('blur');
+                targetModal.css('display', 'block');
             }
         });
     });
+    $(document).on('click', '.js-submit-by-form-id', function () {
+        let formId = $(this).data('form-id');
+        let form = $(`#${formId}`);
+        form.trigger('submit');
+    });
+
     $(document).on('click', '.js-submit-btn', function () {
         let parentModal = $(this).closest('.js-modal');
         let parentForm = $(this).closest('form');

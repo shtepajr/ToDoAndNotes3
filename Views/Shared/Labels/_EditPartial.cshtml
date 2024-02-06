@@ -13,9 +13,9 @@
             more_horiz
         </span>
         <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content">
-            <form asp-controller="Labels" asp-action="DeletePartial" method="get">
+            <form asp-controller="Labels" asp-action="DeletePartial" method="get" class="js-partial-form" data-target-modal-id="delete-label-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" data-target-modal-id="delete-label-modal" type="button">Delete</button>
+                <button class="btn" type="submit">Delete</button>
             </form>
         </div>
     </div>

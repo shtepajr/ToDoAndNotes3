@@ -22,9 +22,9 @@
         <div class="main-header-left">
             <div class="main-header-title nowrap-ellipsis">@viewName</div>
             <div class="main-header-buttons">
-                <form asp-controller="Tasks" asp-action="CreatePartial" method="get">
+                <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-partial-form" data-target-modal-id="create-task-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn btn-action js-modal-btn" data-target-modal-id="create-task-modal" type="button">
+                    <button class="btn btn-action"  type="submit">
                         <span class="material-symbols-outlined md-30">
                             add_task
                         </span>
@@ -59,11 +59,15 @@
         <ul class="tasks">
             @foreach (var task in Model.Tasks)
             {
+                <form id="edit-task-form" style="display: none;" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-task-modal">
+                    <input hidden type="text" name="id" value="@task.TaskId">
+                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                </form>
                 <li class="task nav-link dropdown">
-                    <a class="js-modal-btn">
+                    <a class="js-submit-by-form-id" data-form-id="edit-task-form">
                         <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form">
                             <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                            <button class="btn btn-clean" type="submit">
+                            <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
                                 @if (task.IsCompleted)
                                 {
                                     <span class="material-symbols-outlined md-24">
@@ -127,9 +131,9 @@
             }
         </ul>
         <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
-            <form asp-controller="Tasks" asp-action="EditPartial" method="get">
+            <form asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-task-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" data-target-modal-id="edit-task-modal" type="button">Edit</button>
+                <button class="btn" type="submit">Edit</button>
             </form>
             <form asp-controller="Tasks" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
@@ -140,9 +144,9 @@
                 <button class="btn" type="submit">Remove</button>
             </form>
             @* TEST (to del) *@
-            <form asp-controller="Tasks" asp-action="DeletePartial" method="get">
+            <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-partial-form" data-target-modal-id="delete-task-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" data-target-modal-id="delete-task-modal" type="button">Delete</button>
+                <button class="btn js-modal-btn" type="submit">Delete</button>
             </form>
         </div>
         @* modal (ajax request content) *@

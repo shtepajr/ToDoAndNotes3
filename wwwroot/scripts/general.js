@@ -52,10 +52,6 @@
             $(this).removeClass('show');
         });
     });
-    $(document).on('click', '.js-modal-btn', function () {
-        let modal = document.getElementById($(this).attr('data-target-modal-id'));
-        modal.style.display = 'block';
-    });
 
     // Text area auto grow
     function autoGrow(event) {

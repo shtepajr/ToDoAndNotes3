@@ -42,9 +42,9 @@
     <nav class="projects">
         <div class="projects-preview">
             <p>Projects</p>
-            <form asp-controller="Projects" asp-action="CreatePartial" method="get">
+            <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-partial-form" data-target-modal-id="create-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn btn-plus js-modal-btn" data-target-modal-id="create-project-modal" type="button">
+                <button class="btn btn-plus" type="submit">
                     <span class="material-symbols-outlined md-24">
                         add
                     </span>
@@ -74,9 +74,9 @@
         <div id="delete-project-modal" class="modal js-modal">
         </div>
         <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
-            <form asp-controller="Projects" asp-action="EditPartial" method="get">
+            <form asp-controller="Projects" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" data-target-modal-id="edit-project-modal" type="button">Edit</button>
+                <button class="btn" type="submit">Edit</button>
             </form>
             <form asp-controller="Projects" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
@@ -87,9 +87,9 @@
                 <button class="btn" type="submit">Remove</button>
             </form>
             @* TEST (to del) *@
-            <form asp-controller="Projects" asp-action="DeletePartial" method="get">
+            <form asp-controller="Projects" asp-action="DeletePartial" method="get" class="js-partial-form" data-target-modal-id="delete-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" data-target-modal-id="delete-project-modal" type="button">Delete</button>
+                <button class="btn" type="submit">Delete</button>
             </form>
         </div>
     </nav>

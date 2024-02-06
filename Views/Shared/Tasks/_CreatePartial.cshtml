@@ -81,9 +81,18 @@
 
     <div class="task-body">
         <div class="task-toggler">
-            <span class="material-symbols-outlined md-24 is-done-btn" id="task-is-done">
-                radio_button_unchecked
-            </span>
+            @if (Model.Task.IsCompleted)
+            {
+                <span class="material-symbols-outlined md-24" id="task-is-done">
+                    radio_button_checked
+                </span>
+            }
+            else
+            {
+                <span class="material-symbols-outlined md-24" id="task-is-done">
+                    radio_button_unchecked
+                </span>
+            }
         </div>
         <div class="task-content">
             <div>

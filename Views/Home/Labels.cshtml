@@ -19,9 +19,9 @@
         <div class="main-header-center">
             <div class="main-header-title">@ViewData["Title"]</div>
             <div class="main-header-buttons">
-                <form asp-controller="Labels" asp-action="CreatePartial" method="get">
+                <form asp-controller="Labels" asp-action="CreatePartial" method="get" class="js-partial-form" data-target-modal-id="create-label-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn btn-action js-modal-btn" data-target-modal-id="create-label-modal" type="button">
+                    <button class="btn btn-action" type="submit">
                         <span class="material-symbols-outlined md-30">
                             new_label
                         </span>
@@ -54,13 +54,13 @@
             <div id="delete-label-modal" class="modal">
             </div>
             <div class="dropdown-content js-dropdown-content" id="label-dropdown-content">
-                <form asp-controller="Labels" asp-action="EditPartial" method="get">
+                <form asp-controller="Labels" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-label-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn js-modal-btn" data-target-modal-id="edit-label-modal" type="button">Edit</button>
+                    <button class="btn" type="submit">Edit</button>
                 </form>
-                <form asp-controller="Labels" asp-action="DeletePartial" method="get">
+                <form asp-controller="Labels" asp-action="DeletePartial" method="get" class="js-partial-form" data-target-modal-id="delete-label-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn js-modal-btn" data-target-modal-id="delete-label-modal" type="button">Delete</button>
+                    <button class="btn" type="submit">Delete</button>
                 </form>
             </div>
         </ul>
