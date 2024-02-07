@@ -42,7 +42,7 @@
     <nav class="projects">
         <div class="projects-preview">
             <p>Projects</p>
-            <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-partial-form" data-target-modal-id="create-project-modal">
+            <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn btn-plus" type="submit">
                     <span class="material-symbols-outlined md-24">
@@ -74,7 +74,7 @@
         <div id="delete-project-modal" class="modal js-modal">
         </div>
         <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
-            <form asp-controller="Projects" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-project-modal">
+            <form asp-controller="Projects" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Edit</button>
             </form>
@@ -87,7 +87,7 @@
                 <button class="btn" type="submit">Remove</button>
             </form>
             @* TEST (to del) *@
-            <form asp-controller="Projects" asp-action="DeletePartial" method="get" class="js-partial-form" data-target-modal-id="delete-project-modal">
+            <form asp-controller="Projects" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Delete</button>
             </form>

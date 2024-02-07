@@ -54,11 +54,12 @@
     });
 
     // Text area auto grow
-    function autoGrow(event) {
-        var textarea = $(event.currentTarget);
+    $(document).on('focus input', '.js-textarea-auto', function () {
+        var textarea = $(this);
+        textarea.css('height', 5 + 'px');
         textarea.css('height', textarea[0].scrollHeight + 'px');
-    }
-    $(document).on('focus input', '.js-textarea-auto', autoGrow);
+    });
+
     // Date Time Picker
     $(document).on('click', '.js-date-picker', function () {
         let datePickerInput = $(this).find('.js-picker-input');

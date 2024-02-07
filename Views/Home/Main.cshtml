@@ -22,7 +22,7 @@
         <div class="main-header-left">
             <div class="main-header-title nowrap-ellipsis">@viewName</div>
             <div class="main-header-buttons">
-                <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-partial-form" data-target-modal-id="create-task-modal">
+                <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-task-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn btn-action"  type="submit">
                         <span class="material-symbols-outlined md-30">
@@ -59,7 +59,7 @@
         <ul class="tasks">
             @foreach (var task in Model.Tasks)
             {
-                <form id="edit-task-form" style="display: none;" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-task-modal">
+                <form id="edit-task-form" style="display: none;" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
                     <input hidden type="text" name="id" value="@task.TaskId">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 </form>
@@ -131,7 +131,7 @@
             }
         </ul>
         <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
-            <form asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-partial-form" data-target-modal-id="edit-task-modal">
+            <form asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Edit</button>
             </form>
@@ -144,7 +144,7 @@
                 <button class="btn" type="submit">Remove</button>
             </form>
             @* TEST (to del) *@
-            <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-partial-form" data-target-modal-id="delete-task-modal">
+            <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-task-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn js-modal-btn" type="submit">Delete</button>
             </form>

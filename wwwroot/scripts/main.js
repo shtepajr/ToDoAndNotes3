@@ -5,10 +5,13 @@ $(function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
-
-    $(document).on('submit', '.js-partial-form', function (event) {
+    $(document).on('click', '.js-submit-by-form-id', function () {
+        let formId = $(this).data('form-id');
+        let form = $(`#${formId}`);
+        form.trigger('submit');
+    });
+    $(document).on('submit', '.js-get-partial-form', function (event) {
         event.preventDefault();
-        //event.stopPropagation();
 
         let targetModalId = $(this).data('target-modal-id');
         let targetModal = $(`#${targetModalId}`);
@@ -40,22 +43,19 @@ $(function () {
                 targetModal.html(result);
                 targetModal.find('.js-picker-input').trigger('blur');
                 targetModal.css('display', 'block');
+                targetModal.find('.js-textarea-auto').trigger('focus');
             }
         });
     });
-    $(document).on('click', '.js-submit-by-form-id', function () {
-        let formId = $(this).data('form-id');
-        let form = $(`#${formId}`);
-        form.trigger('submit');
-    });
+    $(document).on('submit', '.js-post-partial-form', function (event) {
+        event.preventDefault();
 
-    $(document).on('click', '.js-submit-btn', function () {
         let parentModal = $(this).closest('.js-modal');
-        let parentForm = $(this).closest('form');
-        let formMethod = parentForm.attr('method');
-        let formAction = parentForm.attr('action');
-        let formToken = parentForm.find('input[name="__RequestVerificationToken"]').val();
-        let formData = parentForm.serialize();
+        let form = $(this);
+        let formMethod = form.attr('method');
+        let formAction = form.attr('action');
+        let formToken = form.find('input[name="__RequestVerificationToken"]').val();
+        let formData = form.serialize();
 
         // POST: create/edit/delete project
         // POST: create/edit/delete label
@@ -78,7 +78,6 @@ $(function () {
             }
         });
     });
-
     function checkWindowSize() {
         let main = $('#main');
 
