@@ -78,6 +78,7 @@ $(function () {
             }
         });
     });
+
     function checkWindowSize() {
         let main = $('#main');
 
@@ -127,6 +128,19 @@ $(function () {
             }
         }
     }
+
+    $(document).on('click', '.js-task-is-done', function () {
+        let isChecked = this.innerHTML.includes('radio_button_checked');
+
+        if (isChecked) {
+            this.innerHTML = 'radio_button_unchecked';
+            $(this).closest('form')
+            $(this).closest('form').find('input[name="Task.IsCompleted"]').val(false);
+        } else {
+            this.innerHTML = 'radio_button_checked';
+            $(this).closest('form').find('input[name="Task.IsCompleted"]').val(true);
+        }
+    });
 
     $('.label-tools').each(function () {
         let labelsCount = $(this).children('.tools-label').length;

@@ -58,6 +58,8 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePartial(TaskLabelsViewModel taskLabels, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (ModelState.IsValid)
             {
                 if (!ProjectExists(taskLabels.Task.ProjectId))
@@ -99,7 +101,7 @@ namespace ToDoAndNotes3.Controllers
             }
 
             IEnumerable<int?> selectedInt = taskInclude?.TaskLabels?.Select(tl => tl.Label.LabelId);
-            string selected = JsonSerializer.Serialize(selectedInt);
+            string selected = JsonSerializer.Serialize(selectedInt); // => "[12, 17]"
 
             return PartialView("Tasks/_EditPartial", new TaskLabelsViewModel()
             {
@@ -243,9 +245,6 @@ namespace ToDoAndNotes3.Controllers
             return RedirectToLocal(returnUrl);
         }
 
-
-
-
         public static Models.Task? DeepCopy(Models.Task oldTask)
         {
             if (oldTask == null || oldTask.ProjectId == null)
@@ -285,6 +284,7 @@ namespace ToDoAndNotes3.Controllers
         {
             if (taskLabelsViewModel?.SelectedLabelsId != null)
             {
+                // SelectedLabelsId value: " \"12\" , \"17\" "
                 List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabelsViewModel?.SelectedLabelsId);
                 List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
 

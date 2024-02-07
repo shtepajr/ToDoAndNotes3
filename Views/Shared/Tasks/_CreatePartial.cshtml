@@ -56,19 +56,6 @@
             let selectedProject = $(this).val();
             $('input[name="Task.ProjectId"]').val(selectedProject);
         });
-
-        // is done toggle
-        $('#task-is-done').on('click', function () {
-            var isChecked = this.innerHTML.includes('radio_button_checked');
-
-            if (isChecked) {
-                this.innerHTML = 'radio_button_unchecked';
-                $('#Task_IsCompleted').val(false);
-            } else {
-                this.innerHTML = 'radio_button_checked';
-                $('#Task_IsCompleted').val(true);
-            }
-        });
     })
 </script>
 
@@ -84,13 +71,13 @@
         <div class="task-toggler">
             @if (Model.Task.IsCompleted)
             {
-                <span class="material-symbols-outlined md-24" id="task-is-done">
+                <span class="material-symbols-outlined md-24 js-task-is-done">
                     radio_button_checked
                 </span>
             }
             else
             {
-                <span class="material-symbols-outlined md-24" id="task-is-done">
+                <span class="material-symbols-outlined md-24 js-task-is-done">
                     radio_button_unchecked
                 </span>
             }
