@@ -5,11 +5,41 @@ $(function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
+
+    $(document).on('click', '.js-pass-data-to', function () {
+        let targetId = $(this).data('receiver-id');
+        let id = $(this).data('id'); // element data
+        let target = $(`#${targetId}`);
+
+        if (target.is('form')) {
+            setIdToAction(target, id);
+            target.trigger('submit'); // if target is one form also submit it
+        }
+        else {
+            let forms = target.find('form');
+            forms.each(function () {
+                setIdToAction($(this), id);
+            });
+        }
+
+        function setIdToAction(target, id) {
+            let currentAction = target.attr('action');
+
+            if (currentAction.includes('id=')) {
+                let updatedAction = currentAction.replace(/id=[^\/]+/, 'id=' + id);
+                target.attr('action', updatedAction);
+            } else {
+                target.attr('action', currentAction + (currentAction.includes('?') ? '&' : '?') + 'id=' + id);
+            }
+        }
+    });
+
     $(document).on('click', '.js-submit-by-form-id', function () {
         let formId = $(this).data('form-id');
         let form = $(`#${formId}`);
         form.trigger('submit');
     });
+
     $(document).on('submit', '.js-get-partial-form', function (event) {
         event.preventDefault();
 
@@ -50,7 +80,8 @@ $(function () {
     $(document).on('submit', '.js-post-partial-form', function (event) {
         event.preventDefault();
 
-        let parentModal = $(this).closest('.js-modal');
+        let targetModalId = $(this).data('target-modal-id');
+        let targetModal = $(`#${targetModalId}`);
         let form = $(this);
         let formMethod = form.attr('method');
         let formAction = form.attr('action');
@@ -72,8 +103,8 @@ $(function () {
                     window.location.href = result.redirectTo;
                 }
                 else {
-                    parentModal.html(result);
-                    parentModal.find('.js-picker-input').trigger('blur');
+                    targetModal.html(result);
+                    targetModal.find('.js-picker-input').trigger('blur');
                 }
             }
         });

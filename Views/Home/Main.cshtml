@@ -59,12 +59,8 @@
         <ul class="tasks">
             @foreach (var task in Model.Tasks)
             {
-                <form id="edit-task-form" style="display: none;" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
-                    <input hidden type="text" name="id" value="@task.TaskId">
-                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                </form>
                 <li class="task nav-link dropdown">
-                    <a class="js-submit-by-form-id" data-form-id="edit-task-form">
+                    <a class="js-pass-data-to" data-receiver-id="edit-task-form" data-id="@task.TaskId">
                         <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form">
                             <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                             <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
@@ -123,7 +119,8 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-dropdown-content-id="task-dropdown-content" data-target-id="@task?.TaskId">
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-pass-data-to"
+                              data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
                             more_horiz
                         </span>
                     </a>
@@ -131,7 +128,7 @@
             }
         </ul>
         <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
-            <form asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
+            <form id="edit-task-form" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Edit</button>
             </form>

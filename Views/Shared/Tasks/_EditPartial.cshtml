@@ -17,7 +17,8 @@
         </div>
     </div>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-dropdown-content-id="current-task-dropdown-content" data-target-id="@Model.Task.TaskId">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-pass-data-to"
+              data-dropdown-content-id="current-task-dropdown-content" data-receiver-id="current-task-dropdown-content" data-id="@Model.Task.TaskId">
             more_horiz
         </span>
         <div class="dropdown-content js-dropdown-content" id="current-task-dropdown-content">
@@ -70,7 +71,7 @@
 </script>
 
 <form method="post" asp-controller="Tasks" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form">
+      class="js-post-partial-form" data-target-modal-id="edit-task-modal">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Task.TaskId" />

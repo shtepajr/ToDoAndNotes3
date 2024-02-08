@@ -11,7 +11,8 @@
     </div>
 }
 
-<form method="post" asp-controller="Projects" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-partial-form">
+<form method="post" asp-controller="Projects" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-partial-form"
+      data-target-modal-id="create-project-modal">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="IsDeleted"/>

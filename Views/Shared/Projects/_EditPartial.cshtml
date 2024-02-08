@@ -9,7 +9,8 @@
         <div class="modal-title">Edit</div>
     </div>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn" data-dropdown-content-id="current-project-dropdown-content" data-target-id="@Model.ProjectId">
+        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-pass-data-to"
+              data-dropdown-content-id="current-project-dropdown-content" data-receiver-id="current-project-dropdown-content" data-id="@Model.ProjectId">
             more_horiz
         </span>
         <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
@@ -25,8 +26,8 @@
     </div>
 }
 
-<form method="post" asp-controller="Projects" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" 
-        class="js-post-partial-form">
+<form method="post" asp-controller="Projects" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
+      class="js-post-partial-form" data-target-modal-id="edit-project-modal">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="ProjectId" />

@@ -18,22 +18,7 @@
         event.preventDefault(); // parent <a> project will not work  
 
         let dropContentId = $(this).data('dropdown-content-id');
-
-        // get target id (e.g ProjectId)
-        let targetId = $(this).data('target-id');
         let dropContent = $(`#${dropContentId}`);
-
-        let forms = dropContent.find('form');
-        forms.each(function () {
-            let currentAction = $(this).attr('action');
-
-            if (currentAction.includes('id=')) {
-                let updatedAction = currentAction.replace(/id=[^\/]+/, 'id=' + targetId);
-                $(this).attr('action', updatedAction);
-            } else {
-                $(this).attr('action', currentAction + (currentAction.includes('?') ? '&' : '?') + 'id=' + targetId);
-            }
-        });
 
         // show
         dropContent.css('top', event.clientY + 10 + "px");

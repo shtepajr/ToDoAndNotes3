@@ -238,7 +238,6 @@ a.btn-default, button.btn-default {
     resize: none;
     max-height: 300px;
     overflow-y: auto;
-    scrollbar-color: #007 #bada55;
 }
 
 .modal .modal-title {

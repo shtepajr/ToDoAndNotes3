@@ -60,7 +60,8 @@
                 <li class="project nav-link dropdown">
                     <a asp-controller="Home" asp-action="Main" asp-route-projectId="@project.ProjectId">
                         <div class="nowrap-ellipsis">@project.Title</div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn" data-dropdown-content-id="project-dropdown-content" data-target-id="@project.ProjectId">
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-pass-data-to"
+                              data-dropdown-content-id="project-dropdown-content" data-receiver-id="project-dropdown-content" data-id="@project.ProjectId">
                             more_horiz
                         </span>
                     </a>

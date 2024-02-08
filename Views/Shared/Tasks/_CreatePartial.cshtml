@@ -60,7 +60,7 @@
 </script>
 
 <form method="post" asp-controller="Tasks" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form">
+      class="js-post-partial-form" data-target-modal-id="create-task-modal">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Task.IsDeleted" />

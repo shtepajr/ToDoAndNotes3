@@ -10,8 +10,8 @@
     </div>
 }
 
-<form method="post" asp-controller="Labels" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" 
-        class="js-post-partial-form">
+<form method="post" asp-controller="Labels" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
+      class="js-post-partial-form" data-target-modal-id="create-label-modal">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="IsDeleted" />
