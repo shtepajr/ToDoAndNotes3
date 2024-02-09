@@ -65,6 +65,8 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPartial(Project project, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (ModelState.IsValid)
             {
                 try
@@ -108,6 +110,8 @@ namespace ToDoAndNotes3.Controllers
                 }
                 await _context.SaveChangesAsync();
             }
+
+            returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             return RedirectToLocal(returnUrl);
         }
 
