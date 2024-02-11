@@ -37,7 +37,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Main
-        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null)
+        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);

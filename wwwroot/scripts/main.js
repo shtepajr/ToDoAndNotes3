@@ -47,11 +47,11 @@ $(function () {
         let targetModal = $(`#${targetModalId}`);
         let formMethod = $(this).attr('method');
         let formAction = $(this).attr('action');
-
         let formData = new FormData($(this)[0]);
         let returnUrl = formData.get('returnUrl');
         let targetId = formData.get('id');
-        // create URL
+
+        // create form action URL
         let url = new URL(formAction, window.location.origin);
         let params = new URLSearchParams(url.search);
         if (!params.has('returnUrl')) {
@@ -63,9 +63,9 @@ $(function () {
         url.search = params.toString();
         formAction = url.toString();
 
-        // GET: create/edit/delete project partial
-        // GET: create/edit/delete label partial
-        // GET: create/edit/delete task partial
+         //GET: create/edit/delete project partial
+         //GET: create/edit/delete label partial
+         //GET: create/edit/delete task partial
         $.ajax({
             url: formAction,
             type: formMethod,
@@ -74,6 +74,16 @@ $(function () {
                 targetModal.find('.js-picker-input').trigger('blur');
                 targetModal.css('display', 'block');
                 targetModal.find('.js-textarea-auto').trigger('focus');
+
+                // set openModal param
+                let mainFullUrl = new URL(window.location.href);
+                let mainParams = mainFullUrl.searchParams;
+
+                mainParams.set('openModal', formAction);
+                mainFullUrl.searchParams = mainParams;
+                window.history.pushState({}, '', mainFullUrl.toString());
+
+                console.log('openModal from AJAX: ', formAction);
             }
         });
     });
@@ -188,4 +198,47 @@ $(function () {
             $(this).html(''); // empty if there is not labels
         }
     });
+
+    $(document).on('click', function (event) {
+        if (event.target.classList.contains('js-close')) {
+            let url = new URL(window.location.href);
+            url.searchParams.delete('openModal');
+            window.history.pushState({}, '', url.toString());
+        }
+    });
+
+    /* 
+      Open modal:
+      1. Main url: get openModal param
+      2. Open modal url: path (form action)
+      3. Open modal url: params (form inputs)
+    */
+    let urlParams = new URLSearchParams(window.location.search);
+    let openModalUrl = urlParams.get('openModal');
+    if (openModalUrl !== null) {
+        let url = new URL(openModalUrl);
+        let params = url.searchParams;
+        let modalId;
+        if (url.pathname.includes('Tasks')) {
+            modalId = 'edit-task-modal';
+        }
+        else if (url.pathname.includes('Notes')) {
+            modalId = 'edit-note-modal';
+        }
+        else if (url.pathname.includes('Projects')) {
+            modalId = 'edit-project-modal';
+        }
+        else {
+            return;
+        }
+
+        let form = $(
+            `<form id="test" method="get" action=${url.pathname} class="js-get-partial-form" data-target-modal-id="${modalId}">
+                <input type="hidden" name="id" value="${params.get('id')}">
+                <input type="hidden" name="returnUrl" value="${params.get('returnUrl')}">
+            </form>`
+        );
+        $('body').append(form);
+        $('body').find('#test').trigger('submit');
+    }
 });
