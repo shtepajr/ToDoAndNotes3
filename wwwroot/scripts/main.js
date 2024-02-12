@@ -119,6 +119,33 @@ $(function () {
             }
         });
     });
+    $(document).on('submit', '.js-change-temp-data', function (event) {
+        event.preventDefault();
+
+        console.log('hello');
+
+        let formAction = $(this).attr('action');
+        let formData = $(this).serialize();
+        let formToken = $(this).find('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            url: formAction,
+            type: 'POST',
+            data: formData,
+            headers: {
+                RequestVerificationToken: formToken
+            },
+            success: function (result) {
+                if (result.success) {
+                    window.location.href = result.redirectTo;
+                    console.log('success');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('error');
+            }
+        });
+    });
 
     function checkWindowSize() {
         let main = $('#main');

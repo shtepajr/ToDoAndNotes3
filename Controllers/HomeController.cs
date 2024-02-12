@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -39,15 +40,27 @@ namespace ToDoAndNotes3.Controllers
         // GET: /Home/Main
         public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null)
         {
-            GeneralViewModel generalViewModel = new GeneralViewModel();
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
             projectId ??= defaultProject.ProjectId;
 
             // provide authorization for projectId
 
-            TempData["CurrentProjectId"] = projectId; // => for select on the view
-            TempData["DaysViewName"] = daysViewName;  // => for title on the view
+            TempData["CurrentProjectId"] = projectId; // => for select on the create task/note views
+
+            string? dateOrder = TempData["DateOrder"] as string;
+            TempData.Keep("DateOrder");
+            string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower(); // True => true
+            Boolean.TryParse(hideCompletedString, out bool hideCompleted);
+
+            if (dateOrder == null)
+            {
+                TempData["DateOrder"] = dateOrder = "descending";
+            }
+            if (hideCompleted == null)
+            {
+                TempData["HideCompleted"] = hideCompleted = false;
+            }
 
             if (daysViewName == null)
             {
@@ -58,6 +71,95 @@ namespace ToDoAndNotes3.Controllers
                 ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
             }
 
+            if (daysViewName == DaysViewName.Today || daysViewName == DaysViewName.Upcoming)
+            {
+                TempData["DaysViewName"] = daysViewName;  // => title on the view
+            }
+            else if (daysViewName == DaysViewName.Unsorted || projectId != null)
+            {
+                TempData["DaysViewName"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
+            }
+
+            GeneralViewModel generalViewModel = await LoadGeneralViewModel(daysViewName, userId, projectId);
+            
+            // sort by dateOrder, hideCompleted
+            if (dateOrder == "ascending")
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ToList();
+            }
+            else
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ToList();
+            }
+            if (hideCompleted == true)
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.IsCompleted == false).ToList();
+            }
+
+            return View(generalViewModel);
+        }
+
+        // GET: /Home/Labels
+        public async Task<IActionResult> Labels()
+        {
+            ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Labels), "Home");
+
+            ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
+            string? userId = _userManager.GetUserId(User);
+            var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
+            var labels = await _context.Labels.Where(p => p.UserId == userId).ToListAsync();
+            projectLabelViewModel.Projects = projects;
+            projectLabelViewModel.Labels = labels;
+            return View(projectLabelViewModel);
+        }
+
+        // GET: /Home/Privacy
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        // GET: /Home/Privacy
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        // POST: /Home/ChangeTempDataValue
+        [HttpPost]
+        public IActionResult ChangeTempDataValue(string? tempDataName, string? tempDataValue = null, string? returnUrl = null)
+        {
+            if (string.IsNullOrWhiteSpace(tempDataName))
+            {
+                return Json(new { success = false });
+            }
+            TempData[tempDataName] = tempDataValue;
+            return Json(new { success = true, redirectTo = returnUrl });
+        }
+
+        #region Helpers
+        Models.Project GetOrCreateDefaultProject()
+        {
+            var checkDefault = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User) 
+                                                                && p.IsDefault == true).FirstOrDefault();
+            if (checkDefault == null)
+            {
+                var defaultProject = new Models.Project()
+                {
+                    IsDefault = true,
+                    Title = "Unsorted",
+                    UserId = _userManager.GetUserId(User),
+                };
+                _context.Add(defaultProject);
+                _context.SaveChanges();
+                return defaultProject;
+            }
+            return checkDefault;
+        }
+        async Task<GeneralViewModel> LoadGeneralViewModel(DaysViewName? daysViewName, string? userId, int? projectId)
+        {
+            GeneralViewModel generalViewModel = new GeneralViewModel();
             if (daysViewName == DaysViewName.Today)
             {
                 var today = DateOnly.FromDateTime(DateTime.Now);
@@ -103,58 +205,22 @@ namespace ToDoAndNotes3.Controllers
 
                 generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
                 generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
-                TempData["DaysViewName"] = currentProjectInclude.Title;
             }
-
-            return View(generalViewModel);
+            generalViewModel.Labels = await _context.Labels.Where(l => l.UserId == userId).ToListAsync();
+            return generalViewModel;
         }
-
-        // GET: /Home/Labels
-        public async Task<IActionResult> Labels()
+        private IActionResult RedirectToLocal(string returnUrl)
         {
-            ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Labels), "Home");
-
-            ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
-            string? userId = _userManager.GetUserId(User);
-            var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
-            var labels = await _context.Labels.Where(p => p.UserId == userId).ToListAsync();
-            projectLabelViewModel.Projects = projects;
-            projectLabelViewModel.Labels = labels;
-            return View(projectLabelViewModel);
-        }
-
-        // GET: /Home/Privacy
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        // GET: /Home/Privacy
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        #region Helpers
-        Models.Project GetOrCreateDefaultProject()
-        {
-            var checkDefault = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User) 
-                                                                && p.IsDefault == true).FirstOrDefault();
-            if (checkDefault == null)
+            if (Url.IsLocalUrl(returnUrl))
             {
-                var defaultProject = new Models.Project()
-                {
-                    IsDefault = true,
-                    Title = "Unsorted",
-                    UserId = _userManager.GetUserId(User),
-                };
-                _context.Add(defaultProject);
-                _context.SaveChanges();
-                return defaultProject;
+                return Redirect(returnUrl);
             }
-            return checkDefault;
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
+            }
         }
+
         // test
         void SeedDbData()
         {

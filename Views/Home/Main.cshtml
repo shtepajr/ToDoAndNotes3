@@ -4,8 +4,32 @@
     Layout = "_MainLayout";
     ViewData["Title"] = "Main";
 
-    var viewName = TempData["DaysViewName"];
+    var daysViewName = TempData["DaysViewName"];
     TempData.Keep("DaysViewName");
+
+    // sort value
+    var dateOrder = TempData["DateOrder"] as string;
+    string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower();
+    Boolean.TryParse(hideCompletedString, out bool hideCompleted);
+    TempData.Keep("DateOrder");
+    TempData.Keep("HideCompleted");
+
+    if (dateOrder == "ascending")
+    {
+        dateOrder = "descending";
+    }
+    else if (dateOrder == "descending")
+    {
+        dateOrder = "ascending";
+    }
+    if (hideCompleted == false)
+    {
+        hideCompleted = true;
+    }
+    else if (hideCompleted == true)
+    {
+        hideCompleted = false;
+    }
 }
 
 @section Header 
@@ -20,7 +44,7 @@
 <main id="main">
     <div class="main-header">
         <div class="main-header-left">
-            <div class="main-header-title nowrap-ellipsis">@viewName</div>
+            <div class="main-header-title nowrap-ellipsis">@daysViewName</div>
             <div class="main-header-buttons">
                 <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-task-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
@@ -46,10 +70,24 @@
                     </div>
                 </div>
                 <button class="btn btn-action">
-                    <span class="material-symbols-outlined md-30">
+                    <span class="material-symbols-outlined md-30 js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
                         filter_alt
                     </span>
                 </button>
+                <div class="dropdown-content js-dropdown-content" id="filter-dropdown-content">
+                    <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-change-temp-data">
+                        <input hidden type="text" name="tempDataName" value="DateOrder">
+                        <input hidden type="text" name="tempDataValue" value="@dateOrder">
+                        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                        <button class="btn" type="submit">DateOrder sort</button>
+                    </form>
+                    <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-change-temp-data">
+                        <input hidden type="text" name="tempDataName" value="HideCompleted">
+                        <input hidden type="text" name="tempDataValue" value="@hideCompleted.ToString()">
+                        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                        <button class="btn" type="submit">HideCompleted sort</button>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="main-header-right">
