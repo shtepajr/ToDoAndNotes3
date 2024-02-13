@@ -85,16 +85,21 @@ namespace ToDoAndNotes3.Controllers
             // sort by dateOrder, hideCompleted
             if (dateOrder == "ascending")
             {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ToList();
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
             }
             else
             {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ToList();
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
             }
             if (hideCompleted == true)
             {
                 generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.IsCompleted == false).ToList();
             }
+            else
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.IsCompleted).ToList();
+            }
+
 
             return View(generalViewModel);
         }

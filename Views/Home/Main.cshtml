@@ -69,8 +69,8 @@
                         @* <partial name="Task/Create" model="new ToDoAndNotes3.Models.Task()"/> *@
                     </div>
                 </div>
-                <button class="btn btn-action">
-                    <span class="material-symbols-outlined md-30 js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
+                <button class="btn btn-action js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
+                    <span class="material-symbols-outlined md-30">
                         filter_alt
                     </span>
                 </button>
@@ -79,13 +79,39 @@
                         <input hidden type="text" name="tempDataName" value="DateOrder">
                         <input hidden type="text" name="tempDataValue" value="@dateOrder">
                         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                        <button class="btn" type="submit">DateOrder sort</button>
+                        <button class="btn" type="submit">
+                            <span class="material-symbols-outlined md-24 js-dropdown-btn">
+                                swap_vert
+                            </span>
+                            @if (dateOrder == "descending")
+                            {
+                                @Html.Raw("Due date (asc)")
+                            }
+                            else
+                            {
+                                @Html.Raw("Due date (desc)")
+                            }
+                        </button>
                     </form>
                     <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-change-temp-data">
                         <input hidden type="text" name="tempDataName" value="HideCompleted">
                         <input hidden type="text" name="tempDataValue" value="@hideCompleted.ToString()">
                         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                        <button class="btn" type="submit">HideCompleted sort</button>
+                        <button class="btn" type="submit">  
+                            @if (hideCompleted == true)
+                            {
+                                <span class="material-symbols-outlined md-24 js-dropdown-btn">
+                                    visibility
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined md-24 js-dropdown-btn">
+                                    visibility_off
+                                </span>
+                            }
+                            Completed
+                        </button>
                     </form>
                 </div>
             </div>
@@ -117,7 +143,14 @@
                             </button>
                         </form>
                         <div class="task-content">
-                            <div class="nowrap-ellipsis">@task.Title</div>
+                            @if (task.IsCompleted)
+                            {
+                                <div class="nowrap-ellipsis line-through">@task.Title</div>
+                            }
+                            else
+                            {
+                                <div class="nowrap-ellipsis">@task.Title</div>
+                            }
                             <div class="tools">
                                 <div class="date-tools">
                                     @if(task?.DueDate != null){

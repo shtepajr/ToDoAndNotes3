@@ -333,6 +333,9 @@ a.btn-default, button.btn-default {
 .dropdown-content a, .dropdown-content button {
     padding: 5px;
     padding-left: 7px;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
 }
 .dropdown-content button {
     background-color: inherit;
@@ -383,6 +386,7 @@ a.btn-default, button.btn-default {
 }
 .line-through {
     text-decoration: line-through;
+    text-decoration-thickness: 2px;
 }
 .min-width-0 {
     min-width: 0;
