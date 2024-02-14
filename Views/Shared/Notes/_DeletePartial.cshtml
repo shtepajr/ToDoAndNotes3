@@ -1,0 +1,21 @@
+﻿@model TaskLabelsViewModel
+
+@{
+    Layout = "_ModalContentLayout";
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Delete</div>
+    </div>
+}
+
+<div>Are you sure you want to delete <strong>"@Model.Task.Title"</strong> task?</div>
+<form method="post" asp-controller="Tasks" asp-action="Delete" asp-route-id="@Model.Task.TaskId" asp-route-returnUrl="@ViewData["ReturnUrl"]"
+      class="js-post-partial-form" data-target-modal-id="delete-task-modal">
+    @Html.AntiForgeryToken()
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok" type="submit">Ok</button>
+    </div>
+</form>

@@ -4,8 +4,6 @@
     Layout = "_ModalContentLayout";
     ViewData["SelectLabels"] = new SelectList(Model.Labels, "LabelId", "Title");
     ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
-    string projectSelect = JsonSerializer.Serialize(ViewBag.SelectProjects); // "[{..},{..},{..}]"
-    string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);
 }
 
 @section ModalHeaderContent {
@@ -15,8 +13,7 @@
             <span class="material-symbols-outlined md-24 black select-togle-icon">
                 arrow_drop_down
             </span>
-            <div class="js-set-projects-virtual-select" data-target-select-list=@Html.Raw(projectSelect) // [{..},{..},{..}]
-                 data-target-selected=@Html.Raw(Model.Task.ProjectId)></div>
+            <div id="select-project-edit"></div>
         </div>
     </div>
     <div class="dropdown">
@@ -36,6 +33,42 @@
         </div>
     </div>
 }
+
+<script>
+    $(function () {
+        let labelsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectLabels));
+        // !!! VirtualSelect ele should be unique
+        VirtualSelect.init({
+            ele: '#select-labels-edit',
+            options: labelsOptions.map(option => ({ label: option.text, value: option.value })),
+            multiple: true,
+            placeholder: "Labels",
+            optionsSelectedText: "labels",
+            optionSelectedText: "label",
+            hideClearButton: true,
+            selectedValue: @Html.Raw(Model.SelectedLabelsId),
+        });
+
+        let projectsOptions = @Html.Raw(Json.Serialize(ViewBag.SelectProjects));
+        VirtualSelect.init({
+            ele: '#select-project-edit',
+            options: projectsOptions.map(option => ({ label: option.text, value: option.value })),
+            hideClearButton: true,
+            selectedValue: @Html.Raw(@Model.Task.ProjectId),
+        });
+
+        /* selected => to input */
+        $('#select-labels-edit').on('change', function () {
+            let selectedOptions = $('#select-labels-edit').get(0).getSelectedOptions();
+            let selectedValues = Array.from(selectedOptions).map(option => option.value);  // array =>  ['12', '17']
+            $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));       // string => ["12", "17"]
+        });
+        $('#select-project-edit').on('change', function () {
+            let selectedProject = $(this).val();
+            $('input[name="Task.ProjectId"]').val(selectedProject);
+        });
+    })
+</script>
 
 <form method="post" asp-controller="Tasks" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
       class="js-post-partial-form" data-target-modal-id="edit-task-modal">
@@ -102,8 +135,6 @@
                         label
                     </span>
                     <div id="select-labels-edit"></div>
-                    <div class="js-set-labels-virtual-select" data-target-select-list=@Html.Raw(labelsSelect)
-                         data-target-selected=@Html.Raw(Model.SelectedLabelsId)></div>
                 </div>
             </div>
         </div>

@@ -74,6 +74,10 @@ $(function () {
                 targetModal.find('.js-picker-input').trigger('blur');
                 targetModal.css('display', 'block');
                 targetModal.find('.js-textarea-auto').trigger('focus');
+                //targetModal.find('.js-set-labels-virtual-select').trigger('click');
+                targetModal.find('.js-set-projects-virtual-select').trigger('blur');
+                targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
+                targetModal.initInnerVirtualSelects();
 
                 // set openModal param
                 let mainFullUrl = new URL(window.location.href);
@@ -82,8 +86,6 @@ $(function () {
                 mainParams.set('openModal', formAction);
                 mainFullUrl.searchParams = mainParams;
                 window.history.pushState({}, '', mainFullUrl.toString());
-
-                console.log('openModal from AJAX: ', formAction);
             }
         });
     });
@@ -233,6 +235,59 @@ $(function () {
             window.history.pushState({}, '', url.toString());
         }
     });
+
+    function initInnerVirtualSelects() {
+        // projectSelect
+        let projectSelect = $(this).find('.js-set-projects-virtual-select');
+        if (projectSelect.length > 0) {
+            let projectsOptions = projectSelect.data('target-select-list'); // [{..},{..},{..}]
+            let projectsSelected = projectSelect.data('target-selected'); // number
+            console.log(projectsOptions);
+            console.log(projectsSelected);
+
+            VirtualSelect.init({
+                ele: projectSelect.get(0),
+                options: projectsOptions.map(option => ({ label: option.Text, value: option.Value })),
+                hideClearButton: true,
+            });
+            projectSelect.get(0).setValue(projectsSelected);
+
+            // set value to its input
+            projectSelect.on('change', function () {
+                let selectedProject = $(this).val();
+                $('input[name="Task.ProjectId"]').val(selectedProject);
+                console.log($('input[name="Task.ProjectId"]').val());
+            });
+        }
+      
+        // labels
+        let labelsSelect = $(this).find('.js-set-labels-virtual-select');
+        if (labelsSelect.length > 0) {
+            let labelsOptions = labelsSelect.data('target-select-list'); // ["12", "17"]
+            let labelsSelected = labelsSelect.data('target-selected');
+            console.log(labelsOptions);
+            console.log(labelsSelected);
+
+            VirtualSelect.init({
+                ele: labelsSelect.get(0),
+                options: labelsOptions.map(option => ({ label: option.Text, value: option.Value })),
+                multiple: true,
+                placeholder: "Labels",
+                optionsSelectedText: "labels",
+                optionSelectedText: "label",
+                hideClearButton: true,
+            });
+            labelsSelect.get(0).setValue(labelsSelected);
+
+            // set value to its input
+            labelsSelect.on('change', function () {
+                let selectedOptions = $(this).get(0).getSelectedOptions();
+                let selectedValues = Array.from(selectedOptions).map(option => option.value);
+                $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));
+                console.log($('input[name="SelectedLabelsId"]').val());
+            });
+        }
+    }
 
     /* 
       Open modal:
