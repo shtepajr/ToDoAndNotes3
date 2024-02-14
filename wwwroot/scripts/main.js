@@ -1,11 +1,9 @@
-$(function () {
-    checkWindowSize();
+$(function () {   
     $(window).on('resize', checkWindowSize);
     $('#burger-menu-toggle').on('click', function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
-
     $(document).on('click', '.js-pass-data-to', function () {
         let targetId = $(this).data('receiver-id');
         let id = $(this).data('id'); // element data
@@ -33,13 +31,11 @@ $(function () {
             }
         }
     });
-
     $(document).on('click', '.js-submit-by-form-id', function () {
         let formId = $(this).data('form-id');
         let form = $(`#${formId}`);
         form.trigger('submit');
     });
-
     $(document).on('submit', '.js-get-partial-form', function (event) {
         event.preventDefault();
 
@@ -77,7 +73,9 @@ $(function () {
                 //targetModal.find('.js-set-labels-virtual-select').trigger('click');
                 targetModal.find('.js-set-projects-virtual-select').trigger('blur');
                 targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
+                targetModal.initInnerQuill = initInnerQuill;
                 targetModal.initInnerVirtualSelects();
+                targetModal.initInnerQuill();
 
                 // set openModal param
                 let mainFullUrl = new URL(window.location.href);
@@ -148,6 +146,40 @@ $(function () {
             }
         });
     });
+    $(document).on('click', '.js-task-is-done', function () {
+        let isChecked = this.innerHTML.includes('radio_button_checked');
+
+        if (isChecked) {
+            this.innerHTML = 'radio_button_unchecked';
+            $(this).closest('form')
+            $(this).closest('form').find('input[name="Task.IsCompleted"]').val(false);
+        } else {
+            this.innerHTML = 'radio_button_checked';
+            $(this).closest('form').find('input[name="Task.IsCompleted"]').val(true);
+        }
+    });
+    $('.label-tools').each(function () {
+        let labelsCount = $(this).children('.tools-label').length;
+        var labelsToHide = $(this).children(".tools-label:gt(0)");
+        labelsToHide.remove();  // if 1 + label
+
+        if (labelsCount > 1) {
+            $(this).append('+' + (labelsCount - 1));
+        }
+        else if (labelsCount === 1) {
+            // do nothing
+        }
+        else {
+            $(this).html(''); // empty if there is not labels
+        }
+    });
+    $(document).on('click', function (event) {
+        if (event.target.classList.contains('js-close')) {
+            let url = new URL(window.location.href);
+            url.searchParams.delete('openModal');
+            window.history.pushState({}, '', url.toString());
+        }
+    });
 
     function checkWindowSize() {
         let main = $('#main');
@@ -198,44 +230,6 @@ $(function () {
             }
         }
     }
-
-    $(document).on('click', '.js-task-is-done', function () {
-        let isChecked = this.innerHTML.includes('radio_button_checked');
-
-        if (isChecked) {
-            this.innerHTML = 'radio_button_unchecked';
-            $(this).closest('form')
-            $(this).closest('form').find('input[name="Task.IsCompleted"]').val(false);
-        } else {
-            this.innerHTML = 'radio_button_checked';
-            $(this).closest('form').find('input[name="Task.IsCompleted"]').val(true);
-        }
-    });
-
-    $('.label-tools').each(function () {
-        let labelsCount = $(this).children('.tools-label').length;
-        var labelsToHide = $(this).children(".tools-label:gt(0)");
-        labelsToHide.remove();  // if 1 + label
-
-        if (labelsCount > 1) {
-            $(this).append('+' + (labelsCount - 1));
-        }
-        else if (labelsCount === 1) {
-            // do nothing
-        }
-        else {
-            $(this).html(''); // empty if there is not labels
-        }
-    });
-
-    $(document).on('click', function (event) {
-        if (event.target.classList.contains('js-close')) {
-            let url = new URL(window.location.href);
-            url.searchParams.delete('openModal');
-            window.history.pushState({}, '', url.toString());
-        }
-    });
-
     function initInnerVirtualSelects() {
         // projectSelect
         let projectSelect = $(this).find('.js-set-projects-virtual-select');
@@ -288,39 +282,65 @@ $(function () {
             });
         }
     }
+    function openModal() {
+        /*
+          Open modal:
+          1. Main url: get openModal param
+          2. Open modal url: path (form action)
+          3. Open modal url: params (form inputs)
+        */
+        let urlParams = new URLSearchParams(window.location.search);
+        let openModalUrl = urlParams.get('openModal');
+        if (openModalUrl !== null) {
+            let url = new URL(openModalUrl);
+            let params = url.searchParams;
+            let modalId;
+            if (url.pathname.includes('Tasks')) {
+                modalId = 'edit-task-modal';
+            }
+            else if (url.pathname.includes('Notes')) {
+                modalId = 'edit-note-modal';
+            }
+            else if (url.pathname.includes('Projects')) {
+                modalId = 'edit-project-modal';
+            }
+            else {
+                return;
+            }
 
-    /* 
-      Open modal:
-      1. Main url: get openModal param
-      2. Open modal url: path (form action)
-      3. Open modal url: params (form inputs)
-    */
-    let urlParams = new URLSearchParams(window.location.search);
-    let openModalUrl = urlParams.get('openModal');
-    if (openModalUrl !== null) {
-        let url = new URL(openModalUrl);
-        let params = url.searchParams;
-        let modalId;
-        if (url.pathname.includes('Tasks')) {
-            modalId = 'edit-task-modal';
-        }
-        else if (url.pathname.includes('Notes')) {
-            modalId = 'edit-note-modal';
-        }
-        else if (url.pathname.includes('Projects')) {
-            modalId = 'edit-project-modal';
-        }
-        else {
-            return;
-        }
-
-        let form = $(
-            `<form id="test" method="get" action=${url.pathname} class="js-get-partial-form" data-target-modal-id="${modalId}">
+            let form = $(
+                `<form id="test" method="get" action=${url.pathname} class="js-get-partial-form" data-target-modal-id="${modalId}">
                 <input type="hidden" name="id" value="${params.get('id')}">
                 <input type="hidden" name="returnUrl" value="${params.get('returnUrl')}">
             </form>`
-        );
-        $('body').append(form);
-        $('body').find('#test').trigger('submit');
+            );
+            $('body').append(form);
+            $('body').find('#test').trigger('submit');
+        }
     }
+    function initInnerQuill() {
+        let quillElem = $(this).find('.js-quill');
+        if (quillElem.length > 0) {
+            let toolbarOptions = [
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'header': 1 }, { 'header': 2 }, 'blockquote', { 'list': 'bullet' }, 'image'],
+                ['clean']
+            ];
+            let options = {
+                modules: {
+                    toolbar: toolbarOptions // false by default
+                },
+                theme: 'snow'
+            };
+            let quill = new Quill(quillElem.get(0), options);
+            quill.on('text-change', function (delta, oldDelta, source) {
+                let form = quillElem.closest('form');
+                let noteDescInput = form.find('input[name="Note.Description"]');
+                noteDescInput.val(JSON.stringify(quill.getContents()));
+            });
+        }    
+    }
+
+    checkWindowSize();
+    openModal();
 });

@@ -76,7 +76,7 @@
     height: 35px;
     max-width: 100%;
 }
-.modal .modal-body .task-tools .labels-section .vscomp-toggle-button {
+.modal .modal-body .task-tools .labels-section .vscomp-toggle-button, .modal .modal-body .note-tools .labels-section .vscomp-toggle-button {
     border-color: var(--coral-color);
 }
 .modal .vscomp-arrow {
@@ -93,8 +93,14 @@
 .modal .modal-content .modal-header .modal-header-left .select-container {
     width: 100%;
 }
-.modal .modal-body .task-tools .labels-section.select-container {
+.modal .modal-body .task-tools .labels-section.select-container, .modal .modal-body .note-tools .labels-section.select-container {
     width: 150px;
+}
+
+/* Quill */
+.modal .modal-body .scroll-quill {
+    overflow-y: auto;
+    max-height: 300px;
 }
 
 /* Google material */
@@ -258,13 +264,13 @@ a.btn-default, button.btn-default {
 .modal .modal-body .task-content .task-description-icon {
     margin-top: 5px;
 }
-.modal .modal-body .task-tools {
+.modal .modal-body .task-tools, .modal .modal-body .note-tools {
     display: flex;
     flex-wrap: wrap;
     column-gap: 5px;
     row-gap: 5px;
 }
-.modal .modal-body .task-tools .labels-section {
+.modal .modal-body .task-tools .labels-section, .modal .modal-body .note-tools .labels-section {
 }
 
 /* Picker */
