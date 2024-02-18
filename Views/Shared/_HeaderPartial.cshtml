@@ -10,11 +10,13 @@
                 home
             </span>
         </a>
-        <form class="search-form">
+        <form method="get" asp-controller="Home" asp-action="Main" class="search-form">
             <span class="material-symbols-outlined md-32 white search-icon">
                 search
             </span>
-            <input type="search" />
+            <input type="hidden" name="projectId" value="@TempData.Peek("CurrentProjectId")" />
+            <input type="hidden" name="daysViewName" value="@TempData.Peek("DaysViewName")" />
+            <input type="search" name="search" value="@ViewData["Search"]" />
         </form>
     </section>
     <section class="header-right">

@@ -38,7 +38,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Main
-        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null)
+        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null, string? search = null)
         {
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
@@ -48,8 +48,7 @@ namespace ToDoAndNotes3.Controllers
 
             TempData["CurrentProjectId"] = projectId; // => for select on the create task/note views
 
-            string? dateOrder = TempData["DateOrder"] as string;
-            TempData.Keep("DateOrder");
+            string? dateOrder = TempData.Peek("DateOrder") as string;
             string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower(); // True => true
             Boolean.TryParse(hideCompletedString, out bool hideCompleted);
 
@@ -80,6 +79,7 @@ namespace ToDoAndNotes3.Controllers
                 TempData["DaysViewName"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
             }
 
+            // check data loading time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -93,10 +93,12 @@ namespace ToDoAndNotes3.Controllers
             if (dateOrder == "ascending")
             {
                 generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+                generalViewModel.Notes = generalViewModel.Notes.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
             }
             else
             {
                 generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+                generalViewModel.Notes = generalViewModel.Notes.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
             }
             if (hideCompleted == true)
             {
@@ -106,7 +108,13 @@ namespace ToDoAndNotes3.Controllers
             {
                 generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.IsCompleted).ToList();
             }
-
+            if (search is not null)
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                generalViewModel.Notes = generalViewModel.Notes.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                ViewData["Search"] = search;
+                ViewData["ReturnUrl"] += $"&search={search}";
+            }
 
             return View(generalViewModel);
         }
