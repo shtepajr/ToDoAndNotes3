@@ -27,9 +27,8 @@
                         </span>
                     </button>
                 </form>
-                @* modal (ajax request content) *@
+                @* modal (ajax) *@
                 <div id="create-label-modal" class="modal">
-
                 </div>
             </div>
         </div>
@@ -39,7 +38,7 @@
             @foreach (var label in Model.Labels)
             {
                 <li class="label nav-link dropdown">
-                    <a>
+                    <a asp-controller="Home" asp-action="Main" asp-route-labelId="@label.LabelId">
                         <div class="nowrap-ellipsis">@label.Title</div>
                         <span class="material-symbols-outlined md-24 black js-dropdown-btn js-pass-data-to" data-dropdown-content-id="label-dropdown-content"
                               data-receiver-id="label-dropdown-content" data-id="@label.LabelId">
@@ -48,10 +47,10 @@
                     </a>
                 </li>
             }
-            @* modal (ajax request content) *@
+            @* modal (ajax) *@
             <div id="edit-label-modal" class="modal">
             </div>
-            @* modal (ajax request content) *@
+            @* modal (ajax) *@
             <div id="delete-label-modal" class="modal">
             </div>
             <div class="dropdown-content js-dropdown-content" id="label-dropdown-content">

@@ -38,28 +38,20 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Main
-        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null, string? search = null)
+        public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null, 
+            string? search = null, int? labelId = null)
         {
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
             projectId ??= defaultProject.ProjectId;
 
-            // provide authorization for projectId
+            // provide authorization for projectId, labelId
 
             TempData["CurrentProjectId"] = projectId; // => for select on the create task/note views
 
             string? dateOrder = TempData.Peek("DateOrder") as string;
             string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower(); // True => true
             Boolean.TryParse(hideCompletedString, out bool hideCompleted);
-
-            if (dateOrder == null)
-            {
-                TempData["DateOrder"] = dateOrder = "descending";
-            }
-            if (hideCompleted == null)
-            {
-                TempData["HideCompleted"] = hideCompleted = false;
-            }
 
             if (daysViewName == null)
             {
@@ -70,51 +62,48 @@ namespace ToDoAndNotes3.Controllers
                 ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
             }
 
-            if (daysViewName == DaysViewName.Today || daysViewName == DaysViewName.Upcoming)
+            // title of "data container"
+            if (labelId is not null)
             {
-                TempData["DaysViewName"] = daysViewName;  // => title on the view
+                ViewData["DisplayDataTitle"] = "Label: " + _context.Labels.Find(labelId).Title;
+            }
+            else if (search is not null)
+            {
+                ViewData["Search"] = search;
+                ViewData["ReturnUrl"] += $"&search={search}"; // next sorts won't break search
+                ViewData["DisplayDataTitle"] = "Search: " + search;
+            }
+            else if (daysViewName == DaysViewName.Today || daysViewName == DaysViewName.Upcoming)
+            {
+                TempData["DaysViewName"] = daysViewName; // for Create Tasks/Notes to understand default date
+                ViewData["DisplayDataTitle"] = daysViewName;
             }
             else if (daysViewName == DaysViewName.Unsorted || projectId != null)
             {
-                TempData["DaysViewName"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
+                ViewData["DisplayDataTitle"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
+            }
+
+            // sort things
+            if (dateOrder == null)
+            {
+                TempData["DateOrder"] = dateOrder = "descending";
+            }
+            if (hideCompleted == null)
+            {
+                TempData["HideCompleted"] = hideCompleted = false;
             }
 
             // check data loading time
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            GeneralViewModel generalViewModel = await LoadGeneralViewModel(daysViewName, userId, projectId);
+            GeneralViewModel generalViewModel = await LoadGeneralViewModel(daysViewName, userId, projectId, labelId, search);
 
             stopwatch.Stop();
             TimeSpan elapsedTime = stopwatch.Elapsed;
             Console.WriteLine("Elapsed time: " + elapsedTime);
 
-            // sort by dateOrder, hideCompleted
-            if (dateOrder == "ascending")
-            {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
-                generalViewModel.Notes = generalViewModel.Notes.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
-            }
-            else
-            {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
-                generalViewModel.Notes = generalViewModel.Notes.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
-            }
-            if (hideCompleted == true)
-            {
-                generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.IsCompleted == false).ToList();
-            }
-            else
-            {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.IsCompleted).ToList();
-            }
-            if (search is not null)
-            {
-                generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-                generalViewModel.Notes = generalViewModel.Notes.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-                ViewData["Search"] = search;
-                ViewData["ReturnUrl"] += $"&search={search}"; // next sorts won't break search
-            }
+            SortGeneralViewModel(generalViewModel, dateOrder, hideCompleted);
 
             return View(generalViewModel);
         }
@@ -177,10 +166,40 @@ namespace ToDoAndNotes3.Controllers
             }
             return checkDefault;
         }
-        async Task<GeneralViewModel> LoadGeneralViewModel(DaysViewName? daysViewName, string? userId, int? projectId)
+        async Task<GeneralViewModel> LoadGeneralViewModel(DaysViewName? daysViewName, string? userId, int? projectId, int? labelId, string? search)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
-            if (daysViewName == DaysViewName.Today)
+            if (labelId is not null)
+            {
+                var projectsLabelInclude = await _context.Projects
+                    .Where(p => p.UserId == userId)
+                    .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                    .Include(n => n.Notes).ThenInclude(t => t.NoteLabels).ThenInclude(l => l.Label)
+                    .ToListAsync();
+                generalViewModel.Projects = projectsLabelInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
+
+                foreach (var project in projectsLabelInclude) // but here using default project
+                {
+                    generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.TaskLabels.Any(tl => tl.Label.LabelId == labelId)));
+                    generalViewModel.Notes.AddRange(project.Notes.Where(n => n.NoteLabels.Any(nl => nl.Label.LabelId == labelId)));
+                }
+            }
+            else if (search is not null)
+            {
+                var projectsLabelInclude = await _context.Projects
+                    .Where(p => p.UserId == userId)
+                    .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                    .Include(n => n.Notes).ThenInclude(t => t.NoteLabels).ThenInclude(l => l.Label)
+                    .ToListAsync();
+                generalViewModel.Projects = projectsLabelInclude.Where(p => p.IsDefault == false).ToList(); // do not show default project
+
+                foreach (var project in projectsLabelInclude) // but here using default project
+                {
+                    generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                    generalViewModel.Notes.AddRange(project.Notes.Where(n => n.Title.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                }
+            }
+            else if (daysViewName == DaysViewName.Today)
             {
                 var today = DateOnly.FromDateTime(DateTime.Now);
 
@@ -226,8 +245,31 @@ namespace ToDoAndNotes3.Controllers
                 generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
                 generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
             }
+            
             generalViewModel.Labels = await _context.Labels.Where(l => l.UserId == userId).ToListAsync();
             return generalViewModel;
+        }
+        void SortGeneralViewModel(GeneralViewModel generalViewModel, string? dateOrder, bool? hideCompleted)
+        {
+            // sort by dateOrder, hideCompleted
+            if (dateOrder == "ascending")
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+                generalViewModel.Notes = generalViewModel.Notes.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+            }
+            else
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+                generalViewModel.Notes = generalViewModel.Notes.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+            }
+            if (hideCompleted == true)
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.IsCompleted == false).ToList();
+            }
+            else
+            {
+                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.IsCompleted).ToList();
+            }
         }
         private IActionResult RedirectToLocal(string returnUrl)
         {
