@@ -80,8 +80,15 @@ namespace ToDoAndNotes3.Controllers
                 TempData["DaysViewName"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
             }
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             GeneralViewModel generalViewModel = await LoadGeneralViewModel(daysViewName, userId, projectId);
-            
+
+            stopwatch.Stop();
+            TimeSpan elapsedTime = stopwatch.Elapsed;
+            Console.WriteLine("Elapsed time: " + elapsedTime);
+
             // sort by dateOrder, hideCompleted
             if (dateOrder == "ascending")
             {

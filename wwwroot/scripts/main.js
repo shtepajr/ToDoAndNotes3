@@ -70,12 +70,11 @@ $(function () {
                 targetModal.find('.js-picker-input').trigger('blur');
                 targetModal.css('display', 'block');
                 targetModal.find('.js-textarea-auto').trigger('focus');
-                //targetModal.find('.js-set-labels-virtual-select').trigger('click');
-                targetModal.find('.js-set-projects-virtual-select').trigger('blur');
                 targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
                 targetModal.initInnerQuill = initInnerQuill;
                 targetModal.initInnerVirtualSelects();
                 targetModal.initInnerQuill();
+                console.log('hello success');
 
                 // set openModal param
                 let mainFullUrl = new URL(window.location.href);
@@ -84,6 +83,9 @@ $(function () {
                 mainParams.set('openModal', formAction);
                 mainFullUrl.searchParams = mainParams;
                 window.history.pushState({}, '', mainFullUrl.toString());
+            },
+            error: function (xhr, status, error) {
+                console.log('hello error');
             }
         });
     });
@@ -115,14 +117,20 @@ $(function () {
                 else {
                     targetModal.html(result);
                     targetModal.find('.js-picker-input').trigger('blur');
+                    targetModal.find('.js-textarea-auto').trigger('focus');
+                    targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
+                    targetModal.initInnerQuill = initInnerQuill;
+                    targetModal.initInnerVirtualSelects();
+                    targetModal.initInnerQuill();
                 }
+            },
+            error: function (xhr, status, error) {
+                console.log('hello error');
             }
         });
     });
     $(document).on('submit', '.js-change-temp-data', function (event) {
         event.preventDefault();
-
-        console.log('hello');
 
         let formAction = $(this).attr('action');
         let formData = $(this).serialize();
@@ -138,11 +146,9 @@ $(function () {
             success: function (result) {
                 if (result.success) {
                     window.location.href = result.redirectTo;
-                    console.log('success');
                 }
             },
             error: function (xhr, status, error) {
-                console.log('error');
             }
         });
     });
@@ -236,8 +242,6 @@ $(function () {
         if (projectSelect.length > 0) {
             let projectsOptions = projectSelect.data('target-select-list'); // [{..},{..},{..}]
             let projectsSelected = projectSelect.data('target-selected'); // number
-            console.log(projectsOptions);
-            console.log(projectsSelected);
 
             VirtualSelect.init({
                 ele: projectSelect.get(0),
@@ -250,7 +254,6 @@ $(function () {
             projectSelect.on('change', function () {
                 let selectedProject = $(this).val();
                 $('input[name="Task.ProjectId"]').val(selectedProject);
-                console.log($('input[name="Task.ProjectId"]').val());
             });
         }
       
@@ -259,8 +262,6 @@ $(function () {
         if (labelsSelect.length > 0) {
             let labelsOptions = labelsSelect.data('target-select-list'); // ["12", "17"]
             let labelsSelected = labelsSelect.data('target-selected');
-            console.log(labelsOptions);
-            console.log(labelsSelected);
 
             VirtualSelect.init({
                 ele: labelsSelect.get(0),
@@ -278,7 +279,6 @@ $(function () {
                 let selectedOptions = $(this).get(0).getSelectedOptions();
                 let selectedValues = Array.from(selectedOptions).map(option => option.value);
                 $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));
-                console.log($('input[name="SelectedLabelsId"]').val());
             });
         }
     }
@@ -335,12 +335,20 @@ $(function () {
             let quill = new Quill(quillElem.get(0), options);
             quill.on('text-change', function (delta, oldDelta, source) {
                 let form = quillElem.closest('form');
-                let noteDescInput = form.find('input[name="Note.Description"]');
-                noteDescInput.val(JSON.stringify(quill.getContents()));
+                let noteDescInput = form.find('input[name="Note.NoteDescription.Description"]');
+                let noteShortDescInput = form.find('input[name="Note.ShortDescription"]');
+                noteDescInput.val(quill.root.innerHTML);
+                noteShortDescInput.val(quill.getText(0, 150));
+                //noteDescInput.val(JSON.stringify(quill.getContents()));
             });
         }    
     }
-
     checkWindowSize();
     openModal();
+
+    $('.js-quill-json-to-text').each(function () {
+        let quill = new Quill(document.createElement('div'));
+        quill.root.innerHTML = $(this).html();
+        $(this).html(quill.root.textContent);
+    });
 });

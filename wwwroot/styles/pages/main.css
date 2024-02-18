@@ -270,13 +270,13 @@ main {
     margin-top: 2px;
     column-gap: 3px;
 }
-.task .task-content .tools .date-tools {
+.task .task-content .tools .date-tools, .note .note-content .tools .date-tools {
     color: var(--dark-blue-tr-color);
     display: flex;
     min-width: 0;
 
 }
-.task .task-content .tools .label-tools {
+.task .task-content .tools .label-tools, .note .note-content .tools .label-tools {
     color: var(--coral-color);
     display: flex;
     max-width: 150px;

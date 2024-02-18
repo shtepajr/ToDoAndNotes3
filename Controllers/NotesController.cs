@@ -80,7 +80,7 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Notes/_CreatePartial", noteLabels);
         }
 
-        // GET: Tasks/EditPartial/5
+        // GET: Notes/EditPartial/5
         public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -90,32 +90,33 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var taskInclude = _context.Tasks
-                .Where(t => t.TaskId == id)
-                .Include(t => t.TaskLabels)?.ThenInclude(t => t.Label)
+            var noteInclude = _context.Notes
+                .Where(n => n.NoteId == id)
+                .Include(n => n.NoteDescription)
+                .Include(n => n.NoteLabels)?.ThenInclude(nl => nl.Label)
                 .FirstOrDefault();
 
-            if (taskInclude == null)
+            if (noteInclude == null)
             {
                 return NotFound();
             }
 
-            IEnumerable<int?> selectedInt = taskInclude?.TaskLabels?.Select(tl => tl.Label.LabelId);
+            IEnumerable<int?> selectedInt = noteInclude?.NoteLabels?.Select(nl => nl.Label.LabelId);
             string selected = JsonSerializer.Serialize(selectedInt); // => "[12, 17]"
 
-            return PartialView("Tasks/_EditPartial", new TaskLabelsViewModel()
+            return PartialView("Notes/_EditPartial", new NoteLabelsViewModel()
             {
-                Task = taskInclude!,
+                Note = noteInclude!,
                 SelectedLabelsId = selected,
                 Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList(),
                 Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList(),
             });
         }
 
-        // POST: Tasks/EditPartial/5
+        // POST: Notes/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPartial(TaskLabelsViewModel taskLabels, string? returnUrl = null)
+        public async Task<IActionResult> EditPartial(NoteLabelsViewModel noteLabels, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -123,13 +124,13 @@ namespace ToDoAndNotes3.Controllers
             {
                 try
                 {
-                    //SetSelectedLabels(taskLabels);
-                    _context.Update(taskLabels.Task);
+                    SetSelectedLabels(noteLabels);
+                    _context.Update(noteLabels.Note);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProjectExists(taskLabels.Task.TaskId))
+                    if (!ProjectExists(noteLabels.Note.NoteId))
                     {
                         return NotFound();
                     }
@@ -141,27 +142,27 @@ namespace ToDoAndNotes3.Controllers
                 return Json(new { success = true, redirectTo = returnUrl });
             }
             // get data for select lists (asp-for approach for each field uncomfortable on view)
-            taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
-            taskLabels.Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList();
-            return PartialView("Tasks/_EditPartial", taskLabels);
+            noteLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
+            noteLabels.Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList();
+            return PartialView("Notes/_EditPartial", noteLabels);
         }
 
-        // POST: Tasks/SoftDelete/5
+        // POST: Notes/SoftDelete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoftDelete(int? id, string? returnUrl = null)
         {
-            var task = _context.Tasks.SingleOrDefault(p => p.TaskId == id);
+            var note = _context.Notes.SingleOrDefault(n => n.NoteId == id);
 
-            if (task != null)
+            if (note != null)
             {
-                task.IsDeleted = true;
+                note.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
             return RedirectToLocal(returnUrl);
         }
        
-        // GET: Tasks/DeletePartial/5
+        // GET: Notes/DeletePartial/5
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -171,18 +172,18 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var task = await _context.Tasks.FindAsync(id);
-            if (task == null)
+            var note = await _context.Notes.FindAsync(id);
+            if (note == null)
             {
                 return NotFound();
             }
-            return PartialView("Tasks/_DeletePartial", new TaskLabelsViewModel()
+            return PartialView("Notes/_DeletePartial", new NoteLabelsViewModel()
             {
-                Task = task
+                Note = note
             });
         }
 
-        // POST: Tasks/Delete/5
+        // POST: Notes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
@@ -192,83 +193,66 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == id);
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.NoteId == id);
 
-            if (task == null)
+            if (note == null)
             {
                 return NotFound();
             }
 
-            _context.Tasks.Remove(task);
+            _context.Notes.Remove(note);
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, redirectTo = returnUrl });
         }
 
-        // POST: Tasks/Duplicate/5
+        // POST: Notes/Duplicate/5
         public async Task<IActionResult> Duplicate(int? id, string? returnUrl = null)
         {
-            var task = await _context.Tasks
-                .Include(t => t.TaskLabels)
-                .ThenInclude(tl => tl.Label)
-                .FirstOrDefaultAsync(t => t.TaskId == id);
+            var note = await _context.Notes
+                .Include(n => n.NoteDescription)
+                .Include(n => n.NoteLabels).ThenInclude(nl => nl.Label)
+                .FirstOrDefaultAsync(n => n.NoteId == id);
 
-            if (task != null)
+            if (note != null)
             {
-                Models.Task? copy = TasksController.DeepCopy(task);
+                Note? copy = NotesController.DeepCopy(note);
                 if (copy == null)
                 {
                     return RedirectToLocal(returnUrl);
                 }
-                await _context.Tasks.AddAsync(copy);
+                await _context.Notes.AddAsync(copy);
                 await _context.SaveChangesAsync();
             }
             return RedirectToLocal(returnUrl);
         }
-
-        // POST: Tasks/ToggleState/5
-        public async Task<IActionResult> ToggleState(int? id, string? returnUrl = null)
+       
+        public static Note? DeepCopy(Note oldNote)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == id);
-
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            task.IsCompleted = !task.IsCompleted;
-            await _context.SaveChangesAsync();
-
-            return RedirectToLocal(returnUrl);
-        }
-
-        public static Models.Task? DeepCopy(Models.Task oldTask)
-        {
-            if (oldTask == null || oldTask.ProjectId == null)
+            if (oldNote == null || oldNote.ProjectId == null)
             {
                 return null;
             }
 
-            Models.Task copy = new Models.Task()
+            Note copy = new Note()
             {
-                ProjectId = oldTask.ProjectId,
-                Title = oldTask.Title,
-                Description = oldTask.Description,
-                DueDate = oldTask.DueDate,
-                DueTime = oldTask.DueTime,
-                TaskLabels = new List<TaskLabel>()
+                ProjectId = oldNote.ProjectId,
+                Title = oldNote.Title,
+                ShortDescription = oldNote.ShortDescription,
+                NoteDescription = new NoteDescription()
+                {
+                    Description = oldNote.NoteDescription.Description,
+                },
+                DueDate = oldNote.DueDate,
+                DueTime = oldNote.DueTime,
+                NoteLabels = new List<NoteLabel>()
             };
 
-            foreach (var old in oldTask?.TaskLabels)
+            foreach (var old in oldNote?.NoteLabels)
             {
-                copy?.TaskLabels?.Add(new TaskLabel()
+                copy?.NoteLabels?.Add(new NoteLabel()
                 {
-                    Task = copy,
+                    Note = copy,
                     Label = old.Label,
                 });
             }

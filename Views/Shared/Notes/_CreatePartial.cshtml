@@ -30,6 +30,7 @@
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Note.IsDeleted" />
     <input type="hidden" asp-for="Note.ProjectId" />
+    <input type="hidden" asp-for="Note.ShortDescription" />
 
     <div class="note-content">
         <div>
@@ -37,14 +38,12 @@
             <span asp-validation-for="Note.Title"></span>
         </div>
         <div>
-            <input hidden asp-for="Note.Description" placeholder="Description" class="input-borderless js-textarea-auto" rows="1" />
-            <span asp-validation-for="Note.Description"></span>
-            <div>
-                <div class="scroll-quill js-quill">
-                    <p>Hello World!</p>
-                    <p>Some initial <strong>bold</strong> text</p>
-                    <p><br></p>
-                </div>
+            <input hidden asp-for="Note.NoteDescription.Description"/>
+            <span asp-validation-for="Note.NoteDescription.Description"></span>
+            <div class="scroll-quill js-quill">
+                <p>Hello World!</p>
+                <p>Some initial <strong>bold</strong> text</p>
+                <p><br></p>
             </div>
         </div>
         <div class="note-tools mt-1">

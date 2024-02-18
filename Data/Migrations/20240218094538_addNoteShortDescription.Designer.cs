@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAndNotes3.Data;
 
@@ -11,9 +12,11 @@ using ToDoAndNotes3.Data;
 namespace ToDoAndNotes3.Migrations
 {
     [DbContext(typeof(TdnDbContext))]
-    partial class TdnDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240218094538_addNoteShortDescription")]
+    partial class addNoteShortDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,6 +196,9 @@ namespace ToDoAndNotes3.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateOnly?>("DueDate")
                         .HasColumnType("date");
 
@@ -201,9 +207,6 @@ namespace ToDoAndNotes3.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("NoteDescriptionId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
@@ -217,27 +220,9 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasKey("NoteId");
 
-                    b.HasIndex("NoteDescriptionId");
-
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Notes");
-                });
-
-            modelBuilder.Entity("ToDoAndNotes3.Models.NoteDescription", b =>
-                {
-                    b.Property<int?>("NoteDescriptionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("NoteDescriptionId"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("NoteDescriptionId");
-
-                    b.ToTable("NoteDescription");
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.NoteLabel", b =>
@@ -478,16 +463,10 @@ namespace ToDoAndNotes3.Migrations
 
             modelBuilder.Entity("ToDoAndNotes3.Models.Note", b =>
                 {
-                    b.HasOne("ToDoAndNotes3.Models.NoteDescription", "NoteDescription")
-                        .WithMany()
-                        .HasForeignKey("NoteDescriptionId");
-
                     b.HasOne("ToDoAndNotes3.Models.Project", "Project")
                         .WithMany("Notes")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("NoteDescription");
 
                     b.Navigation("Project");
                 });

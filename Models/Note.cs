@@ -9,7 +9,8 @@ namespace ToDoAndNotes3.Models
         public Project? Project { get; set; }
         [Required]
         public string? Title { get; set; }
-        public string? Description { get; set; } = default!;
+        public string? ShortDescription { get; set; } = default!;
+        public NoteDescription? NoteDescription { get; set; } = new NoteDescription();
         public bool IsDeleted { get; set; } = false;
         public DateTime? CreatedAt { get; set; } = DateTime.Now;
         [DataType(DataType.Date)]

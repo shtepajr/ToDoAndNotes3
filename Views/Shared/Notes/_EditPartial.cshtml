@@ -1,4 +1,4 @@
-﻿@model TaskLabelsViewModel
+﻿@model NoteLabelsViewModel
 
 @{
     Layout = "_ModalContentLayout";
@@ -15,21 +15,21 @@
             <span class="material-symbols-outlined md-24 black select-togle-icon">
                 arrow_drop_down
             </span>
-            <div class="js-set-projects-virtual-select" data-target-select-list=@Html.Raw(projectSelect) // [{..},{..},{..}]
-                 data-target-selected=@Html.Raw(Model.Task.ProjectId)></div>
+            <div class="js-set-projects-virtual-select" data-target-select-list=@Html.Raw(projectSelect)
+                 data-target-selected=@Html.Raw(Model.Note.ProjectId)></div>
         </div>
     </div>
     <div class="dropdown">
         <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-pass-data-to"
-              data-dropdown-content-id="current-task-dropdown-content" data-receiver-id="current-task-dropdown-content" data-id="@Model.Task.TaskId">
+              data-dropdown-content-id="current-note-dropdown-content" data-receiver-id="current-note-dropdown-content" data-id="@Model.Note.NoteId">
             more_horiz
         </span>
-        <div class="dropdown-content js-dropdown-content" id="current-task-dropdown-content">
-            <form asp-controller="Tasks" asp-action="Duplicate">
+        <div class="dropdown-content js-dropdown-content" id="current-note-dropdown-content">
+            <form asp-controller="Notes" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Duplicate</button>
             </form>
-            <form asp-controller="Tasks" asp-action="SoftDelete">
+            <form asp-controller="Notes" asp-action="SoftDelete">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">Remove</button>
             </form>
@@ -37,77 +37,64 @@
     </div>
 }
 
-<form method="post" asp-controller="Tasks" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
+<form method="post" asp-controller="Notes" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
       class="js-post-partial-form" data-target-modal-id="edit-task-modal">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
-    <input type="hidden" asp-for="Task.TaskId" />
-    <input type="hidden" asp-for="Task.IsDeleted" />
-    <input type="hidden" asp-for="Task.ProjectId" />
-    <input type="hidden" asp-for="Task.IsCompleted" />
+    <input type="hidden" asp-for="Note.NoteId" />
+    <input type="hidden" asp-for="Note.IsDeleted" />
+    <input type="hidden" asp-for="Note.ProjectId" />
+    <input type="hidden" asp-for="Note.ShortDescription" />
+    <input type="hidden" asp-for="Note.NoteDescription.Description" />
 
-    <div class="task-body">
-        <div class="task-toggler">
-            @if (Model.Task.IsCompleted)
-            {
-                <span class="material-symbols-outlined md-24 js-task-is-done">
-                    radio_button_checked
-                </span>
-            }
-            else
-            {
-                <span class="material-symbols-outlined md-24 js-task-is-done">
-                    radio_button_unchecked
-                </span>
-            }
+    <div class="note-content">
+        <div>
+            <textarea asp-for="Note.Title" placeholder="Note name" class="input-borderless js-textarea-auto" rows="1"></textarea>
+            <span asp-validation-for="Note.Title"></span>
         </div>
-        <div class="task-content">
+        <div>
+            <span asp-validation-for="Note.NoteDescription.Description"></span>
             <div>
-                <textarea asp-for="Task.Title" placeholder="Task name" class="input-borderless js-textarea-auto" rows="1"></textarea>
-                <span asp-validation-for="Task.Title"></span>
-            </div>
-            <div class="d-flex">
-                <span class="material-symbols-outlined md-20 task-description-icon">
-                    subject
-                </span>
-                <textarea asp-for="Task.Description" placeholder="Description" class="input-borderless js-textarea-auto" rows="1"></textarea>
-                <span asp-validation-for="Task.Description"></span>
-            </div>
-            <div class="task-tools mt-1">
-                <div class="date-time-picker js-date-time-picker">
-                    <div class="picker-preview date-picker js-date-picker">
-                        <span class="material-symbols-outlined md-20 black picker-preview-icon">
-                            date_range
-                        </span>
-                        <input asp-for="Task.DueDate" class="picker-input js-picker-input" placeholder="Date/time" />
-                        <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
-                            close
-                        </span>
-                        <span asp-validation-for="Task.DueDate"></span>
-                    </div>
-                    <div class="picker-preview time-picker js-time-picker">
-                        <span class="material-symbols-outlined md-20 black picker-preview-icon">
-                            access_time
-                        </span>
-                        <input asp-for="Task.DueTime" class="picker-input js-picker-input" placeholder="Time" />
-                        <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
-                            close
-                        </span>
-                        <span asp-validation-for="Task.DueTime"></span>
-                    </div>
+                <div class="scroll-quill js-quill">
+                    @Html.Raw(Model?.Note?.NoteDescription?.Description)
                 </div>
-                <div class="labels-section select-container">
-                    <input type="hidden" asp-for="SelectedLabelsId" />
-                    <span class="material-symbols-outlined md-24 black select-togle-icon">
-                        label
+            </div>
+        </div>
+        <div class="note-tools mt-1">
+            <div class="date-time-picker js-date-time-picker">
+                <div class="picker-preview date-picker js-date-picker">
+                    <span class="material-symbols-outlined md-20 black picker-preview-icon">
+                        date_range
                     </span>
-                    <div id="select-labels-edit"></div>
-                    <div class="js-set-labels-virtual-select" data-target-select-list=@Html.Raw(labelsSelect)
-                         data-target-selected=@Html.Raw(Model.SelectedLabelsId)></div>
+                    <input asp-for="Note.DueDate" class="picker-input js-picker-input" placeholder="Date/time" />
+                    <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
+                        close
+                    </span>
+                    <span asp-validation-for="Note.DueDate"></span>
                 </div>
+                <div class="picker-preview time-picker js-time-picker">
+                    <span class="material-symbols-outlined md-20 black picker-preview-icon">
+                        access_time
+                    </span>
+                    <input asp-for="Note.DueTime" class="picker-input js-picker-input" placeholder="Time" />
+                    <span class="material-symbols-outlined md-20 black picker-clear-icon js-clear-input">
+                        close
+                    </span>
+                    <span asp-validation-for="Note.DueTime"></span>
+                </div>
+            </div>
+            <div class="labels-section select-container">
+                <input type="hidden" asp-for="SelectedLabelsId" />
+                <span class="material-symbols-outlined md-24 black select-togle-icon">
+                    label
+                </span>
+                <div id="select-labels"></div>
+                <div class="js-set-labels-virtual-select" data-target-select-list=@Html.Raw(labelsSelect)
+                     data-target-selected=@Html.Raw(Model.SelectedLabelsId)></div>
             </div>
         </div>
     </div>
+
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
         <button class="btn btn-ok" type="submit">Ok</button>

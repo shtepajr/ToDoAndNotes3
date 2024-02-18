@@ -1,4 +1,4 @@
-﻿@model TaskLabelsViewModel
+﻿@model NoteLabelsViewModel
 
 @{
     Layout = "_ModalContentLayout";
@@ -10,9 +10,9 @@
     </div>
 }
 
-<div>Are you sure you want to delete <strong>"@Model.Task.Title"</strong> task?</div>
-<form method="post" asp-controller="Tasks" asp-action="Delete" asp-route-id="@Model.Task.TaskId" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form" data-target-modal-id="delete-task-modal">
+<div>Are you sure you want to delete <strong>"@Model.Note.Title"</strong> note?</div>
+<form method="post" asp-controller="Notes" asp-action="Delete" asp-route-id="@Model.Note.NoteId" asp-route-returnUrl="@ViewData["ReturnUrl"]"
+      class="js-post-partial-form" data-target-modal-id="delete-note-modal">
     @Html.AntiForgeryToken()
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
