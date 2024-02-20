@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Diagnostics;
 using System.Security.Claims;
+using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.MainViewModels;
@@ -19,12 +20,14 @@ namespace ToDoAndNotes3.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public HomeController(ILogger<HomeController> logger, TdnDbContext context, UserManager<User> userManager)
+        public HomeController(ILogger<HomeController> logger, TdnDbContext context, UserManager<User> userManager, IAuthorizationService authorizationService)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
         // GET: /Home
         [AllowAnonymous]
@@ -43,10 +46,28 @@ namespace ToDoAndNotes3.Controllers
         {
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
+            
+            if (projectId is not null)
+            {
+       
+                var isAuthorized = await _authorizationService.AuthorizeAsync(
+                                                  User, _context.Projects.Find(projectId), EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
+            if (labelId is not null)
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(
+                                                  User, _context.Labels.Find(labelId), EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
+
             projectId ??= defaultProject.ProjectId;
-
-            // provide authorization for projectId, labelId
-
             TempData["CurrentProjectId"] = projectId; // => for select on the create task/note views
 
             string? dateOrder = TempData.Peek("DateOrder") as string;
@@ -126,13 +147,6 @@ namespace ToDoAndNotes3.Controllers
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        // GET: /Home/Privacy
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         // POST: /Home/ChangeTempDataValue
@@ -240,7 +254,7 @@ namespace ToDoAndNotes3.Controllers
                     .Where(p => p.UserId == userId && p.ProjectId == projectId)
                     .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
                     .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
-                    .First();
+                    .FirstOrDefault();
 
                 generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
                 generalViewModel.Notes.AddRange(currentProjectInclude.Notes);

@@ -283,7 +283,13 @@ namespace ToDoAndNotes3.Controllers
         {
             return View();
         }
-        
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Error()
+        {
+            return View();
+        }
+
         #region Helpers
 
         private void AddErrors(IdentityResult result)
