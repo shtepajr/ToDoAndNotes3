@@ -4,13 +4,6 @@
     Layout = "_MainLayout";
     ViewData["Title"] = "Main";
 
-    // var label = ViewData["Label"];
-    // var daysViewName = TempData.Peek("DaysViewName");
-    // if (label is not null)
-    // {
-    //     daysViewName = label;
-    // }
-
     // sort value
     var dateOrder = TempData["DateOrder"] as string;
     string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower();
@@ -71,13 +64,6 @@
                         </span>
                     </button>
                 </form>
-                <div id="add-note-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <p>Some text in the Modal..</p>
-                        @* <partial name="Task/Create" model="new ToDoAndNotes3.Models.Task()"/> *@
-                    </div>
-                </div>
                 <button class="btn btn-action js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
                     <span class="material-symbols-outlined md-30">
                         filter_alt
@@ -133,7 +119,7 @@
             @foreach (var task in Model.Tasks)
             {
                 <li class="task nav-link dropdown">
-                    <a class="js-pass-data-to" data-receiver-id="edit-task-form" data-id="@task.TaskId">
+                    <a class="js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
                         <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form">
                             <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                             <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
@@ -199,7 +185,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-pass-data-to"
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
                               data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
                             more_horiz
                         </span>
@@ -236,7 +222,7 @@
             @foreach (var note in Model.Notes)
             {
                 <li class="note nav-link dropdown">
-                    <a class="js-pass-data-to" data-receiver-id="edit-note-form" data-id="@note.NoteId">
+                    <a class="js-update-action-with-id" data-receiver-id="edit-note-form" data-id="@note.NoteId">
                         <div class="note-content">
                             <div class="nowrap-ellipsis">@note.Title</div>
                             <div class="nowrap-ellipsis note-description js-quill-json-to-text">@Html.Raw(@note?.ShortDescription)</div>
@@ -280,7 +266,7 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-pass-data-to"
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
                               data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
                             more_horiz
                         </span>

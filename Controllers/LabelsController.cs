@@ -1,24 +1,31 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Mail;
+using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 
 namespace ToDoAndNotes3.Controllers
 {
+    [Authorize]
     public class LabelsController : Controller
     {
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public LabelsController(TdnDbContext context, UserManager<User> userManager)
+        public LabelsController(TdnDbContext context, UserManager<User> userManager, IAuthorizationService authorizationService)
         {
             _context = context;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         // GET: Labels/CreatePartial
+        [HttpGet]
         public IActionResult CreatePartial(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -41,6 +48,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Labels/EditPartial/5
+        [HttpGet]
         public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -51,10 +59,20 @@ namespace ToDoAndNotes3.Controllers
             }
 
             var label = await _context.Labels.FindAsync(id);
-            if (label == null)
+
+            if (label is null)
             {
                 return NotFound();
             }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, label, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
+
             return PartialView("Labels/_EditPartial", label);
         }
 
@@ -65,6 +83,18 @@ namespace ToDoAndNotes3.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (label is null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    var isAuthorized = await _authorizationService.AuthorizeAsync(User, label, EntityOperations.FullAccess);
+                    if (!isAuthorized.Succeeded)
+                    {
+                        return Forbid();
+                    }
+                }
                 try
                 {
                     _context.Update(label);
@@ -83,10 +113,12 @@ namespace ToDoAndNotes3.Controllers
                 }
                 return Json(new { success = true, redirectTo = returnUrl });
             }
+
             return PartialView("Labels/_EditPartial", label);
         }
 
         // GET: : Labels/Delete/5
+        [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -97,10 +129,20 @@ namespace ToDoAndNotes3.Controllers
             }
 
             var label = await _context.Labels.FindAsync(id);
-            if (label == null)
+
+            if (label is null)
             {
                 return NotFound();
             }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, label, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
+
             return PartialView("Labels/_DeletePartial", label);
         }
 
@@ -114,18 +156,28 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var labelInclude = _context.Labels.FirstOrDefault(l => l.LabelId == id);
+            var label = await _context.Labels.FindAsync(id);
 
-            if (labelInclude == null)
+            if (label is null)
             {
                 return NotFound();
             }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, label, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
 
-            _context.Labels.Remove(labelInclude);
+            _context.Labels.Remove(label);
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, redirectTo = returnUrl });
         }
+
+        #region Helpers       
         private bool LabelExists(int? id)
         {
             return _context.Labels.Any(e => e.LabelId == id);
@@ -141,5 +193,6 @@ namespace ToDoAndNotes3.Controllers
                 return RedirectToAction(nameof(HomeController.Labels), "Home");
             }
         }
+        #endregion
     }
 }

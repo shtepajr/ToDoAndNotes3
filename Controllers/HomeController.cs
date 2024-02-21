@@ -30,6 +30,7 @@ namespace ToDoAndNotes3.Controllers
             _authorizationService = authorizationService;
         }
         // GET: /Home
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult Index()
         {
@@ -41,6 +42,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Main
+        [HttpGet]
         public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null, 
             string? search = null, int? labelId = null)
         {
@@ -130,6 +132,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Labels
+        [HttpGet]
         public async Task<IActionResult> Labels()
         {
             ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Labels), "Home");
@@ -144,6 +147,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: /Home/Privacy
+        [HttpGet]
         public IActionResult Privacy()
         {
             return View();
@@ -151,6 +155,7 @@ namespace ToDoAndNotes3.Controllers
 
         // POST: /Home/ChangeTempDataValue
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ChangeTempDataValue(string? tempDataName, string? tempDataValue = null, string? returnUrl = null)
         {
             if (string.IsNullOrWhiteSpace(tempDataName))
@@ -162,7 +167,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         #region Helpers
-        Models.Project GetOrCreateDefaultProject()
+        private Models.Project GetOrCreateDefaultProject()
         {
             var checkDefault = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User) 
                                                                 && p.IsDefault == true).FirstOrDefault();
@@ -180,7 +185,7 @@ namespace ToDoAndNotes3.Controllers
             }
             return checkDefault;
         }
-        async Task<GeneralViewModel> LoadGeneralViewModel(DaysViewName? daysViewName, string? userId, int? projectId, int? labelId, string? search)
+        private async Task<GeneralViewModel> LoadGeneralViewModel(DaysViewName? daysViewName, string? userId, int? projectId, int? labelId, string? search)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             if (labelId is not null)
@@ -263,7 +268,7 @@ namespace ToDoAndNotes3.Controllers
             generalViewModel.Labels = await _context.Labels.Where(l => l.UserId == userId).ToListAsync();
             return generalViewModel;
         }
-        void SortGeneralViewModel(GeneralViewModel generalViewModel, string? dateOrder, bool? hideCompleted)
+        private void SortGeneralViewModel(GeneralViewModel generalViewModel, string? dateOrder, bool? hideCompleted)
         {
             // sort by dateOrder, hideCompleted
             if (dateOrder == "ascending")

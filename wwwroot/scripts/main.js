@@ -4,7 +4,7 @@ $(function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
         checkWindowSize();
     });
-    $(document).on('click', '.js-pass-data-to', function () {
+    $(document).on('click', '.js-update-action-with-id', function () {
         let targetId = $(this).data('receiver-id');
         let id = $(this).data('id'); // element data
         let target = $(`#${targetId}`);
@@ -22,12 +22,12 @@ $(function () {
 
         function setIdToAction(target, id) {
             let currentAction = target.attr('action');
+            let numberPattern = /\/\d+/;
 
-            if (currentAction.includes('id=')) {
-                let updatedAction = currentAction.replace(/id=[^\/]+/, 'id=' + id);
-                target.attr('action', updatedAction);
+            if (numberPattern.test(currentAction)) {
+                target.attr('action', currentAction.replace(numberPattern, `/${id}`));
             } else {
-                target.attr('action', currentAction + (currentAction.includes('?') ? '&' : '?') + 'id=' + id);
+                target.attr('action', `${currentAction}/${id}`);
             }
         }
     });
@@ -45,16 +45,12 @@ $(function () {
         let formAction = $(this).attr('action');
         let formData = new FormData($(this)[0]);
         let returnUrl = formData.get('returnUrl');
-        let targetId = formData.get('id');
 
         // create form action URL
         let url = new URL(formAction, window.location.origin);
         let params = new URLSearchParams(url.search);
         if (!params.has('returnUrl')) {
             params.set('returnUrl', returnUrl);
-        }
-        if (!params.has('id')) {
-            params.set('id', targetId);
         }
         url.search = params.toString();
         formAction = url.toString();
@@ -85,7 +81,8 @@ $(function () {
                 window.history.pushState({}, '', mainFullUrl.toString());
             },
             error: function (xhr, status, error) {
-                console.log('hello error');
+                window.location.pathname = '/Account/Error';
+                console.log('ajax: hello get error');
             }
         });
     });
@@ -125,7 +122,8 @@ $(function () {
                 }
             },
             error: function (xhr, status, error) {
-                console.log('hello error');
+                window.location.pathname = '/Account/Error';
+                console.log('ajax: hello post error');
             }
         });
     });

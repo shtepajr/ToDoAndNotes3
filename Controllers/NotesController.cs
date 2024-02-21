@@ -5,6 +5,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.MainViewModels;
@@ -17,29 +18,43 @@ namespace ToDoAndNotes3.Controllers
     {
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public NotesController(TdnDbContext context, UserManager<User> userManager)
+        public NotesController(TdnDbContext context, UserManager<User> userManager, IAuthorizationService authorizationService)
         {
             _context = context;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         // GET: Notes/CreatePartial
-        public IActionResult CreatePartial(string? returnUrl = null)
+        [HttpGet]
+        public async Task<IActionResult> CreatePartialAsync(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            // provide authorization
-            var currentProjectId = TempData["CurrentProjectId"] as int?;
-            TempData.Keep("CurrentProjectId");
+            var currentProjectId = TempData.Peek("CurrentProjectId") as int?;
+            var project = await _context.Projects.FindAsync(currentProjectId);
+
+            if (project is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
 
             DateOnly? defaultDate = null;
             // if days view
-            if (Enum.TryParse(TempData["DaysViewName"]?.ToString(), out DaysViewName daysViewName))
+            if (Enum.TryParse(TempData.Peek("DaysViewName")?.ToString(), out DaysViewName daysViewName))
             {
                 defaultDate = DateOnly.FromDateTime(DateTime.Now);
             }
-            TempData.Keep("DaysViewName");
 
             return PartialView("Notes/_CreatePartial", new NoteLabelsViewModel()
             {
@@ -62,13 +77,26 @@ namespace ToDoAndNotes3.Controllers
 
             if (ModelState.IsValid)
             {
-                if (!ProjectExists(noteLabels.Note.ProjectId))
+                var project = await _context.Projects.FindAsync(noteLabels.Note.ProjectId);
+
+                if (project is null)
                 {
                     return NotFound();
                 }
+                else
+                {
+                    var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                    if (!isAuthorized.Succeeded)
+                    {
+                        return Forbid();
+                    }
+                }
 
-                // provide authorization
-                SetSelectedLabels(noteLabels);
+                bool set = await SetSelectedLabelsAsync(noteLabels);
+                if (!set)
+                {
+                    return NotFound();
+                }
 
                 _context.Add(noteLabels.Note);
                 await _context.SaveChangesAsync();
@@ -81,6 +109,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Notes/EditPartial/5
+        [HttpGet]
         public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -90,15 +119,24 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var noteInclude = _context.Notes
-                .Where(n => n.NoteId == id)
-                .Include(n => n.NoteDescription)
-                .Include(n => n.NoteLabels)?.ThenInclude(nl => nl.Label)
-                .FirstOrDefault();
+            var noteInclude = _context?.Notes
+                ?.Where(n => n.NoteId == id)
+                ?.Include(n => n.NoteDescription)
+                ?.Include(n => n.NoteLabels)?.ThenInclude(nl => nl.Label)
+                ?.Include(n => n.Project)
+                ?.FirstOrDefault();
 
-            if (noteInclude == null)
+            if (noteInclude is null)
             {
                 return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, noteInclude, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
             IEnumerable<int?> selectedInt = noteInclude?.NoteLabels?.Select(nl => nl.Label.LabelId);
@@ -119,12 +157,17 @@ namespace ToDoAndNotes3.Controllers
         public async Task<IActionResult> EditPartial(NoteLabelsViewModel noteLabels, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-
             if (ModelState.IsValid)
             {
+                _context.Attach(noteLabels.Note).State = EntityState.Modified;
+
                 try
                 {
-                    SetSelectedLabels(noteLabels);
+                    bool set = await SetSelectedLabelsAsync(noteLabels);
+                    if (!set)
+                    {
+                        return NotFound();
+                    }
                     _context.Update(noteLabels.Note);
                     await _context.SaveChangesAsync();
                 }
@@ -152,31 +195,48 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoftDelete(int? id, string? returnUrl = null)
         {
-            var note = _context.Notes.SingleOrDefault(n => n.NoteId == id);
+            var note = await _context.Notes.Include(n => n.Project).FirstOrDefaultAsync(n => n.NoteId == id);
 
-            if (note != null)
+            if (note is null)
             {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, note, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
                 note.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToLocal(returnUrl);
         }
-       
+
         // GET: Notes/DeletePartial/5
+        [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (id == null)
+            var note = await _context.Notes.Include(n => n.Project).FirstOrDefaultAsync(n => n.NoteId == id);
+
+            if (note is null)
             {
                 return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, note, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
-            var note = await _context.Notes.FindAsync(id);
-            if (note == null)
-            {
-                return NotFound();
-            }
             return PartialView("Notes/_DeletePartial", new NoteLabelsViewModel()
             {
                 Note = note
@@ -188,16 +248,19 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
-            if (id == null)
+            var note = await _context.Notes.Include(n => n.Project).FirstOrDefaultAsync(n => n.NoteId == id);
+
+            if (note is null)
             {
                 return NotFound();
             }
-
-            var note = await _context.Notes.FirstOrDefaultAsync(n => n.NoteId == id);
-
-            if (note == null)
+            else
             {
-                return NotFound();
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, note, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
             _context.Notes.Remove(note);
@@ -207,15 +270,28 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // POST: Notes/Duplicate/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Duplicate(int? id, string? returnUrl = null)
         {
             var note = await _context.Notes
                 .Include(n => n.NoteDescription)
                 .Include(n => n.NoteLabels).ThenInclude(nl => nl.Label)
+                .Include(n => n.Project)
                 .FirstOrDefaultAsync(n => n.NoteId == id);
 
-            if (note != null)
+            if (note is null)
             {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, note, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
                 Note? copy = NotesController.DeepCopy(note);
                 if (copy == null)
                 {
@@ -224,9 +300,11 @@ namespace ToDoAndNotes3.Controllers
                 await _context.Notes.AddAsync(copy);
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToLocal(returnUrl);
         }
        
+        #region Helpers
         public static Note? DeepCopy(Note oldNote)
         {
             if (oldNote == null || oldNote.ProjectId == null)
@@ -258,15 +336,15 @@ namespace ToDoAndNotes3.Controllers
             }
             return copy;
         }
-        private bool TaskExists(int? id)
+        private bool NoteExists(int? id)
         {
-            return _context.Tasks.Any(e => e.TaskId == id);
+            return _context.Notes.Any(e => e.NoteId == id);
         }
         private bool ProjectExists(int? id)
         {
             return _context.Projects.IgnoreQueryFilters().Any(e => e.ProjectId == id);
         }
-        private void SetSelectedLabels(NoteLabelsViewModel noteLabelsViewModel)
+        private async Task<bool> SetSelectedLabelsAsync(NoteLabelsViewModel noteLabelsViewModel)
         {
             if (noteLabelsViewModel?.SelectedLabelsId != null)
             {
@@ -276,10 +354,44 @@ namespace ToDoAndNotes3.Controllers
 
                 var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
 
-                if (TaskExists(noteLabelsViewModel.Note.NoteId))
+                foreach (var label in selected)
                 {
-                    _context.Entry(noteLabelsViewModel.Note).Collection(t => t.NoteLabels).Load();
-                    _context.RemoveRange(noteLabelsViewModel.Note.NoteLabels);
+                    if (label is null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var isAuthorized = await _authorizationService.AuthorizeAsync(User, label, EntityOperations.FullAccess);
+                        if (!isAuthorized.Succeeded)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                if (noteLabelsViewModel.Note.NoteId is not null)
+                {
+                    var note = await _context?.Notes
+                        ?.Include(n => n.Project)
+                        ?.Include(n => n.NoteLabels)
+                        ?.FirstOrDefaultAsync(n => n.NoteId == noteLabelsViewModel.Note.NoteId);
+
+                    if (note is null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var isAuthorized = await _authorizationService.AuthorizeAsync(User, note, EntityOperations.FullAccess);
+                        if (!isAuthorized.Succeeded)
+                        {
+                            return false;
+                        }
+                    }
+                    // if note is already exists then clear noteLabels (to recreate it)
+                    //_context.Entry(noteLabelsViewModel.Note).Collection(t => t.NoteLabels).Load();
+                    _context.RemoveRange(note.NoteLabels);
                 }
 
                 List<NoteLabel> noteLabels = new List<NoteLabel>();
@@ -291,7 +403,9 @@ namespace ToDoAndNotes3.Controllers
                     });
                 }
                 noteLabelsViewModel.Note.NoteLabels = noteLabels;
+                return true;
             }
+            return true;
         }
         private IActionResult RedirectToLocal(string returnUrl)
         {
@@ -304,5 +418,6 @@ namespace ToDoAndNotes3.Controllers
                 return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             }
         }
+        #endregion
     }
 }

@@ -283,6 +283,7 @@ namespace ToDoAndNotes3.Controllers
         {
             return View();
         }
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Error()
