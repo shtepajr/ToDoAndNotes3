@@ -5,6 +5,7 @@ using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.MainViewModels;
@@ -17,21 +18,36 @@ namespace ToDoAndNotes3.Controllers
     {
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public TasksController(TdnDbContext context, UserManager<User> userManager)
+        public TasksController(TdnDbContext context, UserManager<User> userManager, IAuthorizationService authorizationService)
         {
             _context = context;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         // GET: Tasks/CreatePartial
-        public IActionResult CreatePartial(string? returnUrl = null)
+        [HttpGet]
+        public async Task<IActionResult> CreatePartialAsync(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            // provide authorization
-            var currentProjectId = TempData["CurrentProjectId"] as int?;
-            TempData.Keep("CurrentProjectId");
+            var currentProjectId = TempData.Peek("CurrentProjectId") as int?;
+            var project = await _context.Projects.FindAsync(currentProjectId);
+
+            if (project is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
 
             DateOnly? defaultDate = null;
             // if days view
@@ -62,13 +78,26 @@ namespace ToDoAndNotes3.Controllers
 
             if (ModelState.IsValid)
             {
-                if (!ProjectExists(taskLabels.Task.ProjectId))
+                var project = await _context.Projects.FindAsync(taskLabels.Task.ProjectId);
+
+                if (project is null)
                 {
                     return NotFound();
                 }
+                else
+                {
+                    var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                    if (!isAuthorized.Succeeded)
+                    {
+                        return Forbid();
+                    }
+                }
 
-                // provide authorization
-                SetSelectedLabels(taskLabels);
+                bool set = await SetSelectedLabelsAsync(taskLabels);
+                if (!set)
+                {
+                    return NotFound();
+                }
 
                 _context.Add(taskLabels.Task);
                 await _context.SaveChangesAsync();
@@ -81,6 +110,7 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Tasks/EditPartial/5
+        [HttpGet]
         public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -90,26 +120,43 @@ namespace ToDoAndNotes3.Controllers
                 return NotFound();
             }
 
-            var taskInclude = _context.Tasks
-                .Where(t => t.TaskId == id)
-                .Include(t => t.TaskLabels)?.ThenInclude(t => t.Label)
+            var taskInclude = _context?.Tasks
+                ?.Where(t => t.TaskId == id)
+                ?.Include(t => t.TaskLabels)?.ThenInclude(t => t.Label)
+                ?.Include(t => t.Project)
                 .FirstOrDefault();
 
-            if (taskInclude == null)
+            if (taskInclude is null)
             {
                 return NotFound();
             }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, taskInclude, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+            }
 
-            IEnumerable<int?> selectedInt = taskInclude?.TaskLabels?.Select(tl => tl.Label.LabelId);
-            string selected = JsonSerializer.Serialize(selectedInt); // => "[12, 17]"
+            IEnumerable<string?>? selectedInt = taskInclude?.TaskLabels?.Select(tl => tl?.Label?.LabelId.ToString());
+            string selected = JsonSerializer.Serialize(selectedInt); // => "["12", "17"]"
 
-            return PartialView("Tasks/_EditPartial", new TaskLabelsViewModel()
+            var test = new TaskLabelsViewModel()
             {
                 Task = taskInclude!,
                 SelectedLabelsId = selected,
-                Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList(),
-                Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList(),
-            });
+                Labels = _context?.Labels?.Where(l => l.UserId == _userManager.GetUserId(User))?.ToList(),
+                Projects = _context?.Projects?.Where(p => p.UserId == _userManager.GetUserId(User))?.ToList(),
+            };
+            foreach (var item in test.Projects)
+            {
+                Console.WriteLine("----------------");
+                Console.WriteLine(item.ProjectId);
+                Console.WriteLine(item.Title);
+            }
+
+            return PartialView("Tasks/_EditPartial", test);
         }
 
         // POST: Tasks/EditPartial/5
@@ -121,15 +168,21 @@ namespace ToDoAndNotes3.Controllers
 
             if (ModelState.IsValid)
             {
+                _context.Attach(taskLabels.Task).State = EntityState.Modified;
+
                 try
                 {
-                    SetSelectedLabels(taskLabels);
+                    bool set = await SetSelectedLabelsAsync(taskLabels);
+                    if (!set)
+                    {
+                        return NotFound();
+                    }
                     _context.Update(taskLabels.Task);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProjectExists(taskLabels.Task.TaskId))
+                    if (!TaskExists(taskLabels.Task.TaskId))
                     {
                         return NotFound();
                     }
@@ -151,31 +204,48 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoftDelete(int? id, string? returnUrl = null)
         {
-            var task = _context.Tasks.SingleOrDefault(p => p.TaskId == id);
+            var task = await _context.Tasks.Include(t => t.Project).FirstOrDefaultAsync(t => t.TaskId == id);
 
-            if (task != null)
+            if (task is null)
             {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, task, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
                 task.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToLocal(returnUrl);
         }
        
         // GET: Tasks/DeletePartial/5
+        [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (id == null)
+            var task = await _context.Tasks.Include(t => t.Project).FirstOrDefaultAsync(t => t.TaskId == id);
+
+            if (task is null)
             {
                 return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, task, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
-            var task = await _context.Tasks.FindAsync(id);
-            if (task == null)
-            {
-                return NotFound();
-            }
             return PartialView("Tasks/_DeletePartial", new TaskLabelsViewModel()
             {
                 Task = task
@@ -187,16 +257,19 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
-            if (id == null)
+            var task = await _context.Tasks.Include(t => t.Project).FirstOrDefaultAsync(t => t.TaskId == id);
+
+            if (task is null)
             {
                 return NotFound();
             }
-
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == id);
-
-            if (task == null)
+            else
             {
-                return NotFound();
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, task, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
             _context.Tasks.Remove(task);
@@ -206,47 +279,65 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // POST: Tasks/Duplicate/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Duplicate(int? id, string? returnUrl = null)
         {
             var task = await _context.Tasks
-                .Include(t => t.TaskLabels)
-                .ThenInclude(tl => tl.Label)
+                .Include(t => t.TaskLabels).ThenInclude(tl => tl.Label)
+                .Include(t => t.Project)
                 .FirstOrDefaultAsync(t => t.TaskId == id);
 
-            if (task != null)
+            if (task is null)
             {
-                Models.Task? copy = TasksController.DeepCopy(task);
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, task, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
+                Models.Task? copy = DeepCopy(task);
                 if (copy == null)
                 {
-                    return RedirectToLocal(returnUrl);
+                    return NotFound();
                 }
                 await _context.Tasks.AddAsync(copy);
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToLocal(returnUrl);
         }
 
         // POST: Tasks/ToggleState/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleState(int? id, string? returnUrl = null)
         {
-            if (id == null)
+            var task = await _context.Tasks.Include(t => t.Project).FirstOrDefaultAsync(t => t.TaskId == id);
+
+            if (task is null)
             {
                 return NotFound();
             }
-
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.TaskId == id);
-
-            if (task == null)
+            else
             {
-                return NotFound();
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, task, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+                task.IsCompleted = !task.IsCompleted;
+                await _context.SaveChangesAsync();
             }
-
-            task.IsCompleted = !task.IsCompleted;
-            await _context.SaveChangesAsync();
 
             return RedirectToLocal(returnUrl);
         }
 
+        #region Helpers
         public static Models.Task? DeepCopy(Models.Task oldTask)
         {
             if (oldTask == null || oldTask.ProjectId == null)
@@ -278,24 +369,54 @@ namespace ToDoAndNotes3.Controllers
         {
             return _context.Tasks.Any(e => e.TaskId == id);
         }
-        private bool ProjectExists(int? id)
-        {
-            return _context.Projects.IgnoreQueryFilters().Any(e => e.ProjectId == id);
-        }
-        private void SetSelectedLabels(TaskLabelsViewModel taskLabelsViewModel)
+        private async Task<bool> SetSelectedLabelsAsync(TaskLabelsViewModel taskLabelsViewModel)
         {
             if (taskLabelsViewModel?.SelectedLabelsId != null)
             {
-                // SelectedLabelsId value: " \"12\" , \"17\" "
+                // SelectedLabelsId value: "["17","27"]" ~ "[\"17\",\"27\"]"
                 List<string>? selectedString = JsonSerializer.Deserialize<List<string>>(taskLabelsViewModel?.SelectedLabelsId);
                 List<int>? selectedInt = selectedString?.Select(int.Parse).ToList();
 
                 var selected = _context.Labels.Where(l => selectedInt.Contains(l.LabelId.Value)).ToList();
 
-                if (TaskExists(taskLabelsViewModel.Task.TaskId))
+                foreach (var label in selected)
                 {
-                    _context.Entry(taskLabelsViewModel.Task).Collection(t => t.TaskLabels).Load();
-                    _context.RemoveRange(taskLabelsViewModel.Task.TaskLabels);
+                    if (label is null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var isAuthorized = await _authorizationService.AuthorizeAsync(User, label, EntityOperations.FullAccess);
+                        if (!isAuthorized.Succeeded)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                if (taskLabelsViewModel.Task.TaskId is not null)
+                {
+                    var task = await _context?.Tasks
+                        ?.Include(n => n.Project)
+                        ?.Include(n => n.TaskLabels)
+                        ?.FirstOrDefaultAsync(t => t.TaskId == taskLabelsViewModel.Task.TaskId);
+
+                    if (task is null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var isAuthorized = await _authorizationService.AuthorizeAsync(User, task, EntityOperations.FullAccess);
+                        if (!isAuthorized.Succeeded)
+                        {
+                            return false;
+                        }
+                    }
+                    // if task is already exists then clear noteLabels (to recreate it)
+                    //_context.Entry(taskLabelsViewModel.Note).Collection(t => t.NoteLabels).Load();
+                    _context.RemoveRange(task.TaskLabels);
                 }
 
                 List<TaskLabel> taskLabels = new List<TaskLabel>();
@@ -307,7 +428,9 @@ namespace ToDoAndNotes3.Controllers
                     });
                 }
                 taskLabelsViewModel.Task.TaskLabels = taskLabels;
+                return true;
             }
+            return true;
         }
         private IActionResult RedirectToLocal(string returnUrl)
         {
@@ -320,5 +443,6 @@ namespace ToDoAndNotes3.Controllers
                 return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             }
         }
+        #endregion
     }
 }

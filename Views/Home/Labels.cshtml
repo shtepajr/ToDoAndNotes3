@@ -56,11 +56,19 @@
             <div class="dropdown-content js-dropdown-content" id="label-dropdown-content">
                 <form asp-controller="Labels" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-label-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn" type="submit">Edit</button>
+                    <button class="btn" type="submit">
+                        <span class="material-symbols-outlined md-20">
+                            edit
+                        </span>Edit
+                    </button>
                 </form>
                 <form asp-controller="Labels" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-label-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn" type="submit">Delete</button>
+                    <button class="btn red" type="submit">
+                        <span class="material-symbols-outlined md-20">
+                            delete
+                        </span>Delete forever
+                    </button>
                 </form>
             </div>
         </ul>

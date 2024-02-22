@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.MainViewModels;
@@ -13,14 +14,17 @@ namespace ToDoAndNotes3.Controllers
     {
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ProjectsController(TdnDbContext context, UserManager<User> userManager)
+        public ProjectsController(TdnDbContext context, UserManager<User> userManager, IAuthorizationService authorizationService)
         {
             _context = context;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         // GET: Projects/CreatePartial
+        [HttpGet]
         public IActionResult CreatePartial(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -43,20 +47,26 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Projects/EditPartial/5
+        [HttpGet]
         public async Task<IActionResult> EditPartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (id == null)
+            var project = await _context.Projects.FindAsync(id);
+
+            if (project is null)
             {
                 return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
             return PartialView("Projects/_EditPartial", project);
         }
 
@@ -69,6 +79,18 @@ namespace ToDoAndNotes3.Controllers
 
             if (ModelState.IsValid)
             {
+                if (project is null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                    if (!isAuthorized.Succeeded)
+                    {
+                        return Forbid();
+                    }
+                }
                 try
                 {
                     _context.Update(project);
@@ -91,14 +113,26 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // POST: Projects/SoftDelete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoftDelete(int? id, string? returnUrl = null)
         {
             var project = _context.Projects
                 .Include(t => t.Tasks)
                 .Include(n => n.Notes)
                 .SingleOrDefault(p => p.ProjectId == id);
-            if (project != null)
+
+            if (project is null)
             {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
                 project.IsDeleted = true;
                 foreach (var task in project?.Tasks)
                 {
@@ -116,20 +150,26 @@ namespace ToDoAndNotes3.Controllers
         }
 
         // GET: Projects/DeletePartial/5
+        [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (id == null)
+            var project = await _context.Projects.FindAsync(id);
+
+            if (project is null)
             {
                 return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
             }
 
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
-            {
-                return NotFound();
-            }
             return PartialView("Projects/_DeletePartial", project);
         }
 
@@ -138,35 +178,50 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
-            if (id == null)
+            var project = await _context.Projects.FindAsync(id);
+
+            if (project is null)
             {
                 return NotFound();
             }
-
-            var project = await _context.Projects.FirstOrDefaultAsync(t => t.ProjectId == id);
-
-            if (project == null)
+            else
             {
-                return NotFound();
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+                _context.Projects.Remove(project);
+                await _context.SaveChangesAsync();
             }
-
-            _context.Projects.Remove(project);
-            await _context.SaveChangesAsync();
 
             returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // POST: Projects/Duplicate/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Duplicate(int? id, string? returnUrl = null)
         {
             var project = _context.Projects
                 .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(tl => tl.Label)
                 .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(nl => nl.Label)
                 .FirstOrDefault(p => p.ProjectId == id);
-            if (project != null)
+
+            if (project is null)
             {
-                Project? copy = ProjectsController.DeepCopy(project);
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
+                Project? copy = DeepCopy(project);
 
                 if (copy == null)
                 {
@@ -175,10 +230,11 @@ namespace ToDoAndNotes3.Controllers
                 await _context.Projects.AddAsync(copy);
                 await _context.SaveChangesAsync();
             }
-            // mb handle error somehow
+
             return RedirectToLocal(returnUrl);
         }
 
+        #region Helpers  
         public static Project? DeepCopy(Project oldProject)
         {
             if (oldProject == null || oldProject.UserId == null)
@@ -200,15 +256,15 @@ namespace ToDoAndNotes3.Controllers
                     copy?.Tasks?.Add(taskCopy);
                 }
             }
-            // To do
-            //foreach (var note in oldProject?.Notes)
-            //{
-            //    var noteCopy = NotesController.DeepCopy(note);
-            //    if (noteCopy != null)
-            //    {
-            //        copy?.Notes?.Add(noteCopy);
-            //    }
-            //}
+            foreach (var note in oldProject?.Notes)
+            {
+                var noteCopy = NotesController.DeepCopy(note);
+                if (noteCopy != null)
+                {
+                    copy?.Notes?.Add(noteCopy);
+                }
+            }
+
             return copy;
         }
         private bool ProjectExists(int? id)
@@ -226,5 +282,6 @@ namespace ToDoAndNotes3.Controllers
                 return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             }
         }
+        #endregion
     }
 }

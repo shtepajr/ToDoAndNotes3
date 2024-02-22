@@ -139,15 +139,15 @@ namespace ToDoAndNotes3.Controllers
                 }
             }
 
-            IEnumerable<int?> selectedInt = noteInclude?.NoteLabels?.Select(nl => nl.Label.LabelId);
-            string selected = JsonSerializer.Serialize(selectedInt); // => "[12, 17]"
+            IEnumerable<string?>? selectedInt = noteInclude?.NoteLabels?.Select(nl => nl?.Label?.LabelId.ToString());
+            string selected = JsonSerializer.Serialize(selectedInt); // => "["12", "17"]"
 
             return PartialView("Notes/_EditPartial", new NoteLabelsViewModel()
             {
                 Note = noteInclude!,
                 SelectedLabelsId = selected,
-                Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList(),
-                Projects = _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User)).ToList(),
+                Labels = _context?.Labels?.Where(l => l.UserId == _userManager.GetUserId(User))?.ToList(),
+                Projects = _context?.Projects?.Where(p => p.UserId == _userManager.GetUserId(User))?.ToList(),
             });
         }
 
@@ -173,7 +173,7 @@ namespace ToDoAndNotes3.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProjectExists(noteLabels.Note.NoteId))
+                    if (!NoteExists(noteLabels.Note.NoteId))
                     {
                         return NotFound();
                     }
@@ -292,10 +292,10 @@ namespace ToDoAndNotes3.Controllers
                     return Forbid();
                 }
 
-                Note? copy = NotesController.DeepCopy(note);
+                Note? copy = DeepCopy(note);
                 if (copy == null)
                 {
-                    return RedirectToLocal(returnUrl);
+                    return NotFound();
                 }
                 await _context.Notes.AddAsync(copy);
                 await _context.SaveChangesAsync();
@@ -339,10 +339,6 @@ namespace ToDoAndNotes3.Controllers
         private bool NoteExists(int? id)
         {
             return _context.Notes.Any(e => e.NoteId == id);
-        }
-        private bool ProjectExists(int? id)
-        {
-            return _context.Projects.IgnoreQueryFilters().Any(e => e.ProjectId == id);
         }
         private async Task<bool> SetSelectedLabelsAsync(NoteLabelsViewModel noteLabelsViewModel)
         {

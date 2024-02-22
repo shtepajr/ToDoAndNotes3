@@ -4,8 +4,8 @@
     Layout = "_ModalContentLayout";
     ViewData["SelectLabels"] = new SelectList(Model.Labels, "LabelId", "Title");
     ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
-    string projectSelect = JsonSerializer.Serialize(ViewBag.SelectProjects); // "[{..},{..},{..}]"
-    string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);
+    string projectSelect = JsonSerializer.Serialize(ViewBag.SelectProjects); // [{"Text":"..", "Value":".."},{..},{..}]
+    string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);    // [{"Text":"..", "Value":".."},{..},{..}]
 }
 
 @section ModalHeaderContent {
@@ -15,23 +15,30 @@
             <span class="material-symbols-outlined md-24 black select-togle-icon">
                 arrow_drop_down
             </span>
-            <div class="js-set-projects-virtual-select" data-target-select-list=@Html.Raw(projectSelect) // [{..},{..},{..}]
-                 data-target-selected=@Html.Raw(Model.Task.ProjectId)></div>
+            <div class="js-set-projects-virtual-select" data-target-select-list="@projectSelect" data-target-selected="@Model.Task.ProjectId"></div>
         </div>
     </div>
+    <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-update-action-with-id"
+          data-dropdown-content-id="current-task-dropdown-content" data-receiver-id="current-task-dropdown-content" data-id="@Model.Task.TaskId">
+        more_horiz
+    </span>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-update-action-with-id"
-              data-dropdown-content-id="current-task-dropdown-content" data-receiver-id="current-task-dropdown-content" data-id="@Model.Task.TaskId">
-            more_horiz
-        </span>
         <div class="dropdown-content js-dropdown-content" id="current-task-dropdown-content">
             <form asp-controller="Tasks" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Duplicate</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        control_point_duplicate
+                    </span>Duplicate
+                </button>
             </form>
             <form asp-controller="Tasks" asp-action="SoftDelete">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Remove</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Move to bin
+                </button>
             </form>
         </div>
     </div>
@@ -102,8 +109,7 @@
                         label
                     </span>
                     <div id="select-labels-edit"></div>
-                    <div class="js-set-labels-virtual-select" data-target-select-list=@Html.Raw(labelsSelect)
-                         data-target-selected=@Html.Raw(Model.SelectedLabelsId)></div>
+                    <div class="js-set-labels-virtual-select" data-target-select-list="@labelsSelect" data-target-selected="@Model.SelectedLabelsId"></div>
                 </div>
             </div>
         </div>

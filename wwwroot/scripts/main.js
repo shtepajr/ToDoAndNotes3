@@ -238,8 +238,9 @@ $(function () {
         // projectSelect
         let projectSelect = $(this).find('.js-set-projects-virtual-select');
         if (projectSelect.length > 0) {
-            let projectsOptions = projectSelect.data('target-select-list'); // [{..},{..},{..}]
-            let projectsSelected = projectSelect.data('target-selected'); // number
+            let projectsOptions = projectSelect.data('target-select-list'); // array => [{"Text":"..", "Value":".."},{..},{..}]
+            console.log(projectsOptions);
+            let projectsSelected = projectSelect.data('target-selected');  // array => ["12"]
 
             VirtualSelect.init({
                 ele: projectSelect.get(0),
@@ -258,8 +259,8 @@ $(function () {
         // labels
         let labelsSelect = $(this).find('.js-set-labels-virtual-select');
         if (labelsSelect.length > 0) {
-            let labelsOptions = labelsSelect.data('target-select-list'); // ["12", "17"]
-            let labelsSelected = labelsSelect.data('target-selected');
+            let labelsOptions = labelsSelect.data('target-select-list'); // array => [{"Text":"..", "Value":".."},{..},{..}]
+            let labelsSelected = labelsSelect.data('target-selected');   // array => ["12", "17"]
 
             VirtualSelect.init({
                 ele: labelsSelect.get(0),
@@ -275,8 +276,8 @@ $(function () {
             // set value to its input
             labelsSelect.on('change', function () {
                 let selectedOptions = $(this).get(0).getSelectedOptions();
-                let selectedValues = Array.from(selectedOptions).map(option => option.value);
-                $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));
+                let selectedValues = Array.from(selectedOptions).map(option => option.value); // ['17', '27']
+                $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues)); // ["17","27"]
             });
         }
     }

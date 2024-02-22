@@ -4,11 +4,10 @@
     Layout = "_ModalContentLayout";
     ViewData["SelectLabels"] = new SelectList(Model.Labels, "LabelId", "Title");
     ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
-    string projectSelect = JsonSerializer.Serialize(ViewBag.SelectProjects); // "[{..},{..},{..}]"
-    string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);
+    string projectSelect = JsonSerializer.Serialize(ViewBag.SelectProjects); // [{"Text":"..", "Value":".."},{..},{..}]
+    string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);    // [{"Text":"..", "Value":".."},{..},{..}]
 
-    var projectId = TempData["CurrentProjectId"] as int?;
-    TempData.Keep("CurrentProjectId");
+    var projectId = TempData.Peek("CurrentProjectId") as int?;
 }
 
 @section ModalHeaderContent {
@@ -18,8 +17,7 @@
             <span class="material-symbols-outlined md-24 black select-togle-icon">
                 arrow_drop_down
             </span>
-            <div class="js-set-projects-virtual-select" data-target-select-list=@Html.Raw(projectSelect)
-                 data-target-selected=@Html.Raw(projectId)></div>
+            <div class="js-set-projects-virtual-select" data-target-select-list="@projectSelect" data-target-selected="@projectId"></div>
         </div>
     </div>
 }
@@ -75,8 +73,7 @@
                     label
                 </span>
                 <div id="select-labels"></div>
-                <div class="js-set-labels-virtual-select" data-target-select-list=@Html.Raw(labelsSelect)
-                     data-target-selected=@Html.Raw(Model.SelectedLabelsId)></div>
+                <div class="js-set-labels-virtual-select" data-target-select-list="@labelsSelect" data-target-selected="@Model.SelectedLabelsId"></div>
             </div>
         </div>
     </div>

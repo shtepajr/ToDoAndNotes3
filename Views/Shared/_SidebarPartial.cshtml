@@ -77,20 +77,36 @@
         <div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
             <form method="get" asp-controller="Projects" asp-action="EditPartial" class="js-get-partial-form" data-target-modal-id="edit-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Edit</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        edit
+                    </span>Edit
+                </button>
             </form>
             <form asp-controller="Projects" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Duplicate</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        control_point_duplicate
+                    </span>Duplicate
+                </button>
             </form>
             <form asp-controller="Projects" asp-action="SoftDelete">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Remove</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Move to bin
+                </button>
             </form>
             @* TEST (to del) *@
             <form method="get" asp-controller="Projects" asp-action="DeletePartial" class="js-get-partial-form" data-target-modal-id="delete-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Delete</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Delete forever
+                </button>
             </form>
         </div>
     </nav>

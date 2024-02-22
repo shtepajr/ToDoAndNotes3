@@ -25,10 +25,22 @@
                 account_circle
             </span>
             <div class="dropdown-content js-dropdown-content" id="profile-dropdown-content">
-                <a href="#Account">Account</a>
-                <a href="#RecycleBin">Recycle Bin</a>
+                <a href="#Account">
+                    <span class="material-symbols-outlined md-20">
+                        manage_accounts
+                    </span>Account
+                </a>
+                <a href="#RecycleBin">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Recycle Bin
+                </a>
                 <form asp-controller="Account" asp-action="LogOff" method="post">
-                    <button type="submit" class="btn">Log out</button>
+                    <button type="submit" class="btn">
+                        <span class="material-symbols-outlined md-20">
+                            logout
+                        </span>Log out
+                    </button>
                 </form>
             </div>
         </div>

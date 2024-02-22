@@ -8,15 +8,19 @@
     <div class="modal-header-left">
         <div class="modal-title">Edit</div>
     </div>
+    <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-update-action-with-id"
+          data-dropdown-content-id="current-label-dropdown-content" data-receiver-id="current-label-dropdown-content" data-id="@Model.LabelId">
+        more_horiz
+    </span>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-update-action-with-id"
-              data-dropdown-content-id="current-label-dropdown-content" data-receiver-id="current-label-dropdown-content" data-id="@Model.LabelId">
-            more_horiz
-        </span>
         <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content">
             <form asp-controller="Labels" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-label-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Delete</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Delete forever
+                </button>
             </form>
         </div>
     </div>

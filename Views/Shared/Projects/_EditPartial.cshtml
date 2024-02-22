@@ -8,19 +8,27 @@
     <div class="modal-header-left">
         <div class="modal-title">Edit</div>
     </div>
+    <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-update-action-with-id"
+          data-dropdown-content-id="current-project-dropdown-content" data-receiver-id="current-project-dropdown-content" data-id="@Model.ProjectId">
+        more_horiz
+    </span>
     <div class="dropdown">
-        <span class="material-symbols-outlined md-24 black btn js-dropdown-btn js-update-action-with-id"
-              data-dropdown-content-id="current-project-dropdown-content" data-receiver-id="current-project-dropdown-content" data-id="@Model.ProjectId">
-            more_horiz
-        </span>
         <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
             <form asp-controller="Projects" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Duplicate</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        control_point_duplicate
+                    </span>Duplicate
+                </button>
             </form>
             <form asp-controller="Projects" asp-action="SoftDelete">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Remove</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Move to bin
+                </button>
             </form>
         </div>
     </div>

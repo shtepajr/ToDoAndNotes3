@@ -53,11 +53,6 @@ namespace ToDoAndNotes3.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var label = await _context.Labels.FindAsync(id);
 
             if (label is null)
@@ -123,11 +118,6 @@ namespace ToDoAndNotes3.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var label = await _context.Labels.FindAsync(id);
 
             if (label is null)
@@ -151,11 +141,6 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var label = await _context.Labels.FindAsync(id);
 
             if (label is null)
@@ -169,10 +154,9 @@ namespace ToDoAndNotes3.Controllers
                 {
                     return Forbid();
                 }
+                _context.Labels.Remove(label);
+                await _context.SaveChangesAsync();
             }
-
-            _context.Labels.Remove(label);
-            await _context.SaveChangesAsync();
 
             return Json(new { success = true, redirectTo = returnUrl });
         }

@@ -75,7 +75,7 @@
                         <input hidden type="text" name="tempDataValue" value="@dateOrder">
                         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                         <button class="btn" type="submit">
-                            <span class="material-symbols-outlined md-24 js-dropdown-btn">
+                            <span class="material-symbols-outlined md-24">
                                 swap_vert
                             </span>
                             @if (dateOrder == "descending")
@@ -95,13 +95,13 @@
                         <button class="btn" type="submit">  
                             @if (hideCompleted == true)
                             {
-                                <span class="material-symbols-outlined md-24 js-dropdown-btn">
+                                <span class="material-symbols-outlined md-24">
                                     visibility
                                 </span>
                             }
                             else
                             {
-                                <span class="material-symbols-outlined md-24 js-dropdown-btn">
+                                <span class="material-symbols-outlined md-24">
                                     visibility_off
                                 </span>
                             }
@@ -200,22 +200,38 @@
         <div id="delete-task-modal" class="modal js-modal">
         </div>
         <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
-            <form id="edit-task-form" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
+            <form id="edit-task-form" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">          
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Edit</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20 black">
+                        edit
+                    </span>Edit
+                </button>
             </form>
             <form asp-controller="Tasks" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Duplicate</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20 black">
+                        control_point_duplicate
+                    </span>Duplicate
+                </button>
             </form>
             <form asp-controller="Tasks" asp-action="SoftDelete">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Remove</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Move to bin
+                </button>
             </form>
             @* TEST (to del) *@
             <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-task-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" type="submit">Delete</button>
+                <button class="btn red js-modal-btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Delete forever
+                </button>
             </form>
         </div>
         <ul class="notes">
@@ -225,7 +241,7 @@
                     <a class="js-update-action-with-id" data-receiver-id="edit-note-form" data-id="@note.NoteId">
                         <div class="note-content">
                             <div class="nowrap-ellipsis">@note.Title</div>
-                            <div class="nowrap-ellipsis note-description js-quill-json-to-text">@Html.Raw(@note?.ShortDescription)</div>
+                            <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
                             <div class="tools">
                                 <div class="date-tools">
                                     @if (note?.DueDate != null)
@@ -283,20 +299,36 @@
         <div class="dropdown-content js-dropdown-content" id="note-dropdown-content">
             <form id="edit-note-form" asp-controller="Notes" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-note-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Edit</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        edit
+                    </span>Edit
+                </button>
             </form>
             <form asp-controller="Notes" asp-action="Duplicate">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Duplicate</button>
+                <button class="btn" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        control_point_duplicate
+                    </span>Duplicate
+                </button>
             </form>
             <form asp-controller="Notes" asp-action="SoftDelete">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn" type="submit">Remove</button>
+                <button class="btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Move to bin
+                </button>
             </form>
             @* TEST (to del) *@
             <form asp-controller="Notes" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-note-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn js-modal-btn" type="submit">Delete</button>
+                <button class="btn js-modal-btn red" type="submit">
+                    <span class="material-symbols-outlined md-20">
+                        delete
+                    </span>Delete forever
+                </button>
             </form>
         </div>
         <ul class="tasks-with-notes">
