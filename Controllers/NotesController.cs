@@ -157,8 +157,10 @@ namespace ToDoAndNotes3.Controllers
         public async Task<IActionResult> EditPartial(NoteLabelsViewModel noteLabels, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+
             if (ModelState.IsValid)
             {
+                _context.Entry(noteLabels.Note).Reference(t => t.Project).Load(); // for next authorization
                 _context.Attach(noteLabels.Note).State = EntityState.Modified;
 
                 try

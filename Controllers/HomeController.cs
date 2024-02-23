@@ -166,6 +166,18 @@ namespace ToDoAndNotes3.Controllers
             return Json(new { success = true, redirectTo = returnUrl });
         }
 
+        // POST: /Home/ChangeTempDataValueNoReload
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public void ChangeTempDataValueNoReload(string? tempDataName, string? tempDataValue = null, string? returnUrl = null)
+        {
+            if (string.IsNullOrWhiteSpace(tempDataName))
+            {
+                return;
+            }
+            TempData[tempDataName] = tempDataValue;
+        }
+
         #region Helpers
         private Models.Project GetOrCreateDefaultProject()
         {
@@ -199,8 +211,8 @@ namespace ToDoAndNotes3.Controllers
 
                 foreach (var project in projectsLabelInclude) // but here using default project
                 {
-                    generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.TaskLabels.Any(tl => tl.Label.LabelId == labelId)));
-                    generalViewModel.Notes.AddRange(project.Notes.Where(n => n.NoteLabels.Any(nl => nl.Label.LabelId == labelId)));
+                    generalViewModel.TdnElements.AddRange(project.Tasks.Where(t => t.TaskLabels.Any(tl => tl.Label.LabelId == labelId)));
+                    generalViewModel.TdnElements.AddRange(project.Notes.Where(n => n.NoteLabels.Any(nl => nl.Label.LabelId == labelId)));
                 }
             }
             else if (search is not null)
@@ -214,8 +226,8 @@ namespace ToDoAndNotes3.Controllers
 
                 foreach (var project in projectsLabelInclude) // but here using default project
                 {
-                    generalViewModel.Tasks.AddRange(project.Tasks.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)));
-                    generalViewModel.Notes.AddRange(project.Notes.Where(n => n.Title.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                    generalViewModel.TdnElements.AddRange(project.Tasks.Where(t => t.Title.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                    generalViewModel.TdnElements.AddRange(project.Notes.Where(n => n.Title.Contains(search, StringComparison.OrdinalIgnoreCase)));
                 }
             }
             else if (daysViewName == DaysViewName.Today)
@@ -231,8 +243,8 @@ namespace ToDoAndNotes3.Controllers
 
                 foreach (var project in projectsTodayInclude)
                 {
-                    generalViewModel.Tasks.AddRange(project.Tasks);
-                    generalViewModel.Notes.AddRange(project.Notes);
+                    generalViewModel.TdnElements.AddRange(project.Tasks);
+                    generalViewModel.TdnElements.AddRange(project.Notes);
                 }
             }
             else if (daysViewName == DaysViewName.Upcoming)
@@ -246,8 +258,8 @@ namespace ToDoAndNotes3.Controllers
 
                 foreach (var project in projectsUpcomingInclude) // but here using default project
                 {
-                    generalViewModel.Tasks.AddRange(project.Tasks);
-                    generalViewModel.Notes.AddRange(project.Notes);
+                    generalViewModel.TdnElements.AddRange(project.Tasks);
+                    generalViewModel.TdnElements.AddRange(project.Notes);
                 }
             }
             else if (daysViewName == DaysViewName.Unsorted || projectId != null)
@@ -261,8 +273,8 @@ namespace ToDoAndNotes3.Controllers
                     .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
                     .FirstOrDefault();
 
-                generalViewModel.Tasks.AddRange(currentProjectInclude.Tasks);
-                generalViewModel.Notes.AddRange(currentProjectInclude.Notes);
+                generalViewModel.TdnElements.AddRange(currentProjectInclude.Tasks);
+                generalViewModel.TdnElements.AddRange(currentProjectInclude.Notes);
             }
             
             generalViewModel.Labels = await _context.Labels.Where(l => l.UserId == userId).ToListAsync();
@@ -273,21 +285,21 @@ namespace ToDoAndNotes3.Controllers
             // sort by dateOrder, hideCompleted
             if (dateOrder == "ascending")
             {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
-                generalViewModel.Notes = generalViewModel.Notes.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+                generalViewModel.TdnElements = generalViewModel.TdnElements.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+                generalViewModel.TdnElements = generalViewModel.TdnElements.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
             }
             else
             {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
-                generalViewModel.Notes = generalViewModel.Notes.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+                generalViewModel.TdnElements = generalViewModel.TdnElements.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+                generalViewModel.TdnElements = generalViewModel.TdnElements.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
             }
             if (hideCompleted == true)
             {
-                generalViewModel.Tasks = generalViewModel.Tasks.Where(t => t.IsCompleted == false).ToList();
+                generalViewModel.TdnElements = generalViewModel.TdnElements.Where(t => t.IsCompleted == false).ToList();
             }
             else
             {
-                generalViewModel.Tasks = generalViewModel.Tasks.OrderBy(t => t.IsCompleted).ToList();
+                generalViewModel.TdnElements = generalViewModel.TdnElements.OrderBy(t => t.IsCompleted).ToList();
             }
         }
         private IActionResult RedirectToLocal(string returnUrl)

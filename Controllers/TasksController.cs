@@ -168,6 +168,7 @@ namespace ToDoAndNotes3.Controllers
 
             if (ModelState.IsValid)
             {
+                _context.Entry(taskLabels.Task).Reference(t => t.Project).Load(); // for next authorization
                 _context.Attach(taskLabels.Task).State = EntityState.Modified;
 
                 try

@@ -2,6 +2,7 @@ $(function () {
     $(window).on('resize', checkWindowSize);
     $('#burger-menu-toggle').on('click', function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
+        localStorage.setItem("IsSidebarShown", !$('#sidebar').hasClass('sidebar-hide'));
         checkWindowSize();
     });
     $(document).on('click', '.js-update-action-with-id', function () {
@@ -186,18 +187,26 @@ $(function () {
     });
 
     function checkWindowSize() {
-        let main = $('#main');
+        // Remember toggle
+        if (window.visualViewport.width > 635) {
+            let isSidebarShown = localStorage.getItem('IsSidebarShown');
+            if (isSidebarShown === 'true') {
+                $('#sidebar').removeClass('sidebar-hide');
+            }
+        }
 
+        // Content behaviour
+        let main = $('#main');
         let sidebarIsHidden = $('#sidebar').hasClass('sidebar-hide');
 
         // sidebar is shown on small screen => hide main
-        if (!sidebarIsHidden && window.innerWidth < 635) {
+        if (!sidebarIsHidden && window.visualViewport.width < 635) {
             main.css('opacity', 0);
             setTimeout(() => {
                 main.css('display', 'none');
             }, 200);
         } // sidebar is hidden or screen is bigger => show main
-        else if (sidebarIsHidden || window.innerWidth > 635) {
+        else if (sidebarIsHidden || window.visualViewport.width > 635) {
             main.css('opacity', 1);
             setTimeout(() => {
                 main.css('display', 'block');
@@ -205,9 +214,9 @@ $(function () {
         }
 
         // if sidebar shown on bigger screen       
-        if (!sidebarIsHidden && window.innerWidth > 635) {
+        if (!sidebarIsHidden && window.visualViewport.width > 635) {
             // smaller => 1 column
-            if (window.innerWidth < 900) {
+            if (window.visualViewport.width < 900) {
                 $(document).find('.tasks').css('display', 'none');
                 $(document).find('.notes').css('display', 'none');
                 $(document).find('.tasks-with-notes').css('display', 'flex');
@@ -221,7 +230,7 @@ $(function () {
         } //if sidebar is hidden
         else if (sidebarIsHidden) {
             // smaller => 1 column
-            if (window.innerWidth < 590) {
+            if (window.visualViewport.width < 590) {
                 $(document).find('.tasks').css('display', 'none');
                 $(document).find('.notes').css('display', 'none');
                 $(document).find('.tasks-with-notes').css('display', 'flex');
@@ -236,7 +245,8 @@ $(function () {
     }
     function initInnerVirtualSelects() {
         // projectSelect
-        let projectSelect = $(this).find('.js-set-projects-virtual-select');
+        let inner = $(this);
+        let projectSelect = inner.find('.js-set-projects-virtual-select');
         if (projectSelect.length > 0) {
             let projectsOptions = projectSelect.data('target-select-list'); // array => [{"Text":"..", "Value":".."},{..},{..}]
             console.log(projectsOptions);
@@ -252,12 +262,17 @@ $(function () {
             // set value to its input
             projectSelect.on('change', function () {
                 let selectedProject = $(this).val();
-                $('input[name="Task.ProjectId"]').val(selectedProject);
+                console.log(selectedProject);
+                if (inner.find('input[name="Task.ProjectId"]').length > 0) {
+                    inner.find('input[name="Task.ProjectId"]').val(selectedProject);
+                } else if (inner.find('input[name="Note.ProjectId"]').length > 0) {
+                    inner.find('input[name="Note.ProjectId"]').val(selectedProject);
+                }
             });
         }
       
         // labels
-        let labelsSelect = $(this).find('.js-set-labels-virtual-select');
+        let labelsSelect = inner.find('.js-set-labels-virtual-select');
         if (labelsSelect.length > 0) {
             let labelsOptions = labelsSelect.data('target-select-list'); // array => [{"Text":"..", "Value":".."},{..},{..}]
             let labelsSelected = labelsSelect.data('target-selected');   // array => ["12", "17"]
@@ -277,7 +292,7 @@ $(function () {
             labelsSelect.on('change', function () {
                 let selectedOptions = $(this).get(0).getSelectedOptions();
                 let selectedValues = Array.from(selectedOptions).map(option => option.value); // ['17', '27']
-                $('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues)); // ["17","27"]
+                inner.find('input[name="SelectedLabelsId"]').val(JSON.stringify(selectedValues));// ["17","27"]
             });
         }
     }
@@ -342,9 +357,9 @@ $(function () {
             });
         }    
     }
+
     checkWindowSize();
     openModal();
-
     $('.js-quill-json-to-text').each(function () {
         let quill = new Quill(document.createElement('div'));
         quill.root.innerHTML = $(this).html();

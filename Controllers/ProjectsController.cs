@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
@@ -28,19 +29,20 @@ namespace ToDoAndNotes3.Controllers
         public IActionResult CreatePartial(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            return PartialView("Projects/_CreatePartial", new Project());
+            return PartialView("Projects/_CreatePartial", new Models.Project());
         }
 
         // POST: Projects/CreatePartial
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePartial(Project project, string? returnUrl = null)
+        public async Task<IActionResult> CreatePartial(Models.Project project, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
                 project.UserId = _userManager.GetUserId(User);
                 _context.Add(project);
                 await _context.SaveChangesAsync();
+                returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { projectId = project.ProjectId });
                 return Json(new { success = true, redirectTo = returnUrl });
             }
             return PartialView("Projects/_CreatePartial", project);
@@ -73,7 +75,7 @@ namespace ToDoAndNotes3.Controllers
         // POST: Projects/EditPartial/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPartial(Project project, string? returnUrl = null)
+        public async Task<IActionResult> EditPartial(Models.Project project, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -207,6 +209,7 @@ namespace ToDoAndNotes3.Controllers
             var project = _context.Projects
                 .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(tl => tl.Label)
                 .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(nl => nl.Label)
+                .Include(n => n.Notes).ThenInclude(n => n.NoteDescription)
                 .FirstOrDefault(p => p.ProjectId == id);
 
             if (project is null)
@@ -221,7 +224,7 @@ namespace ToDoAndNotes3.Controllers
                     return Forbid();
                 }
 
-                Project? copy = DeepCopy(project);
+                Models.Project? copy = DeepCopy(project);
 
                 if (copy == null)
                 {
@@ -235,14 +238,14 @@ namespace ToDoAndNotes3.Controllers
         }
 
         #region Helpers  
-        public static Project? DeepCopy(Project oldProject)
+        public static Models.Project? DeepCopy(Models.Project oldProject)
         {
             if (oldProject == null || oldProject.UserId == null)
             {
                 return null;
             }
 
-            Project copy = new Project()
+            Models.Project copy = new Models.Project()
             {
                 UserId = oldProject.UserId,
                 Title = "Copy of " + oldProject.Title

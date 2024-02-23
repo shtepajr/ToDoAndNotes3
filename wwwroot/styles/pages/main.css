@@ -29,7 +29,7 @@ header {
 .sidebar {
     background-color: var(--coral-color);
     width: var(--sidebar-width);
-    transition: margin-left 0.25s;
+    /*transition: margin-left 0.25s;*/
     padding: 16px 16px;
     height: 100%;
 }
