@@ -24,6 +24,13 @@ namespace ToDoAndNotes3.Controllers
             _authorizationService = authorizationService;
         }
 
+        // GET: Labels/MainListPartial
+        [HttpGet]
+        public IActionResult MainListPartial()
+        {
+            return PartialView("Labels/_MainListPartial", _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)));
+        }
+
         // GET: Labels/CreatePartial
         [HttpGet]
         public IActionResult CreatePartial(string? returnUrl = null)

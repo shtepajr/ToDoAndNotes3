@@ -23,7 +23,7 @@
 }
 
 <form method="post" asp-controller="Tasks" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form" data-target-modal-id="create-task-modal">
+      class="js-post-partial-form" data-target-modal-id="create-task-modal" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Task.IsDeleted" />

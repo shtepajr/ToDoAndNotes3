@@ -215,7 +215,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // GET: Notes/DeletePartial/5
@@ -303,7 +303,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
        
         #region Helpers

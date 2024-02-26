@@ -89,42 +89,66 @@ $(function () {
     });
     $(document).on('submit', '.js-post-partial-form', function (event) {
         event.preventDefault();
+        /* 
+            input:
+            + form's action
+            +- data-target-modal-id (not necessary)
+            +- data-update-partial-id (not necessary)
+            +- data-update-action (not necessary)
 
-        let targetModalId = $(this).data('target-modal-id');
-        let targetModal = $(`#${targetModalId}`);
+            output:
+            || post success
+            || post error
+            || post success => get success (updated partial)
+            || post success => get error
+        */
+
         let form = $(this);
-        let formMethod = form.attr('method');
+        let targetModalId = form.data('target-modal-id');
+        let targetModal = $(`#${targetModalId}`);
         let formAction = form.attr('action');
         let formToken = form.find('input[name="__RequestVerificationToken"]').val();
         let formData = form.serialize();
 
-        // POST: create/edit/delete project
-        // POST: create/edit/delete label
-        // POST: create/edit/delete task
+        let updatePartialId = form.data('update-partial-id');
+        let $updatePartial = $(`#${updatePartialId}`);
+        let updateAction = form.data('update-action');
+
         $.ajax({
             url: formAction,
-            type: formMethod,
+            type: 'POST',
             data: formData,
             headers: {
                 RequestVerificationToken: formToken
             },
             success: function (result) {
                 if (result.success) {
-                    window.location.href = result.redirectTo;
+                    console.log('AJAX 1/2. POST. success=true (next is => update partial request)');
+                    deleteOpenModalParam();
+                    targetModal.css('display', 'none');
+                    if ($updatePartial.length > 0) {
+                        updatePartiaWithAction($updatePartial, updateAction); // next ajax
+                    }
+                    else {
+                        window.location.href = result.redirectTo;
+                    }
                 }
                 else {
-                    targetModal.html(result);
-                    targetModal.find('.js-picker-input').trigger('blur');
-                    targetModal.find('.js-textarea-auto').trigger('focus');
-                    targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
-                    targetModal.initInnerQuill = initInnerQuill;
-                    targetModal.initInnerVirtualSelects();
-                    targetModal.initInnerQuill();
+                    console.log('AJAX 1/2. POST. success=false (show errors on the targetModal)');
+                    if (targetModal.length > 0) {
+                        targetModal.html(result);
+                        targetModal.find('.js-picker-input').trigger('blur');
+                        targetModal.find('.js-textarea-auto').trigger('focus');
+                        targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
+                        targetModal.initInnerQuill = initInnerQuill;
+                        targetModal.initInnerVirtualSelects();
+                        targetModal.initInnerQuill();
+                    }
                 }
             },
             error: function (xhr, status, error) {
+                console.error('AJAX 1/2. POST. error');
                 window.location.pathname = '/Account/Error';
-                console.log('ajax: hello post error');
             }
         });
     });
@@ -163,30 +187,38 @@ $(function () {
             $(this).closest('form').find('input[name="Task.IsCompleted"]').val(true);
         }
     });
-    $('.label-tools').each(function () {
-        let labelsCount = $(this).children('.tools-label').length;
-        var labelsToHide = $(this).children(".tools-label:gt(0)");
-        labelsToHide.remove();  // if 1 + label
-
-        if (labelsCount > 1) {
-            $(this).append('+' + (labelsCount - 1));
-        }
-        else if (labelsCount === 1) {
-            // do nothing
-        }
-        else {
-            $(this).html(''); // empty if there is not labels
-        }
-    });
     $(document).on('click', function (event) {
         if (event.target.classList.contains('js-close')) {
-            let url = new URL(window.location.href);
-            url.searchParams.delete('openModal');
-            window.history.pushState({}, '', url.toString());
+            deleteOpenModalParam();
         }
     });
 
+
+    function updatePartiaWithAction($updatePartial, updateAction) {
+        if ($updatePartial.length > 0 && updateAction !== null) {
+            $.ajax({
+                url: updateAction,
+                type: 'GET',
+                success: function (result) {
+                    console.log('AJAX 2/2. GET. success=true (updating partial)');
+                    $updatePartial.html(result);
+                    checkWindowSize();
+                    updateLabelsPreview();
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX 2/2. GET. error');
+                    window.location.pathname = '/Account/Error';
+                }
+            })
+        }
+    }
+    function deleteOpenModalParam() {
+        let url = new URL(window.location.href);
+        url.searchParams.delete('openModal');
+        window.history.pushState({}, '', url.toString());
+    }
     function checkWindowSize() {
+        console.log('checkWindowSize');
         // Remember toggle
         if (window.visualViewport.width > 635) {
             let isSidebarShown = localStorage.getItem('IsSidebarShown');
@@ -242,6 +274,23 @@ $(function () {
                 $(document).find('.tasks-with-notes').css('display', 'none');
             }
         }
+    }
+    function updateLabelsPreview() {
+        $('.label-tools').each(function () {
+            let labelsCount = $(this).children('.tools-label').length;
+            var labelsToHide = $(this).children(".tools-label:gt(0)");
+            labelsToHide.remove();  // if 1 + label
+
+            if (labelsCount > 1) {
+                $(this).append('+' + (labelsCount - 1));
+            }
+            else if (labelsCount === 1) {
+                // do nothing
+            }
+            else {
+                $(this).html(''); // empty if there is not labels
+            }
+        });
     }
     function initInnerVirtualSelects() {
         // projectSelect
@@ -359,6 +408,7 @@ $(function () {
     }
 
     checkWindowSize();
+    updateLabelsPreview();
     openModal();
     $('.js-quill-json-to-text').each(function () {
         let quill = new Quill(document.createElement('div'));

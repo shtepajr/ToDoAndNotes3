@@ -44,20 +44,34 @@ namespace ToDoAndNotes3.Controllers
         // GET: /Home/Main
         [HttpGet]
         public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null, 
-            string? search = null, int? labelId = null)
+            string? search = null, int? labelId = null, bool isGetPartial = false)
         {
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
-            
+
+            if (daysViewName is not null)
+            {
+                projectId = null;
+                labelId = null;
+                search = null;
+                ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
+                TempData["DaysViewName"] = daysViewName; // for Create Tasks/Notes to understand default date
+                ViewData["DisplayDataTitle"] = daysViewName;
+            }
             if (projectId is not null)
             {
-       
                 var isAuthorized = await _authorizationService.AuthorizeAsync(
                                                   User, _context.Projects.Find(projectId), EntityOperations.FullAccess);
                 if (!isAuthorized.Succeeded)
                 {
                     return Forbid();
                 }
+
+                daysViewName = null;
+                search = null;
+                labelId = null;
+                ViewData["ReturnUrl"] = Url.Action(nameof(Main), "Home", new { projectId });
+                ViewData["DisplayDataTitle"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
             }
             if (labelId is not null)
             {
@@ -67,46 +81,26 @@ namespace ToDoAndNotes3.Controllers
                 {
                     return Forbid();
                 }
-            }
 
-            projectId ??= defaultProject.ProjectId;
-            TempData["CurrentProjectId"] = projectId; // => for select on the create task/note views
-
-            string? dateOrder = TempData.Peek("DateOrder") as string;
-            string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower(); // True => true
-            Boolean.TryParse(hideCompletedString, out bool hideCompleted);
-
-            if (daysViewName == null)
-            {
-                ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { projectId });
-            }
-            else
-            {
-                ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
-            }
-
-            // title of "data container"
-            if (labelId is not null)
-            {
+                projectId = null;
+                daysViewName = null;
+                search = null;
                 ViewData["DisplayDataTitle"] = "Label: " + _context.Labels.Find(labelId).Title;
-            }
-            else if (search is not null)
+            }           
+            if (search is not null)
             {
                 ViewData["Search"] = search;
                 ViewData["ReturnUrl"] += $"&search={search}"; // next sorts won't break search
                 ViewData["DisplayDataTitle"] = "Search: " + search;
             }
-            else if (daysViewName == DaysViewName.Today || daysViewName == DaysViewName.Upcoming)
-            {
-                TempData["DaysViewName"] = daysViewName; // for Create Tasks/Notes to understand default date
-                ViewData["DisplayDataTitle"] = daysViewName;
-            }
-            else if (daysViewName == DaysViewName.Unsorted || projectId != null)
-            {
-                ViewData["DisplayDataTitle"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
-            }
+
+            // project select value on the Tasks/Notes.CreatePartial
+            TempData["CurrentProjectId"] = defaultProject.ProjectId;
 
             // sort things
+            string? dateOrder = TempData.Peek("DateOrder") as string;
+            string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower(); // True => true
+            Boolean.TryParse(hideCompletedString, out bool hideCompleted);
             if (dateOrder == null)
             {
                 TempData["DateOrder"] = dateOrder = "descending";
@@ -128,7 +122,21 @@ namespace ToDoAndNotes3.Controllers
 
             SortGeneralViewModel(generalViewModel, dateOrder, hideCompleted);
 
+            if (isGetPartial)
+            {
+                return PartialView("Home/_TasksNotesPartial", generalViewModel);
+            }
+
             return View(generalViewModel);
+        }
+
+        // GET: /Home/MainListPartial
+        [HttpGet]
+        public IActionResult TasksNotesPartial()
+        {
+            int? projectId = TempData.Peek("CurrentProjectId") as int?;
+            Enum.TryParse(TempData.Peek("DaysViewName")?.ToString(), out DaysViewName daysViewName);
+            return RedirectToAction("Main", new { projectId, daysViewName, isGetPartial = true });
         }
 
         // GET: /Home/Labels
@@ -262,7 +270,23 @@ namespace ToDoAndNotes3.Controllers
                     generalViewModel.TdnElements.AddRange(project.Notes);
                 }
             }
-            else if (daysViewName == DaysViewName.Unsorted || projectId != null)
+            else if (daysViewName == DaysViewName.Unsorted)
+            {
+                var defaultProject = GetOrCreateDefaultProject();
+
+                // 1/2 load projects list separately to save resources
+                generalViewModel.Projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
+                // 2/2 load current project content separately to save resources
+                var currentProjectInclude = _context.Projects
+                    .Where(p => p.UserId == userId && p.ProjectId == defaultProject.ProjectId)
+                    .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                    .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label)
+                    .FirstOrDefault();
+
+                generalViewModel.TdnElements.AddRange(currentProjectInclude.Tasks);
+                generalViewModel.TdnElements.AddRange(currentProjectInclude.Notes);
+            }
+            else if (projectId is not null)
             {
                 // 1/2 load projects list separately to save resources
                 generalViewModel.Projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
@@ -276,7 +300,7 @@ namespace ToDoAndNotes3.Controllers
                 generalViewModel.TdnElements.AddRange(currentProjectInclude.Tasks);
                 generalViewModel.TdnElements.AddRange(currentProjectInclude.Notes);
             }
-            
+
             generalViewModel.Labels = await _context.Labels.Where(l => l.UserId == userId).ToListAsync();
             return generalViewModel;
         }

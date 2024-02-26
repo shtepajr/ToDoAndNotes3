@@ -1,0 +1,57 @@
+﻿@model IEnumerable<Project>
+
+<div id="edit-project-modal" class="modal js-modal">
+</div>
+<div id="delete-project-modal" class="modal js-modal">
+</div>
+
+<div class="dropdown-content js-dropdown-content" id="project-dropdown-content">
+    <form method="get" asp-controller="Projects" asp-action="EditPartial" class="js-get-partial-form" data-target-modal-id="edit-project-modal">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn" type="submit">
+            <span class="material-symbols-outlined md-20">
+                edit
+            </span>Edit
+        </button>
+    </form>
+    <form asp-controller="Projects" asp-action="Duplicate" class="js-post-partial-form" data-update-partial-id="projects-list" data-update-action="/Projects/MainListPartial">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn" type="submit">
+            <span class="material-symbols-outlined md-20">
+                control_point_duplicate
+            </span>Duplicate
+        </button>
+    </form>
+    <form asp-controller="Projects" asp-action="SoftDelete">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn red" type="submit">
+            <span class="material-symbols-outlined md-20">
+                delete
+            </span>Move to bin
+        </button>
+    </form>
+    @* TEST (to del) *@
+    <form method="get" asp-controller="Projects" asp-action="DeletePartial" class="js-get-partial-form" data-target-modal-id="delete-project-modal">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn red" type="submit">
+            <span class="material-symbols-outlined md-20">
+                delete
+            </span>Delete forever
+        </button>
+    </form>
+</div>
+
+<ul class="projects-list">
+    @foreach (var project in Model)
+    {
+        <li class="project nav-link dropdown">
+            <a asp-controller="Home" asp-action="Main" asp-route-projectId="@project.ProjectId">
+                <div class="nowrap-ellipsis">@project.Title</div>
+                <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                      data-dropdown-content-id="project-dropdown-content" data-receiver-id="project-dropdown-content" data-id="@project.ProjectId">
+                    more_horiz
+                </span>
+            </a>
+        </li>
+    }
+</ul>

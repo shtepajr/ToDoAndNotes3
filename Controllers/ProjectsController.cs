@@ -24,6 +24,14 @@ namespace ToDoAndNotes3.Controllers
             _authorizationService = authorizationService;
         }
 
+        // GET: Labels/MainListPartial
+        [HttpGet]
+        public IActionResult MainListPartial()
+        {
+            return PartialView("Projects/_MainListPartial", 
+                _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User) && p.IsDefault == false));
+        }
+
         // GET: Projects/CreatePartial
         [HttpGet]
         public IActionResult CreatePartial(string? returnUrl = null)
@@ -148,7 +156,7 @@ namespace ToDoAndNotes3.Controllers
             }
 
             returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // GET: Projects/DeletePartial/5
@@ -234,7 +242,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         #region Helpers  

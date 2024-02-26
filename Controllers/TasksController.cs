@@ -51,7 +51,7 @@ namespace ToDoAndNotes3.Controllers
 
             DateOnly? defaultDate = null;
             // if days view
-            if (Enum.TryParse(TempData["DaysViewName"]?.ToString(), out DaysViewName daysViewName))
+            if (Enum.TryParse(TempData.Peek("DaysViewName")?.ToString(), out DaysViewName daysViewName))
             {
                 defaultDate = DateOnly.FromDateTime(DateTime.Now);
             }
@@ -223,9 +223,9 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
-       
+
         // GET: Tasks/DeletePartial/5
         [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
@@ -310,7 +310,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // POST: Tasks/ToggleState/5
@@ -335,7 +335,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         #region Helpers

@@ -27,7 +27,7 @@
 }
 
 <form method="post" asp-controller="Labels" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-partial-form"
-      data-target-modal-id="edit-label-modal">
+      data-target-modal-id="edit-label-modal" data-update-partial-id="labels-list" data-update-action="/Labels/MainListPartial">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="LabelId" />
