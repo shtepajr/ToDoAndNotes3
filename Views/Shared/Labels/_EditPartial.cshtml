@@ -14,7 +14,7 @@
     </span>
     <div class="dropdown">
         <div class="dropdown-content js-dropdown-content" id="current-label-dropdown-content">
-            <form asp-controller="Labels" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-label-modal">
+            <form asp-controller="Labels" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-label-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn red" type="submit">
                     <span class="material-symbols-outlined md-20">
@@ -26,7 +26,7 @@
     </div>
 }
 
-<form method="post" asp-controller="Labels" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-partial-form"
+<form method="post" asp-controller="Labels" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-modal-with-update-ajax"
       data-target-modal-id="edit-label-modal" data-update-partial-id="labels-list" data-update-action="/Labels/MainListPartial">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>

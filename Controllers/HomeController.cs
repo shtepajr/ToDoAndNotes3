@@ -46,6 +46,13 @@ namespace ToDoAndNotes3.Controllers
         public async Task<IActionResult> Main(int? projectId = null, DaysViewName? daysViewName = null, string? openModal = null, 
             string? search = null, int? labelId = null, bool isGetPartial = false)
         {
+            /*
+               TempData["CurrentProjectId"]  => project select value on the Tasks/Notes.CreatePartial
+               TempData["DaysViewName"] = daysViewName; => for default date on the Tasks/Notes.CreatePartial
+               ViewData["ReturnUrl"] => important for the future partial-update-url generation
+               ViewData["DisplayDataTitle"] => just for info about current view
+             */
+
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
 
@@ -53,9 +60,8 @@ namespace ToDoAndNotes3.Controllers
             {
                 projectId = null;
                 labelId = null;
-                search = null;
                 ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
-                TempData["DaysViewName"] = daysViewName; // for Create Tasks/Notes to understand default date
+                TempData["DaysViewName"] = daysViewName;
                 ViewData["DisplayDataTitle"] = daysViewName;
             }
             if (projectId is not null)
@@ -68,10 +74,10 @@ namespace ToDoAndNotes3.Controllers
                 }
 
                 daysViewName = null;
-                search = null;
                 labelId = null;
                 ViewData["ReturnUrl"] = Url.Action(nameof(Main), "Home", new { projectId });
                 ViewData["DisplayDataTitle"] = _context.Projects.FirstOrDefault(p => p.ProjectId == projectId).Title;
+                TempData["CurrentProjectId"] = projectId;
             }
             if (labelId is not null)
             {
@@ -85,17 +91,21 @@ namespace ToDoAndNotes3.Controllers
                 projectId = null;
                 daysViewName = null;
                 search = null;
+                ViewData["ReturnUrl"] = Url.Action(nameof(Main), "Home", new { labelId });
                 ViewData["DisplayDataTitle"] = "Label: " + _context.Labels.Find(labelId).Title;
             }           
             if (search is not null)
             {
                 ViewData["Search"] = search;
-                ViewData["ReturnUrl"] += $"&search={search}"; // next sorts won't break search
+                //ViewData["ReturnUrl"] += $"&search={search}";
+                ViewData["ReturnUrl"] = Url.Action(nameof(Main), "Home", new { search });
                 ViewData["DisplayDataTitle"] = "Search: " + search;
             }
 
-            // project select value on the Tasks/Notes.CreatePartial
-            TempData["CurrentProjectId"] = defaultProject.ProjectId;
+            if ((TempData.Peek("CurrentProjectId") as int?) is null)
+            {
+                TempData["CurrentProjectId"] = defaultProject.ProjectId;
+            }
 
             // sort things
             string? dateOrder = TempData.Peek("DateOrder") as string;
@@ -130,21 +140,11 @@ namespace ToDoAndNotes3.Controllers
             return View(generalViewModel);
         }
 
-        // GET: /Home/MainListPartial
-        [HttpGet]
-        public IActionResult TasksNotesPartial()
-        {
-            int? projectId = TempData.Peek("CurrentProjectId") as int?;
-            Enum.TryParse(TempData.Peek("DaysViewName")?.ToString(), out DaysViewName daysViewName);
-            return RedirectToAction("Main", new { projectId, daysViewName, isGetPartial = true });
-        }
-
         // GET: /Home/Labels
         [HttpGet]
         public async Task<IActionResult> Labels()
         {
             ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Labels), "Home");
-
             ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
             string? userId = _userManager.GetUserId(User);
             var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();

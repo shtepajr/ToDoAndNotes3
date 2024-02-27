@@ -8,6 +8,7 @@
     string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);    // [{"Text":"..", "Value":".."},{..},{..}]
 
     var projectId = TempData.Peek("CurrentProjectId") as int?;
+    string updateUrl = ViewData["ReturnUrl"] + "&isGetPartial=true";
 }
 
 @section ModalHeaderContent {
@@ -23,8 +24,8 @@
 }
 
 <form method="post" asp-controller="Notes" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form" data-target-modal-id="create-note-modal"
-      data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+      class="js-post-modal-with-update-ajax" data-target-modal-id="create-note-modal"
+      data-update-partial-id="tasks-notes-list" data-update-action="@updateUrl">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Note.IsDeleted" />

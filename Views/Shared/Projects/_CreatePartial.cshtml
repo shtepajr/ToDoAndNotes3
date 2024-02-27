@@ -2,7 +2,7 @@
 
 @{
     Layout = "_ModalContentLayout";
-
+    string updateUrl = "/Projects/MainListPartial";
 }
 
 @section ModalHeaderContent {
@@ -11,8 +11,8 @@
     </div>
 }
 
-<form method="post" asp-controller="Projects" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-partial-form"
-      data-target-modal-id="create-project-modal" data-update-partial-id="projects-list" data-update-action="/Projects/MainListPartial">
+<form method="post" asp-controller="Projects" asp-action="CreatePartial" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-modal-with-update-ajax"
+      data-target-modal-id="create-project-modal" data-update-partial-id="projects-list" data-update-action="@updateUrl">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="IsDeleted"/>

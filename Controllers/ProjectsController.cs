@@ -206,7 +206,7 @@ namespace ToDoAndNotes3.Controllers
             }
 
             returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
-            return Json(new { success = true, redirectTo = returnUrl });
+            return RedirectToLocal(returnUrl);
         }
 
         // POST: Projects/Duplicate/5

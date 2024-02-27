@@ -2,6 +2,7 @@
 
 @{
     Layout = "_ModalContentLayout";
+    string updateUrl = ViewData["ReturnUrl"] + "&isGetPartial=true";
 }
 
 @section ModalHeaderContent {
@@ -12,8 +13,8 @@
 
 <div>Are you sure you want to delete <strong>"@Model.Note.Title"</strong> note?</div>
 <form method="post" asp-controller="Notes" asp-action="Delete" asp-route-id="@Model.Note.NoteId" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form" data-target-modal-id="delete-note-modal"
-      data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+      class="js-post-modal-with-update-ajax" data-target-modal-id="delete-note-modal"
+      data-update-partial-id="tasks-notes-list" data-update-action="@updateUrl">
     @Html.AntiForgeryToken()
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>

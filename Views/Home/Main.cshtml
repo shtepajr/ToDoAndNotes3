@@ -48,7 +48,7 @@
                 </div>
                 <div id="create-note-modal" class="modal js-modal">
                 </div>
-                <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-task-modal">
+                <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-task-modal">
                     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn btn-action"  type="submit">
                         <span class="material-symbols-outlined md-30">
@@ -56,7 +56,7 @@
                         </span>
                     </button>
                 </form>
-                <form asp-controller="Notes" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-note-modal">
+                <form asp-controller="Notes" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-note-modal">
                     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn btn-action" type="submit">
                         <span class="material-symbols-outlined md-30">

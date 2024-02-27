@@ -43,7 +43,7 @@
     <nav class="projects">
         <div class="projects-preview">
             <p>Projects</p>
-            <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-project-modal">
+            <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-project-modal">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn btn-plus" type="submit">
                     <span class="material-symbols-outlined md-24">

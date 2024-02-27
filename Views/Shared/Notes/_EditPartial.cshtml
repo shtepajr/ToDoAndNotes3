@@ -6,6 +6,8 @@
     ViewData["SelectProjects"] = new SelectList(Model.Projects, "ProjectId", "Title");
     string projectSelect = JsonSerializer.Serialize(ViewBag.SelectProjects); // [{"Text":"..", "Value":".."},{..},{..}]
     string labelsSelect = JsonSerializer.Serialize(ViewBag.SelectLabels);    // [{"Text":"..", "Value":".."},{..},{..}]
+
+    string updateUrl = ViewData["ReturnUrl"] + "&isGetPartial=true";
 }
 
 @section ModalHeaderContent {
@@ -24,7 +26,8 @@
     </span>
     <div class="dropdown">
         <div class="dropdown-content js-dropdown-content" id="current-note-dropdown-content">
-            <form asp-controller="Notes" asp-action="Duplicate" class="js-post-partial-form" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+            <form asp-controller="Notes" asp-action="Duplicate" class="js-post-modal-with-update-ajax" data-update-partial-id="tasks-notes-list" 
+                    data-update-action="@updateUrl">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">
                     <span class="material-symbols-outlined md-20">
@@ -32,7 +35,8 @@
                     </span>Duplicate
                 </button>
             </form>
-            <form asp-controller="Notes" asp-action="SoftDelete" class="js-post-partial-form" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+            <form asp-controller="Notes" asp-action="SoftDelete" class="js-post-modal-with-update-ajax" data-update-partial-id="tasks-notes-list" 
+                    data-update-action="@updateUrl">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn red" type="submit">
                     <span class="material-symbols-outlined md-20">
@@ -45,8 +49,8 @@
 }
 
 <form method="post" asp-controller="Notes" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-partial-form" data-target-modal-id="edit-task-modal"
-      data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+      class="js-post-modal-with-update-ajax" data-target-modal-id="edit-task-modal"
+      data-update-partial-id="tasks-notes-list" data-update-action="@updateUrl">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="Note.NoteId" />

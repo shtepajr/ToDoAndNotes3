@@ -1,5 +1,9 @@
 ﻿@model GeneralViewModel
 
+@{
+    string updateUrl = ViewData["ReturnUrl"] + "&isGetPartial=true";
+}
+
 <div id="edit-task-modal" class="modal js-modal">
 </div>
 <div id="delete-task-modal" class="modal js-modal">
@@ -10,7 +14,8 @@
 </div>
 
 <div class="dropdown-content js-dropdown-content" id="note-dropdown-content">
-    <form id="edit-note-form" asp-controller="Notes" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-note-modal">
+    <form id="edit-note-form" asp-controller="Notes" asp-action="EditPartial" method="get" class="js-get-modal-ajax" 
+            data-target-modal-id="edit-note-modal">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn" type="submit">
             <span class="material-symbols-outlined md-20">
@@ -18,7 +23,8 @@
             </span>Edit
         </button>
     </form>
-    <form asp-controller="Notes" asp-action="Duplicate" class="js-post-partial-form" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+    <form asp-controller="Notes" asp-action="Duplicate" class="js-post-modal-with-update-ajax" data-update-partial-id="tasks-notes-list" 
+            data-update-action="@updateUrl">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn" type="submit">
             <span class="material-symbols-outlined md-20">
@@ -26,7 +32,8 @@
             </span>Duplicate
         </button>
     </form>
-    <form asp-controller="Notes" asp-action="SoftDelete" class="js-post-partial-form" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+    <form asp-controller="Notes" asp-action="SoftDelete" class="js-post-modal-with-update-ajax" data-update-partial-id="tasks-notes-list" 
+            data-update-action="@updateUrl">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn red" type="submit">
             <span class="material-symbols-outlined md-20">
@@ -35,7 +42,7 @@
         </button>
     </form>
     @* TEST (to del) *@
-    <form asp-controller="Notes" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-note-modal">
+    <form asp-controller="Notes" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-note-modal">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn js-modal-btn red" type="submit">
             <span class="material-symbols-outlined md-20">
@@ -45,7 +52,8 @@
     </form>
 </div>
 <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
-    <form id="edit-task-form" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-partial-form" data-target-modal-id="edit-task-modal">
+    <form id="edit-task-form" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-modal-ajax" 
+            data-target-modal-id="edit-task-modal">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn" type="submit">
             <span class="material-symbols-outlined md-20 black">
@@ -53,7 +61,8 @@
             </span>Edit
         </button>
     </form>
-    <form asp-controller="Tasks" asp-action="Duplicate" class="js-post-partial-form" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+    <form asp-controller="Tasks" asp-action="Duplicate" class="js-post-modal-with-update-ajax" data-update-partial-id="tasks-notes-list" 
+            data-update-action="@updateUrl">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn" type="submit">
             <span class="material-symbols-outlined md-20 black">
@@ -61,7 +70,8 @@
             </span>Duplicate
         </button>
     </form>
-    <form asp-controller="Tasks" asp-action="SoftDelete" class="js-post-partial-form" data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+    <form asp-controller="Tasks" asp-action="SoftDelete" class="js-post-modal-with-update-ajax" data-update-partial-id="tasks-notes-list" 
+            data-update-action="@updateUrl">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn red" type="submit">
             <span class="material-symbols-outlined md-20">
@@ -70,7 +80,7 @@
         </button>
     </form>
     @* TEST (to del) *@
-    <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-get-partial-form" data-target-modal-id="delete-task-modal">
+    <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-task-modal">
         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
         <button class="btn red js-modal-btn" type="submit">
             <span class="material-symbols-outlined md-20">
@@ -87,8 +97,8 @@
         {
             <li class="task nav-link dropdown">
                 <a class="js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
-                    <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form js-post-partial-form" 
-                            data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial" >
+                    <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form js-post-modal-with-update-ajax"
+                          data-update-partial-id="tasks-notes-list" data-update-action="@updateUrl">
                         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                         <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
                             @if (task.IsCompleted)
@@ -231,8 +241,8 @@
         {
             <li class="task nav-link dropdown">
                 <a class="js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
-                    <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form js-post-partial-form" 
-                            data-update-partial-id="tasks-notes-list" data-update-action="/Home/TasksNotesPartial">
+                    <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form js-post-modal-with-update-ajax" 
+                            data-update-partial-id="tasks-notes-list" data-update-action="@updateUrl">
                         <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                         <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
                             @if (task.IsCompleted)

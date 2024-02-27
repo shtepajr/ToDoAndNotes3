@@ -19,7 +19,7 @@
         <div class="main-header-center">
             <div class="main-header-title">@ViewData["Title"]</div>
             <div class="main-header-buttons">
-                <form asp-controller="Labels" asp-action="CreatePartial" method="get" class="js-get-partial-form" data-target-modal-id="create-label-modal">
+                <form asp-controller="Labels" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-label-modal">
                     <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                     <button class="btn btn-action" type="submit">
                         <span class="material-symbols-outlined md-30">

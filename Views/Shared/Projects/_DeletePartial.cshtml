@@ -11,9 +11,7 @@
 }
 
 <div>Are you sure you want to delete <strong>"@Model.Title"</strong> project?</div>
-<form method="post" asp-controller="Projects" asp-action="Delete" asp-route-id="@Model.ProjectId"
-      asp-route-returnUrl="@ViewData["ReturnUrl"]" class="js-post-partial-form" data-target-modal-id="delete-project-modal">
-    @* data-update-partial-id="projects-list" data-update-action="/Projects/MainListPartial" *@
+<form method="post" asp-controller="Projects" asp-action="Delete" asp-route-id="@Model.ProjectId" asp-route-returnUrl="@ViewData["ReturnUrl"]">
     @Html.AntiForgeryToken()
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>

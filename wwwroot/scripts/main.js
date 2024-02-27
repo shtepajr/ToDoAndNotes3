@@ -37,121 +37,6 @@ $(function () {
         let form = $(`#${formId}`);
         form.trigger('submit');
     });
-    $(document).on('submit', '.js-get-partial-form', function (event) {
-        event.preventDefault();
-
-        let targetModalId = $(this).data('target-modal-id');
-        let targetModal = $(`#${targetModalId}`);
-        let formMethod = $(this).attr('method');
-        let formAction = $(this).attr('action');
-        let formData = new FormData($(this)[0]);
-        let returnUrl = formData.get('returnUrl');
-
-        // create form action URL
-        let url = new URL(formAction, window.location.origin);
-        let params = new URLSearchParams(url.search);
-        if (!params.has('returnUrl')) {
-            params.set('returnUrl', returnUrl);
-        }
-        url.search = params.toString();
-        formAction = url.toString();
-
-         //GET: create/edit/delete project partial
-         //GET: create/edit/delete label partial
-         //GET: create/edit/delete task partial
-        $.ajax({
-            url: formAction,
-            type: formMethod,
-            success: function (result) {
-                targetModal.html(result);
-                targetModal.find('.js-picker-input').trigger('blur');
-                targetModal.css('display', 'block');
-                targetModal.find('.js-textarea-auto').trigger('focus');
-                targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
-                targetModal.initInnerQuill = initInnerQuill;
-                targetModal.initInnerVirtualSelects();
-                targetModal.initInnerQuill();
-                console.log('hello success');
-
-                // set openModal param
-                let mainFullUrl = new URL(window.location.href);
-                let mainParams = mainFullUrl.searchParams;
-
-                mainParams.set('openModal', formAction);
-                mainFullUrl.searchParams = mainParams;
-                window.history.pushState({}, '', mainFullUrl.toString());
-            },
-            error: function (xhr, status, error) {
-                window.location.pathname = '/Account/Error';
-                console.log('ajax: hello get error');
-            }
-        });
-    });
-    $(document).on('submit', '.js-post-partial-form', function (event) {
-        event.preventDefault();
-        /* 
-            input:
-            + form's action
-            +- data-target-modal-id (not necessary)
-            +- data-update-partial-id (not necessary)
-            +- data-update-action (not necessary)
-
-            output:
-            || post success
-            || post error
-            || post success => get success (updated partial)
-            || post success => get error
-        */
-
-        let form = $(this);
-        let targetModalId = form.data('target-modal-id');
-        let targetModal = $(`#${targetModalId}`);
-        let formAction = form.attr('action');
-        let formToken = form.find('input[name="__RequestVerificationToken"]').val();
-        let formData = form.serialize();
-
-        let updatePartialId = form.data('update-partial-id');
-        let $updatePartial = $(`#${updatePartialId}`);
-        let updateAction = form.data('update-action');
-
-        $.ajax({
-            url: formAction,
-            type: 'POST',
-            data: formData,
-            headers: {
-                RequestVerificationToken: formToken
-            },
-            success: function (result) {
-                if (result.success) {
-                    console.log('AJAX 1/2. POST. success=true (next is => update partial request)');
-                    deleteOpenModalParam();
-                    targetModal.css('display', 'none');
-                    if ($updatePartial.length > 0) {
-                        updatePartiaWithAction($updatePartial, updateAction); // next ajax
-                    }
-                    else {
-                        window.location.href = result.redirectTo;
-                    }
-                }
-                else {
-                    console.log('AJAX 1/2. POST. success=false (show errors on the targetModal)');
-                    if (targetModal.length > 0) {
-                        targetModal.html(result);
-                        targetModal.find('.js-picker-input').trigger('blur');
-                        targetModal.find('.js-textarea-auto').trigger('focus');
-                        targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
-                        targetModal.initInnerQuill = initInnerQuill;
-                        targetModal.initInnerVirtualSelects();
-                        targetModal.initInnerQuill();
-                    }
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('AJAX 1/2. POST. error');
-                window.location.pathname = '/Account/Error';
-            }
-        });
-    });
     $(document).on('submit', '.js-change-temp-data', function (event) {
         event.preventDefault();
 
@@ -193,25 +78,159 @@ $(function () {
         }
     });
 
+    $(document).on('submit', '.js-get-modal-ajax', function (event) {
+        /*
+            input:
+            + form's action (for ajax request)
+            + data-target-modal-id (modal for ajax content)
 
-    function updatePartiaWithAction($updatePartial, updateAction) {
+            output:
+            || show modal with ajax content
+        */
+        event.preventDefault();
+
+        let targetModalId = $(this).data('target-modal-id');
+        let targetModal = $(`#${targetModalId}`);
+        let formMethod = $(this).attr('method');
+        let formAction = $(this).attr('action');
+
+        // update action URL
+        let formData = new FormData($(this)[0]);
+        let returnUrl = formData.get('returnUrl'); 
+        let url = new URL(formAction, window.location.origin);
+        let params = new URLSearchParams(url.search);
+        if (!params.has('returnUrl')) {
+            params.set('returnUrl', returnUrl);
+        }
+        url.search = params.toString();
+        formAction = url.toString();
+
+        getPartialAjax(formAction, function (result) {
+            targetModal.html(result);
+            targetModal.find('.js-picker-input').trigger('blur');
+            targetModal.css('display', 'block');
+            targetModal.find('.js-textarea-auto').trigger('focus');
+            targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
+            targetModal.initInnerQuill = initInnerQuill;
+            targetModal.initInnerVirtualSelects();
+            targetModal.initInnerQuill();
+
+            // set openModal param
+            let mainFullUrl = new URL(window.location.href);
+            let mainParams = mainFullUrl.searchParams;
+            mainParams.set('openModal', formAction);
+            mainFullUrl.searchParams = mainParams;
+            window.history.pushState({}, '', mainFullUrl.toString());
+        });
+    });
+    $(document).on('submit', '.js-post-modal-with-update-ajax', function (event) {
+        event.preventDefault();
+        /* 
+            input:
+            + form's action
+            + data-target-modal-id (if failed to display errors)
+            + data-update-action (update to see changes)
+            + data-update-partial-id (element for update)
+
+            output:
+            || post and update target partial
+        */
+
+        let form = $(this);
+        let targetModalId = form.data('target-modal-id');
+        let targetModal = $(`#${targetModalId}`);
+        let formAction = form.attr('action');
+
+        let updatePartialId = form.data('update-partial-id');
+        let $updatePartial = $(`#${updatePartialId}`);
+        let updateAction = form.data('update-action');
+
+        postPartialAjax(
+            formAction,
+            form,
+            function successCallback() {
+                deleteOpenModalParam();
+                targetModal.css('display', 'none');
+                if ($updatePartial.length > 0) {
+                    updatePartiaWithActionAjax($updatePartial, updateAction); // next ajax
+                }
+                else {
+                    window.location.href = result.redirectTo;
+                }
+            },
+            function failedCallback(result) {
+                if (targetModal.length > 0) {
+                    targetModal.html(result);
+                    targetModal.find('.js-picker-input').trigger('blur');
+                    targetModal.find('.js-textarea-auto').trigger('focus');
+                    targetModal.initInnerVirtualSelects = initInnerVirtualSelects;
+                    targetModal.initInnerQuill = initInnerQuill;
+                    targetModal.initInnerVirtualSelects();
+                    targetModal.initInnerQuill();
+                }
+            }
+        );
+    });
+    function getPartialAjax(action, callback) {
+        $.ajax({
+            url: action,
+            type: 'GET',
+            success: function (result) {
+                console.log('AJAX. GET. success');
+                callback(result);
+            },
+            error: function (xhr, status, error) {
+                console.log('AJAX. GET. error');
+                window.location.pathname = '/Account/Error';
+            }
+        });
+    }
+    function postPartialAjax(action, $form, successCallaback, failedCallback) {
+        // return partial if some model errors
+        let formToken = $form.find('input[name="__RequestVerificationToken"]').val();
+        let formData = $form.serialize();
+        $.ajax({
+            url: action,
+            type: 'POST',
+            data: formData,
+            headers: {
+                RequestVerificationToken: formToken
+            },
+            success: function (result) {
+                if (result.success) {
+                    console.log('postPartialAjax() | success=true');
+                    successCallaback();
+                }
+                else {
+                    console.log('postPartialAjax() | success=false');
+                    failedCallback(result);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('postPartialAjax() | error');
+                window.location.pathname = '/Account/Error';
+            }
+        });
+    }
+    function updatePartiaWithActionAjax($updatePartial, updateAction) {
         if ($updatePartial.length > 0 && updateAction !== null) {
             $.ajax({
                 url: updateAction,
                 type: 'GET',
                 success: function (result) {
-                    console.log('AJAX 2/2. GET. success=true (updating partial)');
+                    console.log('updatePartiaWithActionAjax() | success');
                     $updatePartial.html(result);
                     checkWindowSize();
                     updateLabelsPreview();
                 },
                 error: function (xhr, status, error) {
-                    console.error('AJAX 2/2. GET. error');
+                    console.log('updatePartiaWithActionAjax() | error');
                     window.location.pathname = '/Account/Error';
                 }
             })
         }
     }
+
     function deleteOpenModalParam() {
         let url = new URL(window.location.href);
         url.searchParams.delete('openModal');
@@ -298,7 +317,6 @@ $(function () {
         let projectSelect = inner.find('.js-set-projects-virtual-select');
         if (projectSelect.length > 0) {
             let projectsOptions = projectSelect.data('target-select-list'); // array => [{"Text":"..", "Value":".."},{..},{..}]
-            console.log(projectsOptions);
             let projectsSelected = projectSelect.data('target-selected');  // array => ["12"]
 
             VirtualSelect.init({
@@ -311,7 +329,6 @@ $(function () {
             // set value to its input
             projectSelect.on('change', function () {
                 let selectedProject = $(this).val();
-                console.log(selectedProject);
                 if (inner.find('input[name="Task.ProjectId"]').length > 0) {
                     inner.find('input[name="Task.ProjectId"]').val(selectedProject);
                 } else if (inner.find('input[name="Note.ProjectId"]').length > 0) {
@@ -372,7 +389,7 @@ $(function () {
             }
 
             let form = $(
-                `<form id="test" method="get" action=${url.pathname} class="js-get-partial-form" data-target-modal-id="${modalId}">
+                `<form id="test" method="get" action=${url.pathname} class="js-get-modal-ajax" data-target-modal-id="${modalId}">
                 <input type="hidden" name="id" value="${params.get('id')}">
                 <input type="hidden" name="returnUrl" value="${params.get('returnUrl')}">
             </form>`
