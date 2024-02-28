@@ -2,7 +2,8 @@
 
 @{
     Layout = "_ModalContentLayout";
-    string updateUrl = "/Projects/MainListPartial";
+    string updateUrl = "/Home/SidebarPartial";
+    string updateTargetId = "sidebar";
 }
 
 @section ModalHeaderContent {
@@ -15,7 +16,7 @@
     </span>
     <div class="dropdown">
         <div class="dropdown-content js-dropdown-content" id="current-project-dropdown-content">
-            <form asp-controller="Projects" asp-action="Duplicate" class="js-post-modal-with-update-ajax" data-update-partial-id="projects-list"
+            <form asp-controller="Projects" asp-action="Duplicate" class="js-post-modal-with-partial-update-ajax" data-update-partial-id="@updateTargetId"
                   data-update-action="@updateUrl">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn" type="submit">
@@ -24,7 +25,7 @@
                     </span>Duplicate
                 </button>
             </form>
-            <form asp-controller="Projects" asp-action="SoftDelete" class="js-post-modal-with-update-ajax" data-update-partial-id="projects-list"
+            <form asp-controller="Projects" asp-action="SoftDelete" class="js-post-modal-with-partial-update-ajax" data-update-partial-id="@updateTargetId"
                   data-update-action="@updateUrl">
                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn red" type="submit">
@@ -38,8 +39,8 @@
 }
 
 <form method="post" asp-controller="Projects" asp-action="EditPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
-      class="js-post-modal-with-update-ajax" data-target-modal-id="edit-project-modal" 
-      data-update-partial-id="projects-list" data-update-action="@updateUrl">
+      class="js-post-modal-with-partial-update-ajax" data-target-modal-id="edit-project-modal" 
+      data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly"></div>
     <input type="hidden" asp-for="ProjectId" />

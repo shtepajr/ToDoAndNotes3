@@ -29,7 +29,7 @@ header {
 .sidebar {
     background-color: var(--coral-color);
     width: var(--sidebar-width);
-    /*transition: margin-left 0.25s;*/
+    transition: margin-left 0.25s;
     padding: 16px 16px;
     height: 100%;
 }
@@ -139,7 +139,7 @@ main {
 .nav-link:hover {
     background-color: var(--light-orange-color);
 }
-.nav-link a {
+.nav-link .link  {
     display: flex;
     align-items: center;
     height: 100%;
@@ -147,6 +147,7 @@ main {
     padding: 5px 12px;
     text-decoration: none;
     color: black;
+    width: 100%;
 }
 .nowrap-ellipsis {
     white-space: nowrap;
@@ -235,8 +236,9 @@ main {
 .project {
     border-radius: 10px;
 }
-.project.nav-link a .nowrap-ellipsis {
+.project.nav-link .link .nowrap-ellipsis {
     flex: 1;
+    text-align: start;
 }
 .task, .note {
     background-color: var(--light-yellow-color);
@@ -320,6 +322,6 @@ main {
     max-height: 34px;
     flex: 1;
 }
-.label.nav-link a .nowrap-ellipsis {
+.label.nav-link .nowrap-ellipsis {
     flex: 1;
 }

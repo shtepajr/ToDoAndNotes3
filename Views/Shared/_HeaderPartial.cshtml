@@ -1,4 +1,8 @@
-﻿<header>
+﻿@{
+
+}
+
+<header>
     <section class="header-left">
         <button id="burger-menu-toggle" class="btn btn-icon">
             <span class="material-symbols-outlined md-32 white">
@@ -10,11 +14,11 @@
                 home
             </span>
         </a>
-        <form method="get" asp-controller="Home" asp-action="Main" class="search-form">
+        <form class="search-form js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Main" asp-route-isGetPartial="true" data-partial-id="main">
             <span class="material-symbols-outlined md-32 white search-icon">
                 search
             </span>
-            <input type="search" name="search" value="@ViewData["Search"]" />
+            <input type="search" name="search" />
         </form>
     </section>
     <section class="header-right">

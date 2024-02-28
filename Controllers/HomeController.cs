@@ -29,6 +29,7 @@ namespace ToDoAndNotes3.Controllers
             _userManager = userManager;
             _authorizationService = authorizationService;
         }
+        
         // GET: /Home
         [HttpGet]
         [AllowAnonymous]
@@ -60,7 +61,7 @@ namespace ToDoAndNotes3.Controllers
             {
                 projectId = null;
                 labelId = null;
-                ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName });
+                ViewData["ReturnUrl"] = Url.Action(nameof(Main), "Home", new { daysViewName });
                 TempData["DaysViewName"] = daysViewName;
                 ViewData["DisplayDataTitle"] = daysViewName;
             }
@@ -134,24 +135,41 @@ namespace ToDoAndNotes3.Controllers
 
             if (isGetPartial)
             {
-                return PartialView("Home/_TasksNotesPartial", generalViewModel);
+                return PartialView("Home/_MainPartial", generalViewModel);
             }
 
             return View(generalViewModel);
         }
 
+        // GET: /Home/SidebarPartial
+        [HttpGet]
+        public IActionResult SidebarPartial()
+        {
+            return PartialView("_SidebarPartial",
+                _context.Projects.Where(p => p.UserId == _userManager.GetUserId(User) && p.IsDefault == false));
+        }
+
         // GET: /Home/Labels
         [HttpGet]
-        public async Task<IActionResult> Labels()
+        public async Task<IActionResult> Labels(bool isGetPartial = false)
         {
-            ViewData["ReturnUrl"] = Url.Action(nameof(HomeController.Labels), "Home");
+            ViewData["ReturnUrl"] = Url.Action(nameof(Labels), "Home");
+
             ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
             string? userId = _userManager.GetUserId(User);
             var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
             var labels = await _context.Labels.Where(p => p.UserId == userId).ToListAsync();
             projectLabelViewModel.Projects = projects;
             projectLabelViewModel.Labels = labels;
-            return View(projectLabelViewModel);
+
+            if (isGetPartial)
+            {
+                return PartialView("Home/_LabelsPartial", projectLabelViewModel.Labels);
+            }
+            else
+            {
+                return View(projectLabelViewModel);
+            }
         }
 
         // GET: /Home/Privacy

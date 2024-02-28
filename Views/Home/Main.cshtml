@@ -3,30 +3,6 @@
 @{
     Layout = "_MainLayout";
     ViewData["Title"] = "Main";
-
-    // sort value
-    var dateOrder = TempData["DateOrder"] as string;
-    string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower();
-    Boolean.TryParse(hideCompletedString, out bool hideCompleted);
-    TempData.Keep("DateOrder");
-    TempData.Keep("HideCompleted");
-
-    if (dateOrder == "ascending")
-    {
-        dateOrder = "descending";
-    }
-    else if (dateOrder == "descending")
-    {
-        dateOrder = "ascending";
-    }
-    if (hideCompleted == false)
-    {
-        hideCompleted = true;
-    }
-    else if (hideCompleted == true)
-    {
-        hideCompleted = false;
-    }
 }
 
 @section Header 
@@ -35,86 +11,11 @@
 }
 @section Sidebar
 {
-    <partial name="_SidebarPartial" model="Model.Projects" />
+    <aside class="sidebar sidebar-hide" id="sidebar">
+        <partial name="_SidebarPartial" model="Model.Projects" />
+    </aside>
 }
 
 <main id="main">
-    <div class="main-header">
-        <div class="main-header-left">
-            <div class="main-header-title nowrap-ellipsis">@ViewData["DisplayDataTitle"]</div>
-            <div class="main-header-buttons">
-                @* modal (ajax request content) *@
-                <div id="create-task-modal" class="modal js-modal">
-                </div>
-                <div id="create-note-modal" class="modal js-modal">
-                </div>
-                <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-task-modal">
-                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn btn-action"  type="submit">
-                        <span class="material-symbols-outlined md-30">
-                            add_task
-                        </span>
-                    </button>
-                </form>
-                <form asp-controller="Notes" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-note-modal">
-                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn btn-action" type="submit">
-                        <span class="material-symbols-outlined md-30">
-                            note_add
-                        </span>
-                    </button>
-                </form>
-                <button class="btn btn-action js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
-                    <span class="material-symbols-outlined md-30">
-                        filter_alt
-                    </span>
-                </button>
-                <div class="dropdown-content js-dropdown-content" id="filter-dropdown-content">
-                    <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-change-temp-data">
-                        <input hidden type="text" name="tempDataName" value="DateOrder">
-                        <input hidden type="text" name="tempDataValue" value="@dateOrder">
-                        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                        <button class="btn" type="submit">
-                            <span class="material-symbols-outlined md-24">
-                                swap_vert
-                            </span>
-                            @if (dateOrder == "descending")
-                            {
-                                @Html.Raw("Due date (asc)")
-                            }
-                            else
-                            {
-                                @Html.Raw("Due date (desc)")
-                            }
-                        </button>
-                    </form>
-                    <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-change-temp-data">
-                        <input hidden type="text" name="tempDataName" value="HideCompleted">
-                        <input hidden type="text" name="tempDataValue" value="@hideCompleted.ToString()">
-                        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                        <button class="btn" type="submit">  
-                            @if (hideCompleted == true)
-                            {
-                                <span class="material-symbols-outlined md-24">
-                                    visibility
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="material-symbols-outlined md-24">
-                                    visibility_off
-                                </span>
-                            }
-                            Completed
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="main-header-right">
-        </div>
-    </div>
-    <div class="main-container" id="tasks-notes-list">
-        <partial name="Home/_TasksNotesPartial" model="Model"/>
-    </div>
+    <partial name="Home/_MainPartial" model="Model" />
 </main>

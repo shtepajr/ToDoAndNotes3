@@ -1,39 +1,21 @@
 ﻿@model ProjectLabelViewModel
-
+@inject UserManager<User> UserManager
 @{
     Layout = "_MainLayout";
-    ViewData["Title"] = "Labels";
+    ViewData["Title"] = "Main";
 }
 
-@section Header
+@section Header 
 {
     <partial name="_HeaderPartial" />
 }
 @section Sidebar
 {
-    <partial name="_SidebarPartial" model="Model.Projects" />
+    <aside class="sidebar sidebar-hide" id="sidebar">
+        <partial name="_SidebarPartial" model="Model.Projects" />
+    </aside>
 }
 
 <main id="main">
-    <div class="main-header">
-        <div class="main-header-center">
-            <div class="main-header-title">@ViewData["Title"]</div>
-            <div class="main-header-buttons">
-                <form asp-controller="Labels" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-label-modal">
-                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                    <button class="btn btn-action" type="submit">
-                        <span class="material-symbols-outlined md-30">
-                            new_label
-                        </span>
-                    </button>
-                </form>
-                @* modal (ajax) *@
-                <div id="create-label-modal" class="modal">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="main-container">
-        <partial name="Labels/_MainListPartial" model="Model.Labels" />
-    </div>
+    <partial name="Home/_LabelsPartial" model="Model.Labels" />
 </main>

@@ -5,6 +5,12 @@ $(function () {
         localStorage.setItem("IsSidebarShown", !$('#sidebar').hasClass('sidebar-hide'));
         checkWindowSize();
     });
+    $(document).on('click', '.js-nav-link', function () {
+        if (window.visualViewport.width < 635) {
+            $('#sidebar').addClass('sidebar-hide');
+            checkWindowSize();
+        }
+    });
     $(document).on('click', '.js-update-action-with-id', function () {
         let targetId = $(this).data('receiver-id');
         let id = $(this).data('id'); // element data
@@ -37,29 +43,6 @@ $(function () {
         let form = $(`#${formId}`);
         form.trigger('submit');
     });
-    $(document).on('submit', '.js-change-temp-data', function (event) {
-        event.preventDefault();
-
-        let formAction = $(this).attr('action');
-        let formData = $(this).serialize();
-        let formToken = $(this).find('input[name="__RequestVerificationToken"]').val();
-
-        $.ajax({
-            url: formAction,
-            type: 'POST',
-            data: formData,
-            headers: {
-                RequestVerificationToken: formToken
-            },
-            success: function (result) {
-                if (result.success) {
-                    window.location.href = result.redirectTo;
-                }
-            },
-            error: function (xhr, status, error) {
-            }
-        });
-    });
     $(document).on('click', '.js-task-is-done', function () {
         let isChecked = this.innerHTML.includes('radio_button_checked');
 
@@ -91,7 +74,6 @@ $(function () {
 
         let targetModalId = $(this).data('target-modal-id');
         let targetModal = $(`#${targetModalId}`);
-        let formMethod = $(this).attr('method');
         let formAction = $(this).attr('action');
 
         // update action URL
@@ -123,7 +105,7 @@ $(function () {
             window.history.pushState({}, '', mainFullUrl.toString());
         });
     });
-    $(document).on('submit', '.js-post-modal-with-update-ajax', function (event) {
+    $(document).on('submit', '.js-post-modal-with-partial-update-ajax', function (event) {
         event.preventDefault();
         /* 
             input:
@@ -149,10 +131,16 @@ $(function () {
             formAction,
             form,
             function successCallback() {
+
                 deleteOpenModalParam();
                 targetModal.css('display', 'none');
                 if ($updatePartial.length > 0) {
-                    updatePartiaWithActionAjax($updatePartial, updateAction); // next ajax
+                    // next ajax
+                    getPartialAjax(updateAction, function (result) {
+                        $updatePartial.html(result);
+                        checkWindowSize();
+                        updateLabelsPreview();
+                    });
                 }
                 else {
                     window.location.href = result.redirectTo;
@@ -171,6 +159,51 @@ $(function () {
             }
         );
     });
+    $(document).on('submit', '.js-get-partial-ajax', function (event) {
+        event.preventDefault();
+        /*
+            input:
+            + action attr (url to get partial)
+            + data-partial-id (element for content)
+
+            output:
+            || element get partial content
+        */
+
+        let action = $(this).attr('action');
+        let partialId = $(this).data('partial-id');
+        let partial = $(`#${partialId}`);
+
+        // update action URL
+        let formData = new FormData($(this)[0]);
+        let searchValue = formData.get('search');
+
+        let url = new URL(action, window.location.origin);
+        let params = new URLSearchParams(url.search);
+
+        if (searchValue !== null) {
+            params.set('search', searchValue);
+            $(this).find('input[name="search"]').val('');
+        } else {
+            params.delete('search');
+        }
+
+        url.search = params.toString();
+        action = url.toString();
+
+        getPartialAjax(action, function (result) {
+            partial.html(result);
+            // set url without isGetPartial to be able to refresh the page
+            let url = new URL(action, window.location.origin);
+            let urlParams = url.searchParams;
+            urlParams.delete('isGetPartial');
+            url.searchParams = urlParams;
+            window.history.pushState({}, '', url.toString());
+            checkWindowSize();
+            updateLabelsPreview();
+        });   
+    });
+
     function getPartialAjax(action, callback) {
         $.ajax({
             url: action,
@@ -212,25 +245,7 @@ $(function () {
             }
         });
     }
-    function updatePartiaWithActionAjax($updatePartial, updateAction) {
-        if ($updatePartial.length > 0 && updateAction !== null) {
-            $.ajax({
-                url: updateAction,
-                type: 'GET',
-                success: function (result) {
-                    console.log('updatePartiaWithActionAjax() | success');
-                    $updatePartial.html(result);
-                    checkWindowSize();
-                    updateLabelsPreview();
-                },
-                error: function (xhr, status, error) {
-                    console.log('updatePartiaWithActionAjax() | error');
-                    window.location.pathname = '/Account/Error';
-                }
-            })
-        }
-    }
-
+    
     function deleteOpenModalParam() {
         let url = new URL(window.location.href);
         url.searchParams.delete('openModal');
