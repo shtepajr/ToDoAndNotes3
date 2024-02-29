@@ -247,46 +247,73 @@ main {
 .task {
     height: fit-content;
 }
-.task.nav-link a {
+.task.nav-link a, note.nav-link a {
     padding-top: 2px;
+    display: grid;
 }
-.task .is-done-form {
+.task.nav-link a{
+    grid-template-columns: 23px 1fr 25px;
+}
+.note.nav-link a {
+    padding-top: 2px;
+    display: grid;
+    grid-template-columns: 1fr 25px;
+}
+.task .task-toggler {
     align-self: baseline;
     margin-top: 2px;
 }
-.task .is-done-form button {
+.task .task-toggler button {
     display: flex;
     align-items: center;
     border-radius: 5px;
 }
-.task .is-done-form button span:hover {
+.task .task-toggler button span:hover {
     color: var(--light-green-color);
 }
-.task .task-content, .note-content {
-    flex: 1;
+.task .task-content, .note .note-content {
+    display: grid;
+    grid-template-columns: 1fr 60px;
+    align-items: center;
+    justify-content: space-between;
     min-width: 0;
 }
-.task .task-content .tools, .note .note-content .tools {
+.task ellipsis, .note ellipsis {
+
+}
+
+@media (max-width: 700px){
+    .task .task-content, .note .note-content {
+        grid-template-columns: 1fr;
+    }
+}
+.tools {
     display: flex;
     flex-wrap: wrap;
     margin-top: 2px;
     column-gap: 3px;
+    font-size: 14px;
 }
-.task .task-content .tools .date-tools, .note .note-content .tools .date-tools {
+.tools *{
+    font-size: inherit;
+}
+.tools .date-tools {
     color: var(--dark-blue-tr-color);
     display: flex;
     min-width: 0;
-
 }
-.task .task-content .tools .label-tools, .note .note-content .tools .label-tools {
+.tools .label-tools {
     color: var(--coral-color);
     display: flex;
     max-width: 150px;
 }
-
-.tools-label {
+.tools .label-tools .label-tool-title {
     min-width: 0;
     display: flex;
+}
+.project-title {
+    min-width: 50px;
+    font-size: 14px;
 }
 .note {
     height: fit-content;

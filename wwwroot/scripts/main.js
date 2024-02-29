@@ -311,8 +311,8 @@ $(function () {
     }
     function updateLabelsPreview() {
         $('.label-tools').each(function () {
-            let labelsCount = $(this).children('.tools-label').length;
-            var labelsToHide = $(this).children(".tools-label:gt(0)");
+            let labelsCount = $(this).children('.js-label-tool-title').length;
+            var labelsToHide = $(this).children(".js-label-tool-title:gt(0)");
             labelsToHide.remove();  // if 1 + label
 
             if (labelsCount > 1) {

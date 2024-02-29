@@ -114,77 +114,89 @@
             {
                 <li class="task nav-link dropdown">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
-                        <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form js-post-modal-with-partial-update-ajax"
-                              data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
-                            <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                            <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
+                        <div class="task-toggler">
+                            <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
+                                  data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
+                                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                                <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
+                                    @if (task.IsCompleted)
+                                    {
+                                        <span class="material-symbols-outlined md-24">
+                                            radio_button_checked
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="material-symbols-outlined md-24">
+                                            radio_button_unchecked
+                                        </span>
+                                    }
+                                </button>
+                            </form>
+                        </div>
+                        <div class="task-content">
+                            <div class="min-width-0">
                                 @if (task.IsCompleted)
                                 {
-                                    <span class="material-symbols-outlined md-24">
-                                        radio_button_checked
-                                    </span>
+                                    <div class="nowrap-ellipsis line-through">@task.Title</div>
                                 }
                                 else
                                 {
-                                    <span class="material-symbols-outlined md-24">
-                                        radio_button_unchecked
-                                    </span>
+                                    <div class="nowrap-ellipsis">@task.Title</div>
                                 }
-                            </button>
-                        </form>
-                        <div class="task-content">
-                            @if (task.IsCompleted)
-                            {
-                                <div class="nowrap-ellipsis line-through">@task.Title</div>
-                            }
-                            else
-                            {
-                                <div class="nowrap-ellipsis">@task.Title</div>
-                            }
-                            <div class="tools">
-                                <div class="date-tools">
-                                    @if (task?.DueDate != null)
-                                    {
-                                        <span class="material-symbols-outlined md-20">
-                                            date_range
-                                        </span>
-                                        <div>
-                                            @task.DueDate
-                                        </div>
-                                    }
-                                    @if (task?.DueTime != null)
-                                    {
-                                        <span>&nbsp</span>
-                                        <span class="material-symbols-outlined md-20">
-                                            access_time
-                                        </span>
-                                        <div>
-                                            @task.DueTime
-                                        </div>
-                                    }
-                                </div>
-                                <div class="label-tools">
-                                    @foreach (var taskLabel in task?.TaskLabels?.ToList())
-                                    {
-                                        if (taskLabel.Equals(task?.TaskLabels.First()))
+                                <div class="tools">
+                                    <div class="date-tools">
+                                        @if (task?.DueDate != null)
                                         {
                                             <span class="material-symbols-outlined md-20">
-                                                label
+                                                date_range
                                             </span>
-                                        }
-                                        <div class="tools-label">
                                             <div class="nowrap-ellipsis">
-                                                @taskLabel?.Label?.Title
+                                                @task.DueDate
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                        @if (task?.DueTime != null)
+                                        {
+                                            <span>&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                access_time
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @task.DueTime
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="label-tools">
+                                        @foreach (var taskLabel in task?.TaskLabels?.ToList())
+                                        {
+                                            if (taskLabel.Equals(task?.TaskLabels.First()))
+                                            {
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                            }
+                                            <div class="label-tool-title js-label-tool-title">
+                                                <div class="nowrap-ellipsis">
+                                                    @taskLabel?.Label?.Title
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
+                            <div class="coral d-flex min-width-0">
+                                <span class="material-symbols-outlined md-18">
+                                    work_outline
+                                </span>
+                                <div class="nowrap-ellipsis project-title">@task?.Project?.Title</div>
+                            </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
-                              data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
-                            more_horiz
-                        </span>
+                        <div class="ellipsis">
+                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                                  data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
+                                more_horiz
+                            </span>
+                        </div>
                     </a>
                 </li>
             }
@@ -199,52 +211,62 @@
                 <li class="note nav-link dropdown">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-note-form" data-id="@note.NoteId">
                         <div class="note-content">
-                            <div class="nowrap-ellipsis">@note.Title</div>
-                            <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
-                            <div class="tools">
-                                <div class="date-tools">
-                                    @if (note?.DueDate != null)
-                                    {
-                                        <span class="material-symbols-outlined md-20">
-                                            date_range
-                                        </span>
-                                        <div>
-                                            @note.DueDate
-                                        </div>
-                                    }
-                                    @if (note?.DueTime != null)
-                                    {
-                                        <span>&nbsp</span>
-                                        <span class="material-symbols-outlined md-20">
-                                            access_time
-                                        </span>
-                                        <div>
-                                            @note.DueTime
-                                        </div>
-                                    }
-                                </div>
-                                <div class="label-tools">
-                                    @foreach (var noteLabel in note?.NoteLabels?.ToList())
-                                    {
-                                        if (noteLabel.Equals(note?.NoteLabels.First()))
+                            <div class="min-width-0">
+                                <div class="nowrap-ellipsis">@note.Title</div>
+                                <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
+                                <div class="tools">
+                                    <div class="date-tools">
+                                        @if (note?.DueDate != null)
                                         {
                                             <span class="material-symbols-outlined md-20">
-                                                label
+                                                date_range
                                             </span>
-                                        }
-                                        <div class="tools-label">
-                                            <div class="nowrap-ellipsis">
-                                                @noteLabel?.Label?.Title
+                                            <div class ="nowrap-ellipsis">
+                                                @note.DueDate
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                        @if (note?.DueTime != null)
+                                        {
+                                            <span>&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                access_time
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @note.DueTime
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="label-tools">
+                                        @foreach (var noteLabel in note?.NoteLabels?.ToList())
+                                        {
+                                            if (noteLabel.Equals(note?.NoteLabels.First()))
+                                            {
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                            }
+                                            <div class="label-tool-title js-label-tool-title">
+                                                <div class="nowrap-ellipsis">
+                                                    @noteLabel?.Label?.Title
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
+                            <div class="coral d-flex min-width-0">
+                                <span class="material-symbols-outlined md-18">
+                                    work_outline
+                                </span>
+                                <div class="nowrap-ellipsis fs-14">@note?.Project?.Title</div>
+                            </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
-                              data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
-                            more_horiz
-                        </span>
+                        <div class="ellipsis">
+                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                                  data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
+                                more_horiz
+                            </span>
+                        </div>
                     </a>
                 </li>
             }
@@ -258,77 +280,89 @@
             {
                 <li class="task nav-link dropdown">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
-                        <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="is-done-form js-post-modal-with-partial-update-ajax"
-                              data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
-                            <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                            <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
+                        <div class="task-toggler">
+                            <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
+                                  data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
+                                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                                <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
+                                    @if (task.IsCompleted)
+                                    {
+                                        <span class="material-symbols-outlined md-24">
+                                            radio_button_checked
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="material-symbols-outlined md-24">
+                                            radio_button_unchecked
+                                        </span>
+                                    }
+                                </button>
+                            </form>
+                        </div>
+                        <div class="task-content">
+                            <div class="min-width-0">
                                 @if (task.IsCompleted)
                                 {
-                                    <span class="material-symbols-outlined md-24">
-                                        radio_button_checked
-                                    </span>
+                                    <div class="nowrap-ellipsis line-through">@task.Title</div>
                                 }
                                 else
                                 {
-                                    <span class="material-symbols-outlined md-24">
-                                        radio_button_unchecked
-                                    </span>
+                                    <div class="nowrap-ellipsis">@task.Title</div>
                                 }
-                            </button>
-                        </form>
-                        <div class="task-content">
-                            @if (task.IsCompleted)
-                            {
-                                <div class="nowrap-ellipsis line-through">@task.Title</div>
-                            }
-                            else
-                            {
-                                <div class="nowrap-ellipsis">@task.Title</div>
-                            }
-                            <div class="tools">
-                                <div class="date-tools">
-                                    @if (task?.DueDate != null)
-                                    {
-                                        <span class="material-symbols-outlined md-20">
-                                            date_range
-                                        </span>
-                                        <div>
-                                            @task.DueDate
-                                        </div>
-                                    }
-                                    @if (task?.DueTime != null)
-                                    {
-                                        <span>&nbsp</span>
-                                        <span class="material-symbols-outlined md-20">
-                                            access_time
-                                        </span>
-                                        <div>
-                                            @task.DueTime
-                                        </div>
-                                    }
-                                </div>
-                                <div class="label-tools">
-                                    @foreach (var taskLabel in task?.TaskLabels?.ToList())
-                                    {
-                                        if (taskLabel.Equals(task?.TaskLabels.First()))
+                                <div class="tools">
+                                    <div class="date-tools">
+                                        @if (task?.DueDate != null)
                                         {
                                             <span class="material-symbols-outlined md-20">
-                                                label
+                                                date_range
                                             </span>
-                                        }
-                                        <div class="tools-label">
                                             <div class="nowrap-ellipsis">
-                                                @taskLabel?.Label?.Title
+                                                @task.DueDate
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                        @if (task?.DueTime != null)
+                                        {
+                                            <span>&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                access_time
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @task.DueTime
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="label-tools">
+                                        @foreach (var taskLabel in task?.TaskLabels?.ToList())
+                                        {
+                                            if (taskLabel.Equals(task?.TaskLabels.First()))
+                                            {
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                            }
+                                            <div class="label-tool-title js-label-tool-title">
+                                                <div class="nowrap-ellipsis">
+                                                    @taskLabel?.Label?.Title
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
+                            <div class="coral d-flex min-width-0">
+                                <span class="material-symbols-outlined md-18">
+                                    work_outline
+                                </span>
+                                <div class="nowrap-ellipsis project-title">@task?.Project?.Title</div>
+                            </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
-                              data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
-                            more_horiz
-                        </span>
+                        <div class="ellipsis">
+                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                                  data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
+                                more_horiz
+                            </span>
+                        </div>
                     </a>
                 </li>
             }
@@ -337,52 +371,62 @@
                 <li class="note nav-link dropdown">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-note-form" data-id="@note.NoteId">
                         <div class="note-content">
-                            <div class="nowrap-ellipsis">@note.Title</div>
-                            <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
-                            <div class="tools">
-                                <div class="date-tools">
-                                    @if (note?.DueDate != null)
-                                    {
-                                        <span class="material-symbols-outlined md-20">
-                                            date_range
-                                        </span>
-                                        <div>
-                                            @note.DueDate
-                                        </div>
-                                    }
-                                    @if (note?.DueTime != null)
-                                    {
-                                        <span>&nbsp</span>
-                                        <span class="material-symbols-outlined md-20">
-                                            access_time
-                                        </span>
-                                        <div>
-                                            @note.DueTime
-                                        </div>
-                                    }
-                                </div>
-                                <div class="label-tools">
-                                    @foreach (var noteLabel in note?.NoteLabels?.ToList())
-                                    {
-                                        if (noteLabel.Equals(note?.NoteLabels.First()))
+                            <div class="min-width-0">
+                                <div class="nowrap-ellipsis">@note.Title</div>
+                                <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
+                                <div class="tools">
+                                    <div class="date-tools">
+                                        @if (note?.DueDate != null)
                                         {
                                             <span class="material-symbols-outlined md-20">
-                                                label
+                                                date_range
                                             </span>
-                                        }
-                                        <div class="tools-label">
                                             <div class="nowrap-ellipsis">
-                                                @noteLabel?.Label?.Title
+                                                @note.DueDate
                                             </div>
-                                        </div>
-                                    }
+                                        }
+                                        @if (note?.DueTime != null)
+                                        {
+                                            <span>&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                access_time
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @note.DueTime
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="label-tools">
+                                        @foreach (var noteLabel in note?.NoteLabels?.ToList())
+                                        {
+                                            if (noteLabel.Equals(note?.NoteLabels.First()))
+                                            {
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                            }
+                                            <div class="label-tool-title js-label-tool-title">
+                                                <div class="nowrap-ellipsis">
+                                                    @noteLabel?.Label?.Title
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
+                            <div class="coral d-flex min-width-0">
+                                <span class="material-symbols-outlined md-18">
+                                    work_outline
+                                </span>
+                                <div class="nowrap-ellipsis fs-14">@note?.Project?.Title</div>
+                            </div>
                         </div>
-                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
-                              data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
-                            more_horiz
-                        </span>
+                        <div class="ellipsis">
+                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                                  data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
+                                more_horiz
+                            </span>
+                        </div>
                     </a>
                 </li>
             }
