@@ -88,6 +88,10 @@ $(function () {
         formAction = url.toString();
 
         getPartialAjax(formAction, function (result) {
+            const regex = /<title>.*error/i; // regex pattern if error page
+            if (regex.test(result)) {
+                window.location.pathname = '/Account/Error';
+            }
             targetModal.html(result);
             targetModal.find('.js-picker-input').trigger('blur');
             targetModal.css('display', 'block');

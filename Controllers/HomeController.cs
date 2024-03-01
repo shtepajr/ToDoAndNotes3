@@ -11,6 +11,8 @@ using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.MainViewModels;
+using static ToDoAndNotes3.Controllers.ManageController;
+using ToDoAndNotes3.Models.ManageViewModels;
 
 namespace ToDoAndNotes3.Controllers
 {
@@ -21,15 +23,18 @@ namespace ToDoAndNotes3.Controllers
         private readonly TdnDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IAuthorizationService _authorizationService;
+        private readonly SignInManager<User> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, TdnDbContext context, UserManager<User> userManager, IAuthorizationService authorizationService)
+        public HomeController(ILogger<HomeController> logger, TdnDbContext context, UserManager<User> userManager, 
+            IAuthorizationService authorizationService, SignInManager<User> signInManager)
         {
             _logger = logger;
             _context = context;
             _userManager = userManager;
             _authorizationService = authorizationService;
+            _signInManager = signInManager;
         }
-        
+
         // GET: /Home
         [HttpGet]
         [AllowAnonymous]
@@ -222,6 +227,42 @@ namespace ToDoAndNotes3.Controllers
             {
                 return View(binViewModel);
             }
+        }
+
+        // GET: /Home/Bin
+        [HttpGet]
+        public async Task<IActionResult> Manage(ManageMessageId? message = null, bool isGetPartial = false)
+        {
+            ViewData["ReturnUrl"] = Url.Action(nameof(Manage), "Home");
+
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
+                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
+                : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
+                : message == ManageMessageId.Error ? "An error has occurred."
+                : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
+                : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
+                : "";
+
+            GeneralViewModel generalViewModel = await LoadGeneralViewModel(_userManager.GetUserId(User), daysViewName : DaysViewName.Today);
+
+            var user = await _userManager.GetUserAsync(User);
+            var model = new IndexViewModel
+            {
+                HasPassword = await _userManager.HasPasswordAsync(user),
+                PhoneNumber = await _userManager.GetPhoneNumberAsync(user),
+                TwoFactor = await _userManager.GetTwoFactorEnabledAsync(user),
+                Logins = await _userManager.GetLoginsAsync(user),
+                BrowserRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
+                AuthenticatorKey = await _userManager.GetAuthenticatorKeyAsync(user)
+            };
+            generalViewModel.Manage = model;
+
+            if (isGetPartial)
+            {
+                return PartialView("Home/_ManagePartial", generalViewModel);
+            }
+            return View(generalViewModel);
         }
 
         // GET: /Home/Privacy

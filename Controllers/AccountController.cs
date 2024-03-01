@@ -49,7 +49,7 @@ namespace ToDoAndNotes3.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = model.Email, Email = model.Email, Name = model.Name };
+                var user = new User { UserName = model.Email, Email = model.Email, CustomName = model.Name };
                 user.EmailConfirmed = true; // for test (to delete)
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -174,7 +174,7 @@ namespace ToDoAndNotes3.Controllers
                 var claims = info.Principal.Claims.ToList();
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 var name = info.Principal.FindFirstValue(ClaimTypes.Name);
-                User user = new User { Email = email, UserName = email, Name = name, EmailConfirmed = true };
+                User user = new User { Email = email, UserName = email, CustomName = name, EmailConfirmed = true };
 
                 var createResult = await _userManager.CreateAsync(user);
                 if (createResult.Succeeded)

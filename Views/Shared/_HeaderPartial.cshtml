@@ -27,11 +27,14 @@
                 account_circle
             </span>
             <div class="dropdown-content js-dropdown-content" id="profile-dropdown-content">
-                <a href="#Account">
-                    <span class="material-symbols-outlined md-20">
-                        manage_accounts
-                    </span>Account
-                </a>
+                <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Manage" asp-route-isGetPartial="true" data-partial-id="main">
+                    <button class="link btn btn-clean" type="submit">
+                        <span class="material-symbols-outlined md-20">
+                            manage_accounts
+                        </span>
+                        Account
+                    </button>
+                </form>
                 <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Bin" asp-route-isGetPartial="true" data-partial-id="main">
                     <button class="link btn btn-clean" type="submit">
                         <span class="material-symbols-outlined md-20">

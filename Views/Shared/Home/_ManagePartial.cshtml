@@ -1,0 +1,67 @@
+﻿@model GeneralViewModel
+@{
+    ViewData["Title"] = "Manage your account";
+
+    // string updateUrl = ViewData["ReturnUrl"] + "&isGetPartial=true";
+    // string updateTargetId = "main";
+}
+
+<h1>@ViewData["Title"].</h1>
+<p class="text-success">@ViewData["StatusMessage"]</p>
+
+
+<div id="change-name-modal" class="modal js-modal">
+</div>
+
+<div>Change name</div>
+<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeNamePartial" data-target-modal-id="change-name-modal">
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+    <button type="submit">
+        Change name
+    </button>
+</form>
+
+<div>Change email</div>
+<form method="get" asp-controller="AccountManage" asp-action="ChangeEmail" data->
+    <button>
+        Change email
+    </button>
+</form>
+
+
+<div>Change password</div>
+<form method="get" asp-controller="AccountManage" asp-action="ChangePassword">
+    <button>
+        Change password
+    </button>
+</form>
+
+
+<div>Connected accounts</div>
+<div>Log in with your Google account</div>
+@if (Model.Manage.Logins.Count > 0)
+{
+    <form method="post" asp-controller="AccountManage" asp-action="RemoveLogin">
+        <input name="provider" value="google"></input>
+        <button>
+            Disconnect Google
+        </button>
+    </form>
+}
+else
+{
+    <form method="post" asp-controller="AccountManage" asp-action="LinkLogin">
+        <input name="provider" value="google"></input>
+        <button>
+            Connect Google
+        </button>
+    </form>
+}
+
+<div>Delete account</div>
+<div>This will immediately delete all of your data including tasks, notes, projects, and more. This can’t be undone.</div>
+<form method="get" asp-controller="AccountManage" asp-action="DeleteAccount">
+    <button>
+        Delete account
+    </button>
+</form>
