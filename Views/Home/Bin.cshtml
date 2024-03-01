@@ -1,8 +1,8 @@
-﻿@model ProjectLabelViewModel
+﻿@model BinViewModel
 @inject UserManager<User> UserManager
 @{
     Layout = "_MainLayout";
-    ViewData["Title"] = "Labels";
+    ViewData["Title"] = "Bin";
 }
 
 @section Header 
@@ -12,10 +12,10 @@
 @section Sidebar
 {
     <aside class="sidebar sidebar-hide" id="sidebar">
-        <partial name="_SidebarPartial" model="Model.Projects" />
+        <partial name="_SidebarPartial" model="Model.ActiveProjects" />
     </aside>
 }
 
 <main id="main">
-    <partial name="Home/_LabelsPartial" model="Model.Labels" />
+    <partial name="Home/_BinPartial" model="Model" />
 </main>

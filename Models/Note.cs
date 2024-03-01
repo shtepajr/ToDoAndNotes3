@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ToDoAndNotes3.Models
 {
-    public class Note : TdnElement
+    public class Note : TdnSortElement
     {
         public int? NoteId { get; set; }
         public int? ProjectId { get; set; }

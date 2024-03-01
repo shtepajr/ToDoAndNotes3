@@ -125,7 +125,7 @@ namespace ToDoAndNotes3.Controllers
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            GeneralViewModel generalViewModel = await LoadGeneralViewModel(daysViewName, userId, projectId, labelId, search);
+            GeneralViewModel generalViewModel = await LoadGeneralViewModel(userId, daysViewName, projectId, labelId, search);
 
             stopwatch.Stop();
             TimeSpan elapsedTime = stopwatch.Elapsed;
@@ -169,6 +169,58 @@ namespace ToDoAndNotes3.Controllers
             else
             {
                 return View(projectLabelViewModel);
+            }
+        }
+        
+        // GET: /Home/Bin
+        [HttpGet]
+        public async Task<IActionResult> Bin(bool isGetPartial = false)
+        {
+            ViewData["ReturnUrl"] = Url.Action(nameof(Bin), "Home");
+
+            string userId = _userManager.GetUserId(User);
+
+            // sort things
+            string? dateOrder = TempData.Peek("DateOrder") as string;
+            string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower(); // True => true
+            Boolean.TryParse(hideCompletedString, out bool hideCompleted);
+            if (dateOrder == null)
+            {
+                TempData["DateOrder"] = dateOrder = "descending";
+            }
+            if (hideCompleted == null)
+            {
+                TempData["HideCompleted"] = hideCompleted = false;
+            }
+
+            BinViewModel binViewModel = new BinViewModel();
+
+            // all deleted items
+            var projectsInclude = await _context.Projects
+                .Where(p => p.UserId == userId)
+                .Include(t => t.Tasks).ThenInclude(t => t.TaskLabels).ThenInclude(l => l.Label)
+                .Include(n => n.Notes).ThenInclude(n => n.NoteLabels).ThenInclude(l => l.Label).IgnoreQueryFilters()
+                .ToListAsync();
+
+            // ActiveProjects (for sidebar)
+            binViewModel.ActiveProjects = _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToList();
+            // display all deleted projects
+            binViewModel.DeletedProjects = _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false && p.IsDeleted == true).IgnoreQueryFilters().ToList();
+            // display deleted tasks & notes (only if its project is active)
+            foreach (var project in projectsInclude.Where(p => p.IsDeleted == false))
+            {
+                binViewModel.TdnElements.AddRange(project.Tasks.Where(t => t.IsDeleted == true));
+                binViewModel.TdnElements.AddRange(project.Notes.Where(n => n.IsDeleted == true));
+            }
+            SortBinViewModel(binViewModel, dateOrder, hideCompleted);
+
+            if (isGetPartial)
+            {
+                return PartialView("Home/_BinPartial", binViewModel);
+            }
+            else
+            {
+                return View(binViewModel);
             }
         }
 
@@ -223,7 +275,7 @@ namespace ToDoAndNotes3.Controllers
             }
             return checkDefault;
         }
-        private async Task<GeneralViewModel> LoadGeneralViewModel(DaysViewName? daysViewName, string? userId, int? projectId, int? labelId, string? search)
+        private async Task<GeneralViewModel> LoadGeneralViewModel(string? userId, DaysViewName? daysViewName = null, int? projectId = null, int? labelId = null, string? search = null)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
             if (labelId is not null)
@@ -342,6 +394,24 @@ namespace ToDoAndNotes3.Controllers
             else
             {
                 generalViewModel.TdnElements = generalViewModel.TdnElements.OrderBy(t => t.IsCompleted).ToList();
+            }
+        }
+        private void SortBinViewModel(BinViewModel binViewModel, string? dateOrder, bool? hideCompleted)
+        {
+            // sort by dateOrder, hideCompleted
+            if (dateOrder == "ascending")
+            {
+                binViewModel.TdnElements = binViewModel.TdnElements.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+                binViewModel.TdnElements = binViewModel.TdnElements.OrderBy(t => t.DueDate).ThenBy(t => t.DueTime).ToList();
+            }
+            else
+            {
+                binViewModel.TdnElements = binViewModel.TdnElements.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+                binViewModel.TdnElements = binViewModel.TdnElements.OrderByDescending(t => t.DueDate).ThenByDescending(t => t.DueTime).ToList();
+            }
+            if (hideCompleted == true)
+            {
+                binViewModel.TdnElements = binViewModel.TdnElements.Where(t => t.IsCompleted == false).ToList();
             }
         }
         private IActionResult RedirectToLocal(string returnUrl)

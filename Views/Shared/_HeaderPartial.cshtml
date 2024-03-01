@@ -32,11 +32,14 @@
                         manage_accounts
                     </span>Account
                 </a>
-                <a href="#RecycleBin">
-                    <span class="material-symbols-outlined md-20">
-                        delete
-                    </span>Recycle Bin
-                </a>
+                <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Bin" asp-route-isGetPartial="true" data-partial-id="main">
+                    <button class="link btn btn-clean" type="submit">
+                        <span class="material-symbols-outlined md-20">
+                            delete
+                        </span>
+                        Recycle Bin
+                    </button>
+                </form>
                 <form asp-controller="Account" asp-action="LogOff" method="post">
                     <button type="submit" class="btn">
                         <span class="material-symbols-outlined md-20">

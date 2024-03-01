@@ -218,13 +218,39 @@ namespace ToDoAndNotes3.Controllers
             return Json(new { success = true, redirectTo = returnUrl });
         }
 
+        // POST: Notes/Restore/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int? id, string? returnUrl = null)
+        {
+            var note = await _context.Notes.Include(n => n.Project).IgnoreQueryFilters().FirstOrDefaultAsync(n => n.NoteId == id);
+
+            if (note is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, note, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
+                note.IsDeleted = false;
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true, redirectTo = returnUrl });
+        }
+
         // GET: Notes/DeletePartial/5
         [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            var note = await _context.Notes.Include(n => n.Project).FirstOrDefaultAsync(n => n.NoteId == id);
+            var note = await _context.Notes.Include(n => n.Project).IgnoreQueryFilters().FirstOrDefaultAsync(n => n.NoteId == id);
 
             if (note is null)
             {
@@ -250,7 +276,7 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
-            var note = await _context.Notes.Include(n => n.Project).FirstOrDefaultAsync(n => n.NoteId == id);
+            var note = await _context.Notes.Include(n => n.Project).IgnoreQueryFilters().FirstOrDefaultAsync(n => n.NoteId == id);
 
             if (note is null)
             {

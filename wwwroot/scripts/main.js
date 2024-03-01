@@ -2,7 +2,7 @@ $(function () {
     $(window).on('resize', checkWindowSize);
     $('#burger-menu-toggle').on('click', function () {
         $('#sidebar').toggleClass('sidebar-hide'); // css class toggle
-        localStorage.setItem("IsSidebarShown", !$('#sidebar').hasClass('sidebar-hide'));
+        localStorage.setItem("IsSidebarShown", !$('#sidebar').hasClass('sidebar-hide')); // Remember toggle
         checkWindowSize();
     });
     $(document).on('click', '.js-nav-link', function () {
@@ -156,6 +156,9 @@ $(function () {
                     targetModal.initInnerVirtualSelects();
                     targetModal.initInnerQuill();
                 }
+                else {
+                    window.location.pathname = '/Account/Error';
+                }
             }
         );
     });
@@ -219,7 +222,7 @@ $(function () {
         });
     }
     function postPartialAjax(action, $form, successCallaback, failedCallback) {
-        // return partial if some model errors
+
         let formToken = $form.find('input[name="__RequestVerificationToken"]').val();
         let formData = $form.serialize();
         $.ajax({
@@ -236,6 +239,7 @@ $(function () {
                 }
                 else {
                     console.log('postPartialAjax() | success=false');
+                    // return partial if some model errors
                     failedCallback(result);
                 }
             },
@@ -253,7 +257,7 @@ $(function () {
     }
     function checkWindowSize() {
         console.log('checkWindowSize');
-        // Remember toggle
+        // Remember toggle, only if big screen (small screen always still hidden)
         if (window.visualViewport.width > 635) {
             let isSidebarShown = localStorage.getItem('IsSidebarShown');
             if (isSidebarShown === 'true') {
@@ -442,7 +446,7 @@ $(function () {
     checkWindowSize();
     updateLabelsPreview();
     openModal();
-    $('.js-quill-json-to-text').each(function () {
+    $('.js-quill-html-to-text').each(function () {
         let quill = new Quill(document.createElement('div'));
         quill.root.innerHTML = $(this).html();
         $(this).html(quill.root.textContent);

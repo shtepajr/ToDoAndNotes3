@@ -2,7 +2,7 @@
 
 namespace ToDoAndNotes3.Models
 {
-    public abstract class TdnElement
+    public abstract class TdnSortElement
     {
         [DataType(DataType.Date)]
         virtual public DateOnly? DueDate { get; set; }

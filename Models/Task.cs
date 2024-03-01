@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace ToDoAndNotes3.Models
 {
-    public class Task : TdnElement
+    public class Task : TdnSortElement
     {
         public int? TaskId { get; set; }
         public int? ProjectId { get; set; }

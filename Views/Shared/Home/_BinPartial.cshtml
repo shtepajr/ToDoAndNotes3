@@ -1,5 +1,332 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model BinViewModel
+
 @{
+    ViewData["Title"] = "Bin";
+
+    string updateUrl = ViewData["ReturnUrl"] + "?isGetPartial=true";
+    string updateTargetId = "main";
+
+    // sort value
+    var dateOrder = TempData["DateOrder"] as string;
+    string? hideCompletedString = TempData["HideCompleted"]?.ToString()?.ToLower();
+    Boolean.TryParse(hideCompletedString, out bool hideCompleted);
+    TempData.Keep("DateOrder");
+    TempData.Keep("HideCompleted");
+
+    if (dateOrder == "ascending")
+    {
+        dateOrder = "descending";
+    }
+    else if (dateOrder == "descending")
+    {
+        dateOrder = "ascending";
+    }
+    if (hideCompleted == false)
+    {
+        hideCompleted = true;
+    }
+    else if (hideCompleted == true)
+    {
+        hideCompleted = false;
+    }
 }
+
+<div class="main-header">
+    <div class="main-header-center">
+        <div class="main-header-title nowrap-ellipsis">@ViewData["Title"]</div>
+        <div class="main-header-buttons">
+            <button class="btn btn-action js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
+                <span class="material-symbols-outlined md-30">
+                    filter_alt
+                </span>
+            </button>
+            <div class="dropdown-content js-dropdown-content" id="filter-dropdown-content">
+                <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-post-modal-with-partial-update-ajax"
+                      data-update-action="@updateUrl" data-update-partial-id="@updateTargetId">
+                    <input hidden type="text" name="tempDataName" value="DateOrder">
+                    <input hidden type="text" name="tempDataValue" value="@dateOrder">
+                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                    <button class="btn" type="submit">
+                        <span class="material-symbols-outlined md-24">
+                            swap_vert
+                        </span>
+                        @if (dateOrder == "descending")
+                        {
+                            @Html.Raw("Due date (asc)")
+                        }
+                        else
+                        {
+                            @Html.Raw("Due date (desc)")
+                        }
+                    </button>
+                </form>
+                <form asp-controller="Home" asp-action="ChangeTempDataValue" class="js-post-modal-with-partial-update-ajax"
+                      data-update-action="@updateUrl" data-update-partial-id="@updateTargetId">
+                    <input hidden type="text" name="tempDataName" value="HideCompleted">
+                    <input hidden type="text" name="tempDataValue" value="@hideCompleted.ToString()">
+                    <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                    <button class="btn" type="submit">
+                        @if (hideCompleted == true)
+                        {
+                            <span class="material-symbols-outlined md-24">
+                                visibility
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="material-symbols-outlined md-24">
+                                visibility_off
+                            </span>
+                        }
+                        Completed
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main-container">
+    <ul class="all-objects">
+        @foreach (var project in Model.DeletedProjects)
+        {
+            <li class="project nav-link dropdown js-nav-link">
+                <button class="link btn btn-clean">
+                    <span class="material-symbols-outlined md-24">
+                        work_outline
+                    </span>
+                    <div class="nowrap-ellipsis">@project.Title</div>
+                    <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                          data-dropdown-content-id="bin-project-dropdown-content" data-receiver-id="bin-project-dropdown-content" data-id="@project.ProjectId">
+                        more_horiz
+                    </span>
+                </button>
+            </li>
+        }
+        @foreach (var elem in Model.TdnElements)
+        {
+            if (elem is ToDoAndNotes3.Models.Task task)
+            {
+                <li class="task nav-link dropdown">
+                    <a class="link">
+                        <div class="task-toggler">
+                            <button class="btn btn-clean">
+                                @if (task.IsCompleted)
+                                {
+                                    <span class="material-symbols-outlined md-24">
+                                        radio_button_checked
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="material-symbols-outlined md-24">
+                                        radio_button_unchecked
+                                    </span>
+                                }
+                            </button>
+                        </div>
+                        <div class="task-content">
+                            <div class="min-width-0">
+                                @if (task.IsCompleted)
+                                {
+                                    <div class="nowrap-ellipsis line-through">@task.Title</div>
+                                }
+                                else
+                                {
+                                    <div class="nowrap-ellipsis">@task.Title</div>
+                                }
+                                <div class="tools">
+                                    <div class="date-tools">
+                                        @if (task?.DueDate != null)
+                                        {
+                                            <span class="material-symbols-outlined md-20">
+                                                date_range
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @task.DueDate
+                                            </div>
+                                        }
+                                        @if (task?.DueTime != null)
+                                        {
+                                            <span>&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                access_time
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @task.DueTime
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="label-tools">
+                                        @foreach (var taskLabel in task?.TaskLabels?.ToList())
+                                        {
+                                            if (taskLabel.Equals(task?.TaskLabels.First()))
+                                            {
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                            }
+                                            <div class="label-tool-title js-label-tool-title">
+                                                <div class="nowrap-ellipsis">
+                                                    @taskLabel?.Label?.Title
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="coral d-flex min-width-0">
+                                <span class="material-symbols-outlined md-18">
+                                    work_outline
+                                </span>
+                                <div class="nowrap-ellipsis project-title">@task?.Project?.Title</div>
+                            </div>
+                        </div>
+                        <div class="ellipsis">
+                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                                  data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
+                                more_horiz
+                            </span>
+                        </div>
+                    </a>
+                </li>
+            }
+        }
+        @foreach (var elem in Model.TdnElements)
+        {
+            if (elem is Note note)
+            {
+                <li class="note nav-link dropdown">
+                    <a class="link">
+                        <div class="note-content">
+                            <div class="min-width-0">
+                                <div class="nowrap-ellipsis">@note.Title</div>
+                                <div class="nowrap-ellipsis note-description js-quill-html-to-text">@note?.ShortDescription</div>
+                                <div class="tools">
+                                    <div class="date-tools">
+                                        @if (note?.DueDate != null)
+                                        {
+                                            <span class="material-symbols-outlined md-20">
+                                                date_range
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @note.DueDate
+                                            </div>
+                                        }
+                                        @if (note?.DueTime != null)
+                                        {
+                                            <span>&nbsp</span>
+                                            <span class="material-symbols-outlined md-20">
+                                                access_time
+                                            </span>
+                                            <div class="nowrap-ellipsis">
+                                                @note.DueTime
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="label-tools">
+                                        @foreach (var noteLabel in note?.NoteLabels?.ToList())
+                                        {
+                                            if (noteLabel.Equals(note?.NoteLabels.First()))
+                                            {
+                                                <span class="material-symbols-outlined md-20">
+                                                    label
+                                                </span>
+                                            }
+                                            <div class="label-tool-title js-label-tool-title">
+                                                <div class="nowrap-ellipsis">
+                                                    @noteLabel?.Label?.Title
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="coral d-flex min-width-0">
+                                <span class="material-symbols-outlined md-18">
+                                    work_outline
+                                </span>
+                                <div class="nowrap-ellipsis fs-14">@note?.Project?.Title</div>
+                            </div>
+                        </div>
+                        <div class="ellipsis">
+                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                                  data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
+                                more_horiz
+                            </span>
+                        </div>
+                    </a>
+                </li>
+            }
+        }
+    </ul>
+</div>
+
+<div id="create-task-modal" class="modal js-modal">
+</div>
+<div id="create-note-modal" class="modal js-modal">
+</div>
+<div id="edit-task-modal" class="modal js-modal">
+</div>
+<div id="delete-task-modal" class="modal js-modal">
+</div>
+<div id="edit-note-modal" class="modal js-modal">
+</div>
+<div id="delete-note-modal" class="modal js-modal">
+</div>
+
+<div class="dropdown-content js-dropdown-content" id="note-dropdown-content">
+    <form asp-controller="Notes" asp-action="Restore" class="js-post-modal-with-partial-update-ajax" data-update-partial-id="@updateTargetId"
+          data-update-action="@updateUrl">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn" type="submit">
+            <span class="material-symbols-outlined md-20">
+                restore
+            </span>Restore
+        </button>
+    </form>
+    <form asp-controller="Notes" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-note-modal">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn js-modal-btn red" type="submit">
+            <span class="material-symbols-outlined md-20">
+                delete
+            </span>Delete forever
+        </button>
+    </form>
+</div>
+<div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
+    <form asp-controller="Tasks" asp-action="Restore" class="js-post-modal-with-partial-update-ajax" data-update-partial-id="@updateTargetId"
+          data-update-action="@updateUrl">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn" type="submit">
+            <span class="material-symbols-outlined md-20 black">
+                restore
+            </span>Restore
+        </button>
+    </form>
+    <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-task-modal">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn red js-modal-btn" type="submit">
+            <span class="material-symbols-outlined md-20">
+                delete
+            </span>Delete forever
+        </button>
+    </form>
+</div>
+<div class="dropdown-content js-dropdown-content" id="bin-project-dropdown-content">
+    <form asp-controller="Projects" asp-action="Restore">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn" type="submit">
+            <span class="material-symbols-outlined md-20">
+                restore
+            </span>Restore
+        </button>
+    </form>
+    <form method="get" asp-controller="Projects" asp-action="DeletePartial" class="js-get-modal-ajax" data-target-modal-id="delete-project-modal">
+        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button class="btn red" type="submit">
+            <span class="material-symbols-outlined md-20">
+                delete
+            </span>Delete forever
+        </button>
+    </form>
+</div>

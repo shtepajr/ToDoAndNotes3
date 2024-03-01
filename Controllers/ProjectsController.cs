@@ -152,13 +152,51 @@ namespace ToDoAndNotes3.Controllers
             return RedirectToLocal(returnUrl);
         }
 
+        // POST: Projects/Restore/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int? id, string? returnUrl = null)
+        {
+            var project = await _context.Projects.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.ProjectId == id);
+
+            if (project is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var isAuthorized = await _authorizationService.AuthorizeAsync(User, project, EntityOperations.FullAccess);
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+                project.IsDeleted = false;
+
+                var projectTasks = await _context.Tasks.IgnoreQueryFilters().Where(t => t.ProjectId == id).ToListAsync();
+                var projectNotes = await _context.Tasks.IgnoreQueryFilters().Where(t => t.ProjectId == id).ToListAsync();
+
+                foreach (var task in projectTasks)
+                {
+                    task.IsDeleted = false;
+                }
+                foreach (var note in projectNotes)
+                {
+                    note.IsDeleted = false;
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
+            return RedirectToLocal(returnUrl);
+        }
+
         // GET: Projects/DeletePartial/5
         [HttpGet]
         public async Task<IActionResult> DeletePartial(int? id, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
-            var project = await _context.Projects.FindAsync(id);
+            var project = await _context.Projects.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.ProjectId == id);
 
             if (project is null)
             {
@@ -181,7 +219,7 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id, string? returnUrl = null)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var project = await _context.Projects.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.ProjectId == id);
 
             if (project is null)
             {
@@ -200,7 +238,7 @@ namespace ToDoAndNotes3.Controllers
             }
 
             returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
-            return RedirectToLocal(returnUrl);
+            return Json(new { success = true, redirectTo = returnUrl });
         }
 
         // POST: Projects/Duplicate/5

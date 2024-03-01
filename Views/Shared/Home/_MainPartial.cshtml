@@ -33,11 +33,6 @@
     <div class="main-header-left">
         <div class="main-header-title nowrap-ellipsis">@ViewData["DisplayDataTitle"]</div>
         <div class="main-header-buttons">
-            @* modal (ajax request content) *@
-            <div id="create-task-modal" class="modal js-modal">
-            </div>
-            <div id="create-note-modal" class="modal js-modal">
-            </div>
             <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-task-modal">
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn btn-action" type="submit">
@@ -213,7 +208,7 @@
                         <div class="note-content">
                             <div class="min-width-0">
                                 <div class="nowrap-ellipsis">@note.Title</div>
-                                <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
+                                <div class="nowrap-ellipsis note-description js-quill-html-to-text">@note?.ShortDescription</div>
                                 <div class="tools">
                                     <div class="date-tools">
                                         @if (note?.DueDate != null)
@@ -373,7 +368,7 @@
                         <div class="note-content">
                             <div class="min-width-0">
                                 <div class="nowrap-ellipsis">@note.Title</div>
-                                <div class="nowrap-ellipsis note-description js-quill-json-to-text">@note?.ShortDescription</div>
+                                <div class="nowrap-ellipsis note-description js-quill-html-to-text">@note?.ShortDescription</div>
                                 <div class="tools">
                                     <div class="date-tools">
                                         @if (note?.DueDate != null)
@@ -434,7 +429,10 @@
     </ul>
 </div>
 
-
+<div id="create-task-modal" class="modal js-modal">
+</div>
+<div id="create-note-modal" class="modal js-modal">
+</div>
 <div id="edit-task-modal" class="modal js-modal">
 </div>
 <div id="delete-task-modal" class="modal js-modal">
