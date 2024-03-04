@@ -12,7 +12,10 @@
 
 <div id="change-name-modal" class="modal js-modal">
 </div>
-
+<div id="change-email-modal" class="modal js-modal">
+</div>
+<div id="change-password-modal" class="modal js-modal">
+</div>
 <div>Change name</div>
 <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeNamePartial" data-target-modal-id="change-name-modal">
     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
@@ -22,16 +25,18 @@
 </form>
 
 <div>Change email</div>
-<form method="get" asp-controller="AccountManage" asp-action="ChangeEmail" data->
-    <button>
+<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeEmailPartial" data-target-modal-id="change-email-modal">
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+    <button type="submit">
         Change email
     </button>
 </form>
 
 
 <div>Change password</div>
-<form method="get" asp-controller="AccountManage" asp-action="ChangePassword">
-    <button>
+<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangePasswordPartial" data-target-modal-id="change-password-modal">
+    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+    <button type="submit">
         Change password
     </button>
 </form>

@@ -43,7 +43,7 @@ namespace ToDoAndNotes3.Controllers
                 _context.Add(project);
                 await _context.SaveChangesAsync();
                 returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { projectId = project.ProjectId });
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
             return PartialView("Projects/_CreatePartial", project);
         }
@@ -109,7 +109,7 @@ namespace ToDoAndNotes3.Controllers
                         throw;
                     }
                 }
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
             return PartialView("Projects/_EditPartial", project);
         }
@@ -238,7 +238,7 @@ namespace ToDoAndNotes3.Controllers
             }
 
             returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         // POST: Projects/Duplicate/5
@@ -274,7 +274,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         #region Helpers  

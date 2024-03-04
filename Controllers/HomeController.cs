@@ -282,7 +282,7 @@ namespace ToDoAndNotes3.Controllers
                 return Json(new { success = false });
             }
             TempData[tempDataName] = tempDataValue;
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         // POST: /Home/ChangeTempDataValueNoReload

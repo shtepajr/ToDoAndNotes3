@@ -49,7 +49,7 @@ namespace ToDoAndNotes3.Controllers
                 label.UserId = _userManager.GetUserId(User);
                 _context.Add(label);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
             return PartialView("Labels/_CreatePartial", label);
         }
@@ -113,7 +113,7 @@ namespace ToDoAndNotes3.Controllers
                         throw;
                     }
                 }
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
 
             return PartialView("Labels/_EditPartial", label);
@@ -165,7 +165,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         #region Helpers       

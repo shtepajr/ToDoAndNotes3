@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Claims;
+using System.Text;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.AccountViewModels;
 
@@ -29,6 +31,7 @@ namespace ToDoAndNotes3.Controllers
             _logger = loggerFactory.CreateLogger<AccountController>();
         }
 
+        // GET: Account/Register
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
@@ -41,6 +44,7 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
+        // POST: Account/Register
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -66,7 +70,16 @@ namespace ToDoAndNotes3.Controllers
             }
             return View(model);
         }
-        
+
+        // GET: Account/CheckEmail
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            return View(email);
+        }
+
+        // GET: Account/ConfirmEmail
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
@@ -78,12 +91,58 @@ namespace ToDoAndNotes3.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return View("Error");
+                return NotFound($"Unable to load user with ID '{userId}'.");
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
-       
+
+        // GET: Account/ChangeEmailPartial
+        [HttpGet]
+        public async Task<IActionResult> ChangeEmailConfirm(string userId, string email, string code)
+        {
+            if (userId == null || email == null || code == null)
+            {
+                return View("Error");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{userId}'.");
+            }
+
+            // Check if the new email already exists
+            var existingUser = await _userManager.FindByEmailAsync(email);
+            if (existingUser != null)
+            {
+                //StatusMessage = "Success";
+                return View("Error");
+            }
+
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            var result = await _userManager.ChangeEmailAsync(user, email, code);
+            if (!result.Succeeded)
+            {
+                // Handle failure
+                return NotFound();
+            }
+
+            // In our UI email and user name are one and the same, so when we update the email
+            // we need to update the user name.
+            var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
+            if (!setUserNameResult.Succeeded)
+            {
+                // Handle failure
+                return NotFound();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            //StatusMessage = "Success";
+            return View(nameof(ConfirmEmail));
+        }
+
+        // GET: Account/Login
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
@@ -97,6 +156,7 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
+        // POST: Account/Login
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -121,16 +181,18 @@ namespace ToDoAndNotes3.Controllers
             return View(model);
         }
 
+        // POST: Account/LogOff
         [HttpPost]
-        [ValidateAntiForgeryToken]
-       
+        [ValidateAntiForgeryToken]   
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();
+            TempData.Clear();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
+        // POST: Account/ExternalLogin
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -141,6 +203,7 @@ namespace ToDoAndNotes3.Controllers
             return Challenge(properties, provider);
         }
 
+        // GET: Account/ExternalLoginCallback
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
@@ -196,6 +259,7 @@ namespace ToDoAndNotes3.Controllers
             }
         }
 
+        // GET: Account/ForgotPassword
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
@@ -203,6 +267,7 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
+        // POST: Account/ForgotPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -238,6 +303,7 @@ namespace ToDoAndNotes3.Controllers
             return View(model);
         }
 
+        // GET: Account/ForgotPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
@@ -245,6 +311,7 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
+        // GET: Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPassword(string code = null, string email = null)
@@ -252,6 +319,7 @@ namespace ToDoAndNotes3.Controllers
             return code == null || email == null ? View("Error") : View();
         }
 
+        // POST: Account/ResetPassword
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -277,6 +345,7 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
+        // GET: Account/ResetPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation()
@@ -284,6 +353,7 @@ namespace ToDoAndNotes3.Controllers
             return View();
         }
 
+        // GET: Account/Error
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Error()

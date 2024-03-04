@@ -17,8 +17,9 @@
     <input type="hidden" asp-for="OldName"/>
     <div>
         <input asp-for="NewName" value="@Model.OldName" placeholder="Name" class="input-border w-100" />
-        <span asp-validation-for="NewName"></span>
     </div>
+    <span asp-validation-for="NewName"></span>
+
     <div class="btns-ok-cancel mt-3">
         <button class="btn btn-cancel js-close" type="button">Cancel</button>
         <button class="btn btn-ok" type="submit">Ok</button>

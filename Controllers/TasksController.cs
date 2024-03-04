@@ -101,7 +101,7 @@ namespace ToDoAndNotes3.Controllers
 
                 _context.Add(taskLabels.Task);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
             // get data for select lists (asp-for approach for each field uncomfortable on view)
             taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
@@ -192,7 +192,7 @@ namespace ToDoAndNotes3.Controllers
                         throw;
                     }
                 }
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
             // get data for select lists (asp-for approach for each field uncomfortable on view)
             taskLabels.Labels = _context.Labels.Where(l => l.UserId == _userManager.GetUserId(User)).ToList();
@@ -223,7 +223,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         // POST: Tasks/Restore/5
@@ -249,7 +249,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         // GET: Tasks/DeletePartial/5
@@ -302,7 +302,7 @@ namespace ToDoAndNotes3.Controllers
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         // POST: Tasks/Duplicate/5
@@ -336,7 +336,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         // POST: Tasks/ToggleState/5
@@ -361,7 +361,7 @@ namespace ToDoAndNotes3.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return Json(new { success = true, redirectTo = returnUrl });
+            return Json(new { success = true });
         }
 
         #region Helpers

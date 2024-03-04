@@ -470,15 +470,6 @@
             </span>Move to bin
         </button>
     </form>
-    @* TEST (to del) *@
-    <form asp-controller="Notes" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-note-modal">
-        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-        <button class="btn js-modal-btn red" type="submit">
-            <span class="material-symbols-outlined md-20">
-                delete
-            </span>Delete forever
-        </button>
-    </form>
 </div>
 <div class="dropdown-content js-dropdown-content" id="task-dropdown-content">
     <form id="edit-task-form" asp-controller="Tasks" asp-action="EditPartial" method="get" class="js-get-modal-ajax"
@@ -506,15 +497,6 @@
             <span class="material-symbols-outlined md-20">
                 delete
             </span>Move to bin
-        </button>
-    </form>
-    @* TEST (to del) *@
-    <form asp-controller="Tasks" asp-action="DeletePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="delete-task-modal">
-        <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-        <button class="btn red js-modal-btn" type="submit">
-            <span class="material-symbols-outlined md-20">
-                delete
-            </span>Delete forever
         </button>
     </form>
 </div>

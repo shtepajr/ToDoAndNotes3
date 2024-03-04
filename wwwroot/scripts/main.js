@@ -237,18 +237,22 @@ $(function () {
                 RequestVerificationToken: formToken
             },
             success: function (result) {
-                if (result.success) {
-                    console.log('postPartialAjax() | success=true');
+                if (result.success === true && result.redirectTo == null) {
+                    console.log('AJAX. POST. postPartialAjax() => success=true');
                     successCallaback();
                 }
+                else if (result.success === true && result.redirectTo != null) {
+                    console.log('AJAX. POST. postPartialAjax() => success=true + redirect');
+                    window.location.href = result.redirectTo;
+                }
                 else {
-                    console.log('postPartialAjax() | success=false');
-                    // return partial if some model errors
+                    console.log('AJAX. POST. postPartialAjax() => success=false');
+                    // e.g return partial with some model errors
                     failedCallback(result);
                 }
             },
             error: function (xhr, status, error) {
-                console.error('postPartialAjax() | error');
+                console.error('AJAX. POST. postPartialAjax() => error');
                 window.location.pathname = '/Account/Error';
             }
         });

@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Text;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.ManageViewModels;
 
@@ -55,14 +58,60 @@ namespace ToDoAndNotes3.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 user.CustomName = changeName.NewName;
                 await _userManager.UpdateAsync(user);
-                return Json(new { success = true, redirectTo = returnUrl });
+                return Json(new { success = true });
             }
-            return PartialView("Manage/_ChangeNamePartial", new ChangeNameViewModel()
+            return PartialView("Manage/_ChangeNamePartial", changeName);
+        }
+
+        // GET: Manage/ChangeNamePartial
+        [HttpGet]
+        public async Task<IActionResult> ChangeEmailPartial(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+
+            var user = await _userManager.GetUserAsync(User);
+
+            return PartialView("Manage/_ChangeEmailPartial", new ChangeEmailViewModel()
             {
-                NewName = changeName.NewName
+                OldEmail = user.Email
             });
         }
 
+        // POST: Manage/ChangeNamePartial
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeEmailPartial(ChangeEmailViewModel changeEmail, string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+
+                var email = await _userManager.GetEmailAsync(user);
+                if (changeEmail.NewEmail != email)
+                {
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateChangeEmailTokenAsync(user, changeEmail.NewEmail);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Action(
+                        nameof(AccountController.ChangeEmailConfirm), "Account", 
+                        new { userId = userId, email=changeEmail.NewEmail,  code = code }, 
+                        protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(
+                        changeEmail.NewEmail,
+                        "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                    returnUrl = Url.Action(nameof(AccountController.CheckEmail), "Account");
+                    return Json(new { success = true, redirectTo = returnUrl });
+                }
+            }
+            return PartialView("Manage/_ChangeEmailPartial", changeEmail);
+        }
 
         // POST: /Manage/RemoveLogin
         [HttpPost]
