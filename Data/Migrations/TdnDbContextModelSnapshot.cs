@@ -179,7 +179,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasKey("LabelId");
 
-                    b.ToTable("Labels");
+                    b.ToTable("Labels", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.Note", b =>
@@ -221,7 +221,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Notes");
+                    b.ToTable("Notes", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.NoteDescription", b =>
@@ -237,7 +237,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasKey("NoteDescriptionId");
 
-                    b.ToTable("NoteDescription");
+                    b.ToTable("NoteDescription", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.NoteLabel", b =>
@@ -260,7 +260,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("NoteLabel");
+                    b.ToTable("NoteLabel", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.Project", b =>
@@ -289,7 +289,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasKey("ProjectId");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.Task", b =>
@@ -331,7 +331,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Tasks", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.TaskLabel", b =>
@@ -354,7 +354,7 @@ namespace ToDoAndNotes3.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.ToTable("TaskLabel");
+                    b.ToTable("TaskLabel", (string)null);
                 });
 
             modelBuilder.Entity("ToDoAndNotes3.Models.User", b =>

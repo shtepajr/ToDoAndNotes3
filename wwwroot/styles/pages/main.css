@@ -347,3 +347,25 @@ main {
 .note-description {
     font-size: 12px;
 }
+
+#msg {
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    margin-left: 5px;
+    margin-right: 5px;
+    min-height: 35px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 5px 10px;
+    background-color: var(--light-green-color);
+}
+
+@media(max-width: 450px){
+    #msg {
+        left: 0;
+        right: 0;
+    }
+}

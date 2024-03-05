@@ -23,11 +23,11 @@ namespace ToDoAndNotes3.Data
                 .HasQueryFilter(p => !p.IsDeleted);
             builder.Entity<Project>()
                 .HasMany(p => p.Tasks)
-                .WithOne(pt => pt.Project)
+                .WithOne(t => t.Project)
                 .OnDelete(DeleteBehavior.Cascade);
             builder.Entity<Project>()
                 .HasMany(p => p.Notes)
-                .WithOne(pn => pn.Project)
+                .WithOne(n => n.Project)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Models.Task>()

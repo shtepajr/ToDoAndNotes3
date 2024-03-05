@@ -7,5 +7,7 @@ namespace ToDoAndNotes3.Models
     {
         [PersonalData]
         public string? CustomName { get; set; }
+        public ICollection<Project>? Projects { get; set; }
+        public ICollection<Label>? Labels { get; set; }
     }
 }

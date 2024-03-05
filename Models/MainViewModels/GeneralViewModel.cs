@@ -6,5 +6,6 @@
         public List<TdnSortElement> TdnElements { get; set; } = new List<TdnSortElement> { };
         public List<Label> Labels { get; set; } = new List<Label>();
         public ManageViewModels.IndexViewModel Manage { get; set; }
+        public ManageViewModels.ManageLoginsViewModel Logins { get; set; }
     }
 }

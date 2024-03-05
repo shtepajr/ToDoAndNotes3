@@ -231,36 +231,42 @@ namespace ToDoAndNotes3.Controllers
 
         // GET: /Home/Bin
         [HttpGet]
-        public async Task<IActionResult> Manage(ManageMessageId? message = null, bool isGetPartial = false)
+        public async Task<IActionResult> Manage(bool isGetPartial = false)
         {
             ViewData["ReturnUrl"] = Url.Action(nameof(Manage), "Home");
-
-            ViewData["StatusMessage"] =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.SetTwoFactorSuccess ? "Your two-factor authentication provider has been set."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : message == ManageMessageId.AddPhoneSuccess ? "Your phone number was added."
-                : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
-                : "";
 
             GeneralViewModel generalViewModel = await LoadGeneralViewModel(_userManager.GetUserId(User), daysViewName : DaysViewName.Today);
 
             var user = await _userManager.GetUserAsync(User);
-            var model = new IndexViewModel
+            if (user != null)
             {
-                HasPassword = await _userManager.HasPasswordAsync(user),
-                PhoneNumber = await _userManager.GetPhoneNumberAsync(user),
-                TwoFactor = await _userManager.GetTwoFactorEnabledAsync(user),
-                Logins = await _userManager.GetLoginsAsync(user),
-                BrowserRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
-                AuthenticatorKey = await _userManager.GetAuthenticatorKeyAsync(user)
-            };
-            generalViewModel.Manage = model;
+                // user general info
+                generalViewModel.Manage = new IndexViewModel
+                {
+                    HasPassword = await _userManager.HasPasswordAsync(user),
+                    PhoneNumber = await _userManager.GetPhoneNumberAsync(user),
+                    TwoFactor = await _userManager.GetTwoFactorEnabledAsync(user),
+                    Logins = await _userManager.GetLoginsAsync(user),
+                    BrowserRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
+                    AuthenticatorKey = await _userManager.GetAuthenticatorKeyAsync(user)
+                };
 
-            if (isGetPartial)
-            {
-                return PartialView("Home/_ManagePartial", generalViewModel);
+                // user logins info
+                var userLogins = await _userManager.GetLoginsAsync(user);
+                var schemes = await _signInManager.GetExternalAuthenticationSchemesAsync();
+                var otherLogins = schemes.Where(auth => userLogins.All(ul => auth.Name != ul.LoginProvider)).ToList();
+                ViewData["ShowRemoveButton"] = user.PasswordHash != null || userLogins.Count > 1;
+
+                generalViewModel.Logins = new ManageLoginsViewModel()
+                {
+                    CurrentLogins = userLogins,
+                    OtherLogins = otherLogins
+                };
+
+                if (isGetPartial)
+                {
+                    return PartialView("Home/_ManagePartial", generalViewModel);
+                }
             }
             return View(generalViewModel);
         }

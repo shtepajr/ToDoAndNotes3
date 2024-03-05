@@ -237,6 +237,12 @@ $(function () {
                 RequestVerificationToken: formToken
             },
             success: function (result) {
+                if (result.message != null) {
+                    $('#msg').html(result.message).fadeIn('slow');
+                    $('#msg').css('display', 'flex');
+                    $('#msg').delay(3000).fadeOut('slow');
+                }
+
                 if (result.success === true && result.redirectTo == null) {
                     console.log('AJAX. POST. postPartialAjax() => success=true');
                     successCallaback();

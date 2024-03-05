@@ -6,6 +6,7 @@ namespace ToDoAndNotes3.Models
     {
         public int? ProjectId { get; set; }
         public string? UserId { get; set; }
+        public User? User { get; set; }
         [Required]
         [Display(Name = "Name")]
         public string? Title { get; set; }

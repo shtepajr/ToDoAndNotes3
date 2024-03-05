@@ -74,7 +74,7 @@ namespace ToDoAndNotes3.Controllers
         // GET: Account/CheckEmail
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> CheckEmail(string email)
+        public IActionResult CheckEmail(string email)
         {
             return View(email);
         }
@@ -116,7 +116,6 @@ namespace ToDoAndNotes3.Controllers
             var existingUser = await _userManager.FindByEmailAsync(email);
             if (existingUser != null)
             {
-                //StatusMessage = "Success";
                 return View("Error");
             }
 
@@ -138,7 +137,6 @@ namespace ToDoAndNotes3.Controllers
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            //StatusMessage = "Success";
             return View(nameof(ConfirmEmail));
         }
 
@@ -162,7 +160,7 @@ namespace ToDoAndNotes3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            //ViewData["ReturnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
             {
@@ -225,7 +223,7 @@ namespace ToDoAndNotes3.Controllers
                 await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
                 _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
-                return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
+                return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
             {
@@ -251,7 +249,7 @@ namespace ToDoAndNotes3.Controllers
                         // Update any authentication tokens as well
                         await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
-                        return returnUrl == null ? RedirectToAction(nameof(HomeController.Main), "Home") : RedirectToLocal(returnUrl);
+                        return RedirectToLocal(returnUrl);
                     }
                 }
                 AddErrors(createResult);

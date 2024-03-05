@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "_ModalContentLayout";
+    string updateUrl = ViewData["ReturnUrl"] + "?isGetPartial=true";
+    string updateTargetId = "main";
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Delele account</div>
+    </div>
+}
+
+<div>Are you sure you want to delete account?</div>
+<div class="red mt-1"><strong>This will immediately delete all of your data including tasks, notes, folders, and more. This can’t be undone.</strong></div>
+<form method="post" asp-controller="Manage" asp-action="DeleteAccount">
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok" type="submit">Ok</button>
+    </div>
+</form>
