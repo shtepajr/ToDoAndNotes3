@@ -16,6 +16,9 @@
 </div>
 <div id="change-password-modal" class="modal js-modal">
 </div>
+<div id="set-password-modal" class="modal js-modal">
+</div>
+
 <div>Change name</div>
 <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeNamePartial" data-target-modal-id="change-name-modal">
     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
@@ -32,14 +35,28 @@
     </button>
 </form>
 
+@if (Model.Manage.HasPassword)
+{
 
-<div>Change password</div>
-<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangePasswordPartial" data-target-modal-id="change-password-modal">
-    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-    <button type="submit">
-        Change password
-    </button>
-</form>
+    <div>Change password</div>
+    <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangePasswordPartial" data-target-modal-id="change-password-modal">
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button type="submit">
+            Change password
+        </button>
+    </form>
+}
+else
+{
+    <div>Set password</div>
+    <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="SetPasswordPartial" data-target-modal-id="set-password-modal">
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+        <button type="submit">
+            Set password
+        </button>
+    </form>
+}
+
 
 
 <div>Connected accounts</div>

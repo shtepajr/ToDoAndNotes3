@@ -56,9 +56,16 @@ namespace ToDoAndNotes3.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
-                user.CustomName = changeName.NewName;
-                await _userManager.UpdateAsync(user);
-                return Json(new { success = true });
+                if (user != null)
+                {
+                    user.CustomName = changeName.NewName;
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return Json(new { success = true });
+                    }
+                    AddErrors(result);
+                }
             }
             return PartialView("Manage/_ChangeNamePartial", changeName);
         }
@@ -113,6 +120,72 @@ namespace ToDoAndNotes3.Controllers
             return PartialView("Manage/_ChangeEmailPartial", changeEmail);
         }
 
+        // GET: /Manage/ChangePasswordPartial
+        [HttpGet]
+        public IActionResult ChangePasswordPartial(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return PartialView("Manage/_ChangePasswordPartial", new ChangePasswordViewModel());
+        }
+
+        // POST: /Manage/ChangePasswordPartial
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePasswordPartial(ChangePasswordViewModel model, string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        _logger.LogInformation(3, "User changed their password successfully.");
+                        return Json(new { success = true });
+                    }
+                    AddErrors(result);
+                }
+            }
+            return PartialView("Manage/_ChangePasswordPartial", model);
+        }
+
+        // GET: /Manage/SetPasswordPartial
+        [HttpGet]
+        public IActionResult SetPasswordPartial(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return PartialView("Manage/_SetPasswordPartial", new SetPasswordViewModel());
+        }
+
+        // POST: /Manage/SetPasswordPartial
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetPasswordPartial(SetPasswordViewModel model, string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    var result = await _userManager.AddPasswordAsync(user, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent:true);
+                        return Json(new { success = true });
+                    }
+                    AddErrors(result);
+                }
+            }
+            return PartialView("Manage/_SetPasswordPartial", model);
+        }
+
+
+
+
         // POST: /Manage/RemoveLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -136,70 +209,6 @@ namespace ToDoAndNotes3.Controllers
         public IActionResult AddPhoneNumber()
         {
             return View();
-        }
-
-        // GET: /Manage/ChangePassword
-        [HttpGet]
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
-
-        // POST: /Manage/ChangePassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var user = await GetCurrentUserAsync();
-            if (user != null)
-            {
-                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation(3, "User changed their password successfully.");
-                    return RedirectToAction(nameof(Index), new { Message = ManageMessageId.ChangePasswordSuccess });
-                }
-                AddErrors(result);
-                return View(model);
-            }
-            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
-        }
-
-        // GET: /Manage/SetPassword
-        [HttpGet]
-        public IActionResult SetPassword()
-        {
-            return View();
-        }
-
-        // POST: /Manage/SetPassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await GetCurrentUserAsync();
-            if (user != null)
-            {
-                var result = await _userManager.AddPasswordAsync(user, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction(nameof(Index), new { Message = ManageMessageId.SetPasswordSuccess });
-                }
-                AddErrors(result);
-                return View(model);
-            }
-            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
 
         //GET: /Manage/ManageLogins
