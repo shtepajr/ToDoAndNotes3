@@ -6,6 +6,10 @@ $(function () {
         checkWindowSize();
     });
     $(document).on('click', '.js-nav-link', function () {
+        //$(this).addClass('active');
+        //$(document).find('.js-nav-link').not($(this)).each(function () {
+        //    $(this).removeClass('active');
+        //});
         if (window.visualViewport.width < 635) {
             $('#sidebar').addClass('sidebar-hide');
             checkWindowSize();

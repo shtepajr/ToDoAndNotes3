@@ -5,6 +5,7 @@
     --dark-blue-tr-color: hsla(234, 20%, 45%, 1);
     --light-green-color: hsla(151, 24%, 60%, 1);
     --light-orange-color: hsla(37, 79%, 75%, 1);
+    --light-orange-tr-color: hsla(37, 79%, 80%, 1);
     --transparent-color: hsla(0, 0%, 100%, 0);
     --top-bar-height: 40px;
     --main-bar-height: 50px;
@@ -152,7 +153,17 @@ a.btn-default, button.btn-default {
     color: #FFFFFF;
     border: 0;
 }
-.btn-default:hover {
+button.btn-default-auto {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    background-color: #3D405B;
+    color: #FFFFFF;
+    border: 0;
+    padding: 5px 10px;
+}
+.btn-default:hover, .btn-default-auto:hover {
     opacity: 0.9;
 }
 .btns-ok-cancel {
@@ -352,6 +363,7 @@ a.btn-default, button.btn-default {
     border: 0;
     width: 100%;
     text-align: start;
+    border: 1px solid var(--transparent-color);
 }
 .dropdown-content a:hover, .dropdown-content button:hover {
     border: 1px solid;
@@ -378,6 +390,9 @@ a.btn-default, button.btn-default {
 }
 .mt-5 {
     margin-top: 50px;
+}
+.mt-05{
+    margin-top: 5px;
 }
 .icon-absolute {
     position: absolute;
@@ -406,4 +421,7 @@ a.btn-default, button.btn-default {
 }
 .fs-14{
     font-size: 14px;
+}
+.fs-12 {
+    font-size: 12px;
 }

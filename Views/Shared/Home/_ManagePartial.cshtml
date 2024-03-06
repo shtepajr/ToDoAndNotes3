@@ -1,13 +1,10 @@
 ﻿@model GeneralViewModel
 @{
-    ViewData["Title"] = "Manage your account";
+    ViewData["Title"] = "Account";
 
     string updateUrl = ViewData["ReturnUrl"] + "?isGetPartial=true";
     string updateTargetId = "main";
 }
-
-<h1>@ViewData["Title"].</h1>
-<div asp-validation-summary="ModelOnly"></div>
 
 <div id="change-name-modal" class="modal js-modal">
 </div>
@@ -18,95 +15,119 @@
 <div id="set-password-modal" class="modal js-modal">
 </div>
 
-<div>Change name</div>
-<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeNamePartial" data-target-modal-id="change-name-modal">
-    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-    <button type="submit">
-        Change name
-    </button>
-</form>
-
-<div>Change email</div>
-<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeEmailPartial" data-target-modal-id="change-email-modal">
-    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-    <button type="submit">
-        Change email
-    </button>
-</form>
-
-@if (Model.Manage.HasPassword)
-{
-    <div>Change password</div>
-    <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangePasswordPartial" data-target-modal-id="change-password-modal">
-        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-        <button type="submit">
-            Change password
-        </button>
-    </form>
-}
-else
-{
-    <div>Set password</div>
-    <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="SetPasswordPartial" data-target-modal-id="set-password-modal">
-        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-        <button type="submit">
-            Set password
-        </button>
-    </form>
-}
-
-@if (Model.Logins.CurrentLogins.Count > 0)
-{
-    <h4>Connected accounts</h4>
-    <table class="table">
-        <tbody>
-            @for (var index = 0; index < Model.Logins.CurrentLogins.Count; index++)
-            {
-                <tr>
-                    <td>@Model.Logins.CurrentLogins[index].ProviderDisplayName</td>
-                    <td>
-                        @if ((bool)ViewData["ShowRemoveButton"])
-                        {
-                            <form method="post" asp-controller="Manage" asp-action="RemoveLoginPartial" class="js-post-modal-with-partial-update-ajax"
-                                  data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
-                                <div>
-                                    <input asp-for="@Model.Logins.CurrentLogins[index].LoginProvider" name="LoginProvider" type="hidden" />
-                                    <input asp-for="@Model.Logins.CurrentLogins[index].ProviderKey" name="ProviderKey" type="hidden" />
-                                    <input type="submit" value="Remove" title="Remove this @Model.Logins.CurrentLogins[index].ProviderDisplayName login from your account" />
-                                </div>
-                            </form>
-                        }
-                        else
-                        {
-                            @: &nbsp;
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-@if (Model.Logins.OtherLogins.Count > 0)
-{
-    <h4>Add another login</h4>
-    <form asp-controller="Manage" asp-action="LinkLogin" method="post" class="form-horizontal" role="form">
-        <div id="socialLoginList">
-            <p>
-                @foreach (var provider in Model.Logins.OtherLogins)
-                {
-                    <button type="submit" class="btn btn-action" name="provider" value="@provider.Name" 
-                        title="Log in using your @provider.Name account">@provider.DisplayName</button>
-                }
-            </p>
+<div class="main-header">
+    <div class="main-header-center">
+        <div class="main-header-title nowrap-ellipsis">@ViewData["Title"]</div>
+    </div>
+</div>
+<div class="main-container">
+    <div class="account">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="account-claim">
+            <div><strong>Name</strong></div>
+            <div>@Model.Manage.Name</div>
+            <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeNamePartial" data-target-modal-id="change-name-modal">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                <button type="submit" class="btn btn-default-auto fs-14">
+                    Change name
+                </button>
+            </form>
         </div>
-    </form>
-}
-
-<div>Delete account</div>
-<div>This will immediately delete all of your data including tasks, notes, projects, and more. This can’t be undone.</div>
-<form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="DeleteAccountPartial" data-target-modal-id="change-email-modal">
-    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-    <button type="submit">
-        Delete account
-    </button>
-</form>
+        <div class="account-claim mt-1">
+            <div class="mt-1"><strong>Email</strong></div>
+            <div>@Model.Manage.Email</div>
+            <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangeEmailPartial" data-target-modal-id="change-email-modal">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                <button type="submit" class="btn btn-default-auto fs-14">
+                    Change email
+                </button>
+            </form>
+        </div>
+        <div class="account-claim mt-1">
+            @if (Model.Manage.HasPassword)
+            {
+                <strong>Password</strong>
+                <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="ChangePasswordPartial" data-target-modal-id="change-password-modal">
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                    <button type="submit" class="btn btn-default-auto fs-14">
+                        Change password
+                    </button>
+                </form>
+            }
+            else
+            {
+                <strong>Password</strong>
+                <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="SetPasswordPartial" data-target-modal-id="set-password-modal">
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                    <button type="submit" class="btn btn-default-auto fs-14">
+                        Set password
+                    </button>
+                </form>
+            }
+        </div>
+        <div class="account-claim mt-1">
+            @if (Model.Logins.CurrentLogins.Count > 0)
+            {
+                <strong>Connected accounts</strong>
+                @foreach (var provider in Model.Logins.CurrentLogins)
+                {
+                    @if ((bool)ViewData["ShowRemoveButton"])
+                    {
+                        <form method="post" asp-controller="Manage" asp-action="RemoveLoginPartial" class="js-post-modal-with-partial-update-ajax"
+                              data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
+                            <div>
+                                <input asp-for="@provider.LoginProvider" name="LoginProvider" type="hidden" />
+                                <input asp-for="@provider.ProviderKey" name="ProviderKey" type="hidden" />
+                                <button type="submit" class="btn auth-connect-btn" name="provider" value="@provider.ProviderDisplayName"
+                                        title="Remove @provider.ProviderDisplayName login from your account">
+                                    @if (provider.ProviderDisplayName == "Google")
+                                    {
+                                        <img src="~/images/google256.png" alt="Google" class="image-google" style="width: 20px;">
+                                    }
+                                    Disconnect @provider.ProviderDisplayName
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div>@provider.ProviderDisplayName</div>
+                    }
+                }
+            }
+        </div>
+        <div class="account-claim mt-1">
+            @if (Model.Logins.OtherLogins.Count > 0)
+            {
+                <strong>Connect accounts</strong>
+                <form asp-controller="Manage" asp-action="LinkLogin" method="post" class="form-horizontal" role="form">
+                    <div id="socialLoginList">
+                        <p>
+                            @foreach (var provider in Model.Logins.OtherLogins)
+                            {
+                                <button type="submit" class="btn auth-connect-btn" name="provider" value="@provider.Name"
+                                        title="Log in using your @provider.Name account">
+                                    @if (provider.Name == "Google")
+                                    {
+                                        <img src="~/images/google256.png" alt="Google" class="image-google" style="width: 20px;">
+                                    }
+                                    Connect @provider.DisplayName
+                                </button>
+                            }
+                        </p>
+                    </div>
+                </form>
+            }
+        </div>
+        <div class="account-claim mt-1">
+            <strong>Delete account</strong>
+            <div>This will immediately delete all of your data including tasks, notes, projects, and more. This can’t be undone.</div>
+            <form method="get" class="js-get-modal-ajax" asp-controller="Manage" asp-action="DeleteAccountPartial" data-target-modal-id="change-email-modal">
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                <button type="submit" class="btn btn-default-auto fs-14">
+                    Delete account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

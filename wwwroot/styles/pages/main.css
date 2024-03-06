@@ -83,14 +83,25 @@ main {
     align-items: center;
     justify-content: end;
 }
-
+.header-user {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+.header-user:hover{
+    background-color: var(--dark-blue-tr-color);
+}
+.header-user-name {
+    margin-right: 10px;
+    max-width: 300px;
+}
 /* Buttons */
 .btn-icon {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 4px 6px;
-
     border: 0;
     background-color: var(--transparent-color);
 }
@@ -138,6 +149,9 @@ main {
 }
 .nav-link:hover {
     background-color: var(--light-orange-color);
+}
+.nav-link.active {
+    background-color: var(--light-orange-tr-color);
 }
 .nav-link .link  {
     display: flex;
@@ -243,6 +257,9 @@ main {
 .tasks-with-notes {
     display: none;
 }
+.account {
+    width: 50%;
+}
 
 /* Single object*/
 .project {
@@ -301,6 +318,23 @@ main {
 .label.nav-link .nowrap-ellipsis {
     flex: 1;
 }
+.account-claim > div, .account-claim > form {
+    margin-top: 7px;
+}
+.auth-connect-btn {
+    background-color: var(--light-yellow-color);
+    border: 1px solid var(--transparent-color);
+    border-radius: 5px;
+    padding: 5px 10px;
+    display: flex;
+    column-gap: 5px;
+    transition: background-color 0.1s;
+}
+.auth-connect-btn:hover{
+    border: 1px solid black;
+    background-color: var(--dark-blue-color);
+    color: white;
+}
 
 @media (max-width: 700px){
     .task .task-content, .note .note-content {
@@ -311,6 +345,12 @@ main {
     }
     .all-objects{
         width: 100%;
+    }
+    .account {
+        width: 100%;
+    }
+    .header-user-name{
+        display: none;
     }
 }
 .tools {

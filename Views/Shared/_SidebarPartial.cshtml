@@ -9,7 +9,7 @@
         <li class="nav-link js-nav-link">
             <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Main" asp-route-daysViewName="@DaysViewName.Today"
                   asp-route-isGetPartial="true" data-partial-id="main">
-                <button class="link btn btn-clean" type="submit">
+                <button class="link btn btn-clean" type="submit" title="Today">
                     <span class="material-symbols-outlined md-24 black">
                         calendar_today
                     </span>
@@ -20,7 +20,7 @@
         <li class="nav-link js-nav-link">
             <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Main" asp-route-daysViewName="@DaysViewName.Upcoming"
                   asp-route-isGetPartial="true" data-partial-id="main">
-                <button class="link btn btn-clean" type="submit">
+                <button class="link btn btn-clean" type="submit" title="Upcoming">
                     <span class="material-symbols-outlined md-24 black">
                         calendar_month
                     </span>
@@ -31,7 +31,7 @@
         <li class="nav-link js-nav-link">
             <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Main" asp-route-daysViewName="@DaysViewName.Unsorted"
                   asp-route-isGetPartial="true" data-partial-id="main">
-                <button class="link btn btn-clean" type="submit">
+                <button class="link btn btn-clean" type="submit" title="Unsorted">
                     <span class="material-symbols-outlined md-24 black">
                         unfold_more
                     </span>
@@ -42,7 +42,7 @@
         <li class="nav-link js-nav-link">
             <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Labels" asp-route-isGetPartial="true" 
                     data-partial-id="main">
-                <button class="link btn btn-clean" type="submit">
+                <button class="link btn btn-clean" type="submit" title="Labels">
                     <span class="material-symbols-outlined md-24 black">
                         label
                     </span>
@@ -57,7 +57,7 @@
         <p>Projects</p>
         <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-project-modal">
             <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-            <button class="btn btn-plus" type="submit">
+            <button class="btn btn-plus" type="submit" title="Add project">
                 <span class="material-symbols-outlined md-24">
                     add
                 </span>
@@ -76,7 +76,7 @@
     <ul class="projects-list">
         @foreach (var project in Model)
         {
-            <li class="project nav-link dropdown js-nav-link">
+            <li class="project nav-link dropdown js-nav-link" title="@project.Title">
                 <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Main" asp-route-projectId="@project.ProjectId"
                         asp-route-isGetPartial="true" data-partial-id="main">
                     <button class="link btn btn-clean" type="submit">

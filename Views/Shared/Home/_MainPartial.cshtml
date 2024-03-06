@@ -35,7 +35,7 @@
         <div class="main-header-buttons">
             <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-task-modal">
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn btn-action" type="submit">
+                <button class="btn btn-action" type="submit" title="Add task">
                     <span class="material-symbols-outlined md-30">
                         add_task
                     </span>
@@ -43,13 +43,13 @@
             </form>
             <form asp-controller="Notes" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-note-modal">
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                <button class="btn btn-action" type="submit">
+                <button class="btn btn-action" type="submit" title="Add note">
                     <span class="material-symbols-outlined md-30">
                         note_add
                     </span>
                 </button>
             </form>
-            <button class="btn btn-action js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content">
+            <button class="btn btn-action js-dropdown-btn" data-dropdown-content-id="filter-dropdown-content" title="Filter">
                 <span class="material-symbols-outlined md-30">
                     filter_alt
                 </span>
@@ -107,7 +107,7 @@
         {
             if (elem is ToDoAndNotes3.Models.Task task)
             {
-                <li class="task nav-link dropdown">
+                <li class="task nav-link dropdown" title="@task.Description">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
                         <div class="task-toggler">
                             <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
@@ -273,7 +273,7 @@
         {
             if (elem is ToDoAndNotes3.Models.Task task)
             {
-                <li class="task nav-link dropdown">
+                <li class="task nav-link dropdown" title="@task.Description">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
                         <div class="task-toggler">
                             <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"

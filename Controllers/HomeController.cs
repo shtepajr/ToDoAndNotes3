@@ -161,6 +161,7 @@ namespace ToDoAndNotes3.Controllers
             ViewData["ReturnUrl"] = Url.Action(nameof(Labels), "Home");
 
             ProjectLabelViewModel projectLabelViewModel = new ProjectLabelViewModel();
+            projectLabelViewModel.Manage = await GetManageViewModelAsync();
             string? userId = _userManager.GetUserId(User);
             var projects = await _context.Projects.Where(p => p.UserId == userId && p.IsDefault == false).ToListAsync();
             var labels = await _context.Labels.Where(p => p.UserId == userId).ToListAsync();
@@ -199,7 +200,7 @@ namespace ToDoAndNotes3.Controllers
             }
 
             BinViewModel binViewModel = new BinViewModel();
-
+            binViewModel.Manage = await GetManageViewModelAsync();
             // all deleted items
             var projectsInclude = await _context.Projects
                 .Where(p => p.UserId == userId)
@@ -237,36 +238,9 @@ namespace ToDoAndNotes3.Controllers
 
             GeneralViewModel generalViewModel = await LoadGeneralViewModel(_userManager.GetUserId(User), daysViewName : DaysViewName.Today);
 
-            var user = await _userManager.GetUserAsync(User);
-            if (user != null)
+            if (isGetPartial)
             {
-                // user general info
-                generalViewModel.Manage = new IndexViewModel
-                {
-                    HasPassword = await _userManager.HasPasswordAsync(user),
-                    PhoneNumber = await _userManager.GetPhoneNumberAsync(user),
-                    TwoFactor = await _userManager.GetTwoFactorEnabledAsync(user),
-                    Logins = await _userManager.GetLoginsAsync(user),
-                    BrowserRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user),
-                    AuthenticatorKey = await _userManager.GetAuthenticatorKeyAsync(user)
-                };
-
-                // user logins info
-                var userLogins = await _userManager.GetLoginsAsync(user);
-                var schemes = await _signInManager.GetExternalAuthenticationSchemesAsync();
-                var otherLogins = schemes.Where(auth => userLogins.All(ul => auth.Name != ul.LoginProvider)).ToList();
-                ViewData["ShowRemoveButton"] = user.PasswordHash != null || userLogins.Count > 1;
-
-                generalViewModel.Logins = new ManageLoginsViewModel()
-                {
-                    CurrentLogins = userLogins,
-                    OtherLogins = otherLogins
-                };
-
-                if (isGetPartial)
-                {
-                    return PartialView("Home/_ManagePartial", generalViewModel);
-                }
+                return PartialView("Home/_ManagePartial", generalViewModel);
             }
             return View(generalViewModel);
         }
@@ -325,6 +299,9 @@ namespace ToDoAndNotes3.Controllers
         private async Task<GeneralViewModel> LoadGeneralViewModel(string? userId, DaysViewName? daysViewName = null, int? projectId = null, int? labelId = null, string? search = null)
         {
             GeneralViewModel generalViewModel = new GeneralViewModel();
+            generalViewModel.Manage = await GetManageViewModelAsync();
+            generalViewModel.Logins = await GetLoginsViewModelAsync();
+
             if (labelId is not null)
             {
                 var projectsLabelInclude = await _context.Projects
@@ -421,8 +398,49 @@ namespace ToDoAndNotes3.Controllers
             generalViewModel.Labels = await _context.Labels.Where(l => l.UserId == userId).ToListAsync();
             return generalViewModel;
         }
+        private async Task<IndexViewModel> GetManageViewModelAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                // user general info
+                IndexViewModel model = new IndexViewModel
+                {
+                    Name = user.CustomName,
+                    Email = await _userManager.GetEmailAsync(user),
+                    HasPassword = await _userManager.HasPasswordAsync(user),
+                    Logins = await _userManager.GetLoginsAsync(user),
+                };
+                return model;
+            }
+            return null;
+        }
+        private async Task<ManageLoginsViewModel> GetLoginsViewModelAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                // user logins info
+                var userLogins = await _userManager.GetLoginsAsync(user);
+                var schemes = await _signInManager.GetExternalAuthenticationSchemesAsync();
+                var otherLogins = schemes.Where(auth => userLogins.All(ul => auth.Name != ul.LoginProvider)).ToList();
+                ViewData["ShowRemoveButton"] = user.PasswordHash != null || userLogins.Count > 1;
+
+                ManageLoginsViewModel model = new ManageLoginsViewModel()
+                {
+                    CurrentLogins = userLogins,
+                    OtherLogins = otherLogins
+                };
+                return model;
+            }
+            return null;
+        }
         private void SortGeneralViewModel(GeneralViewModel generalViewModel, string? dateOrder, bool? hideCompleted)
         {
+            if (generalViewModel == null)
+            {
+                return;
+            }
             // sort by dateOrder, hideCompleted
             if (dateOrder == "ascending")
             {
@@ -445,6 +463,10 @@ namespace ToDoAndNotes3.Controllers
         }
         private void SortBinViewModel(BinViewModel binViewModel, string? dateOrder, bool? hideCompleted)
         {
+            if (binViewModel == null)
+            {
+                return;
+            }
             // sort by dateOrder, hideCompleted
             if (dateOrder == "ascending")
             {
@@ -472,7 +494,6 @@ namespace ToDoAndNotes3.Controllers
                 return RedirectToAction(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             }
         }
-
         // test
         void SeedDbData()
         {
