@@ -32,7 +32,7 @@
             </div>
             <div class="dropdown-content js-dropdown-content" id="profile-dropdown-content">
                 <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Manage" asp-route-isGetPartial="true" data-partial-id="main">
-                    <button class="link btn btn-clean" type="submit">
+                    <button class="link btn btn-clean js-nav-link" type="submit">
                         <span class="material-symbols-outlined md-20">
                             manage_accounts
                         </span>
@@ -40,7 +40,7 @@
                     </button>
                 </form>
                 <form class="js-get-partial-ajax" method="get" asp-controller="Home" asp-action="Bin" asp-route-isGetPartial="true" data-partial-id="main">
-                    <button class="link btn btn-clean" type="submit">
+                    <button class="link btn btn-clean js-nav-link" type="submit">
                         <span class="material-symbols-outlined md-20">
                             delete
                         </span>
@@ -48,7 +48,7 @@
                     </button>
                 </form>
                 <form asp-controller="Account" asp-action="LogOff" method="post">
-                    <button type="submit" class="btn">
+                    <button type="submit" class="btn js-nav-link">
                         <span class="material-symbols-outlined md-20">
                             logout
                         </span>Log out

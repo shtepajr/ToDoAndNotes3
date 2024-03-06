@@ -213,16 +213,11 @@ button.btn-default-auto {
     padding: 20px;
     padding-top: 10px;
     border: 1px solid #888;
-    width: 30%;
+    width: 50%;
 }
 @media (max-width: 1000px) {
     .modal .modal-content {
-        width: 50%;
-    }
-}
-@media (max-width: 600px) {
-    .modal .modal-content {
-        width: 65%;
+        width: 80%;
     }
 }
 @media (max-width: 420px) {

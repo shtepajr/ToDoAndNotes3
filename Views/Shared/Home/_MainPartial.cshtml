@@ -33,7 +33,7 @@
     <div class="main-header-left">
         <div class="main-header-title nowrap-ellipsis">@ViewData["DisplayDataTitle"]</div>
         <div class="main-header-buttons">
-            <form asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-task-modal">
+            <form id="create-task-form" asp-controller="Tasks" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-task-modal">
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn btn-action" type="submit" title="Add task">
                     <span class="material-symbols-outlined md-30">
@@ -41,7 +41,7 @@
                     </span>
                 </button>
             </form>
-            <form asp-controller="Notes" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-note-modal">
+            <form id="create-note-form" asp-controller="Notes" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-note-modal">
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]">
                 <button class="btn btn-action" type="submit" title="Add note">
                     <span class="material-symbols-outlined md-30">
@@ -103,172 +103,178 @@
 </div>
 <div class="main-container">
     <ul class="tasks">
-        @foreach (var elem in Model.TdnElements)
+        @if (Model.TdnElements.OfType<ToDoAndNotes3.Models.Task>().Count() == 0)
         {
-            if (elem is ToDoAndNotes3.Models.Task task)
-            {
-                <li class="task nav-link dropdown" title="@task.Description">
-                    <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
-                        <div class="task-toggler">
-                            <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
-                                  data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
-                                <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
-                                <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
-                                    @if (task.IsCompleted)
-                                    {
-                                        <span class="material-symbols-outlined md-24">
-                                            radio_button_checked
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="material-symbols-outlined md-24">
-                                            radio_button_unchecked
-                                        </span>
-                                    }
-                                </button>
-                            </form>
-                        </div>
-                        <div class="task-content">
-                            <div class="min-width-0">
+            <div class="empty-msg">Empty now. <u class="btn js-submit-by-form-id" data-form-id="create-task-form">Let's do something!</u></div>
+        }
+        @foreach (var task in Model.TdnElements.OfType<ToDoAndNotes3.Models.Task>())
+        {
+            <li class="task nav-link dropdown" title="@task.Description">
+                <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
+                    <div class="task-toggler">
+                        <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
+                              data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
+                            <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
+                            <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
                                 @if (task.IsCompleted)
                                 {
-                                    <div class="nowrap-ellipsis line-through">@task.Title</div>
+                                    <span class="material-symbols-outlined md-24">
+                                        radio_button_checked
+                                    </span>
                                 }
                                 else
                                 {
-                                    <div class="nowrap-ellipsis">@task.Title</div>
+                                    <span class="material-symbols-outlined md-24">
+                                        radio_button_unchecked
+                                    </span>
                                 }
-                                <div class="tools">
-                                    <div class="date-tools">
-                                        @if (task?.DueDate != null)
+                            </button>
+                        </form>
+                    </div>
+                    <div class="task-content">
+                        <div class="min-width-0">
+                            @if (task.IsCompleted)
+                            {
+                                <div class="nowrap-ellipsis line-through">@task.Title</div>
+                            }
+                            else
+                            {
+                                <div class="nowrap-ellipsis">@task.Title</div>
+                            }
+                            <div class="tools">
+                                <div class="date-tools">
+                                    @if (task?.DueDate != null)
+                                    {
+                                        <span class="material-symbols-outlined md-20">
+                                            date_range
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @task.DueDate
+                                        </div>
+                                    }
+                                    @if (task?.DueTime != null)
+                                    {
+                                        <span>&nbsp</span>
+                                        <span class="material-symbols-outlined md-20">
+                                            access_time
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @task.DueTime
+                                        </div>
+                                    }
+                                </div>
+                                <div class="label-tools">
+                                    @foreach (var taskLabel in task?.TaskLabels?.ToList())
+                                    {
+                                        if (taskLabel.Equals(task?.TaskLabels.First()))
                                         {
                                             <span class="material-symbols-outlined md-20">
-                                                date_range
+                                                label
                                             </span>
+                                        }
+                                        <div class="label-tool-title js-label-tool-title">
                                             <div class="nowrap-ellipsis">
-                                                @task.DueDate
+                                                @taskLabel?.Label?.Title
                                             </div>
-                                        }
-                                        @if (task?.DueTime != null)
-                                        {
-                                            <span>&nbsp</span>
-                                            <span class="material-symbols-outlined md-20">
-                                                access_time
-                                            </span>
-                                            <div class="nowrap-ellipsis">
-                                                @task.DueTime
-                                            </div>
-                                        }
-                                    </div>
-                                    <div class="label-tools">
-                                        @foreach (var taskLabel in task?.TaskLabels?.ToList())
-                                        {
-                                            if (taskLabel.Equals(task?.TaskLabels.First()))
-                                            {
-                                                <span class="material-symbols-outlined md-20">
-                                                    label
-                                                </span>
-                                            }
-                                            <div class="label-tool-title js-label-tool-title">
-                                                <div class="nowrap-ellipsis">
-                                                    @taskLabel?.Label?.Title
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
-                            <div class="coral d-flex min-width-0">
-                                <span class="material-symbols-outlined md-18">
-                                    work_outline
-                                </span>
-                                <div class="nowrap-ellipsis project-title">@task?.Project?.Title</div>
-                            </div>
                         </div>
-                        <div class="ellipsis">
-                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
-                                  data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
-                                more_horiz
+                        <div class="coral d-flex min-width-0">
+                            <span class="material-symbols-outlined md-18">
+                                work_outline
                             </span>
+                            <div class="nowrap-ellipsis project-title">@task?.Project?.Title</div>
                         </div>
-                    </a>
-                </li>
-            }
+                    </div>
+                    <div class="ellipsis">
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                              data-dropdown-content-id="task-dropdown-content" data-receiver-id="task-dropdown-content" data-id="@task?.TaskId">
+                            more_horiz
+                        </span>
+                    </div>
+                </a>
+            </li>
         }
     </ul>
 
     <ul class="notes">
-        @foreach (var elem in Model.TdnElements)
+        @if (Model.TdnElements.OfType<ToDoAndNotes3.Models.Note>().Count() == 0)
         {
-            if (elem is Note note)
-            {
-                <li class="note nav-link dropdown">
-                    <a class="link js-update-action-with-id" data-receiver-id="edit-note-form" data-id="@note.NoteId">
-                        <div class="note-content">
-                            <div class="min-width-0">
-                                <div class="nowrap-ellipsis">@note.Title</div>
-                                <div class="nowrap-ellipsis note-description js-quill-html-to-text">@note?.ShortDescription</div>
-                                <div class="tools">
-                                    <div class="date-tools">
-                                        @if (note?.DueDate != null)
+            <div class ="empty-msg">Empty now. <u class="btn js-submit-by-form-id" data-form-id="create-note-form">Let's write something!</u></div>
+        }
+        @foreach (var note in Model.TdnElements.OfType<ToDoAndNotes3.Models.Note>())
+        {
+            <li class="note nav-link dropdown">
+                <a class="link js-update-action-with-id" data-receiver-id="edit-note-form" data-id="@note.NoteId">
+                    <div class="note-content">
+                        <div class="min-width-0">
+                            <div class="nowrap-ellipsis">@note.Title</div>
+                            <div class="nowrap-ellipsis note-description js-quill-html-to-text">@note?.ShortDescription</div>
+                            <div class="tools">
+                                <div class="date-tools">
+                                    @if (note?.DueDate != null)
+                                    {
+                                        <span class="material-symbols-outlined md-20">
+                                            date_range
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @note.DueDate
+                                        </div>
+                                    }
+                                    @if (note?.DueTime != null)
+                                    {
+                                        <span>&nbsp</span>
+                                        <span class="material-symbols-outlined md-20">
+                                            access_time
+                                        </span>
+                                        <div class="nowrap-ellipsis">
+                                            @note.DueTime
+                                        </div>
+                                    }
+                                </div>
+                                <div class="label-tools">
+                                    @foreach (var noteLabel in note?.NoteLabels?.ToList())
+                                    {
+                                        if (noteLabel.Equals(note?.NoteLabels.First()))
                                         {
                                             <span class="material-symbols-outlined md-20">
-                                                date_range
+                                                label
                                             </span>
-                                            <div class ="nowrap-ellipsis">
-                                                @note.DueDate
-                                            </div>
                                         }
-                                        @if (note?.DueTime != null)
-                                        {
-                                            <span>&nbsp</span>
-                                            <span class="material-symbols-outlined md-20">
-                                                access_time
-                                            </span>
+                                        <div class="label-tool-title js-label-tool-title">
                                             <div class="nowrap-ellipsis">
-                                                @note.DueTime
+                                                @noteLabel?.Label?.Title
                                             </div>
-                                        }
-                                    </div>
-                                    <div class="label-tools">
-                                        @foreach (var noteLabel in note?.NoteLabels?.ToList())
-                                        {
-                                            if (noteLabel.Equals(note?.NoteLabels.First()))
-                                            {
-                                                <span class="material-symbols-outlined md-20">
-                                                    label
-                                                </span>
-                                            }
-                                            <div class="label-tool-title js-label-tool-title">
-                                                <div class="nowrap-ellipsis">
-                                                    @noteLabel?.Label?.Title
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
-                            <div class="coral d-flex min-width-0">
-                                <span class="material-symbols-outlined md-18">
-                                    work_outline
-                                </span>
-                                <div class="nowrap-ellipsis fs-14">@note?.Project?.Title</div>
-                            </div>
                         </div>
-                        <div class="ellipsis">
-                            <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
-                                  data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
-                                more_horiz
+                        <div class="coral d-flex min-width-0">
+                            <span class="material-symbols-outlined md-18">
+                                work_outline
                             </span>
+                            <div class="nowrap-ellipsis fs-14">@note?.Project?.Title</div>
                         </div>
-                    </a>
-                </li>
-            }
+                    </div>
+                    <div class="ellipsis">
+                        <span class="material-symbols-outlined md-24 black js-dropdown-btn js-update-action-with-id"
+                              data-dropdown-content-id="note-dropdown-content" data-receiver-id="note-dropdown-content" data-id="@note?.NoteId">
+                            more_horiz
+                        </span>
+                    </div>
+                </a>
+            </li>
         }
     </ul>
 
     <ul class="tasks-with-notes">
+        @if (Model.TdnElements.Count() == 0)
+        {
+            <div class="empty-msg">Empty now. <u class="btn js-submit-by-form-id" data-form-id="create-task-form">Let's do something!</u></div>
+        }
         @foreach (var elem in Model.TdnElements)
         {
             if (elem is ToDoAndNotes3.Models.Task task)

@@ -447,6 +447,7 @@ $(function () {
                 modules: {
                     toolbar: toolbarOptions // false by default
                 },
+                placeholder: 'Take a note',
                 theme: 'snow'
             };
             let quill = new Quill(quillElem.get(0), options);
@@ -456,7 +457,6 @@ $(function () {
                 let noteShortDescInput = form.find('input[name="Note.ShortDescription"]');
                 noteDescInput.val(quill.root.innerHTML);
                 noteShortDescInput.val(quill.getText(0, 150));
-                //noteDescInput.val(JSON.stringify(quill.getContents()));
             });
         }    
     }

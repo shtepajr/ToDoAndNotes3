@@ -237,7 +237,6 @@ namespace ToDoAndNotes3.Controllers
                 TempData["CurrentProjectId"] = null;
             }
 
-            returnUrl = Url.Action(nameof(HomeController.Main), "Home", new { daysViewName = DaysViewName.Today });
             return Json(new { success = true });
         }
 

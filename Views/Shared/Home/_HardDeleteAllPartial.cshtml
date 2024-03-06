@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "_ModalContentLayout";
+
+    string updateUrl = ViewData["ReturnUrl"] + "?isGetPartial=true";
+    string updateTargetId = "main";
+}
+
+@section ModalHeaderContent {
+    <div class="modal-header-left">
+        <div class="modal-title">Empty bin</div>
+    </div>
+}
+
+<div>Are you sure you want to empty bin?</div>
+<form method="post" asp-controller="Home" asp-action="HardDeleteAllPartial" asp-route-returnUrl="@ViewData["ReturnUrl"]"
+      class="js-post-modal-with-partial-update-ajax" data-target-modal-id="empty-bin-modal" data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
+    @Html.AntiForgeryToken()
+    <div class="btns-ok-cancel mt-3">
+        <button class="btn btn-cancel js-close" type="button">Cancel</button>
+        <button class="btn btn-ok" type="submit">Ok</button>
+    </div>
+</form>

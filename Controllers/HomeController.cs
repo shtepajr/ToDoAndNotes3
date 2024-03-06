@@ -277,6 +277,44 @@ namespace ToDoAndNotes3.Controllers
             TempData[tempDataName] = tempDataValue;
         }
 
+        // GET: /Home/HardDeleteAllPartial
+        [HttpGet]
+        public IActionResult HardDeleteAllPartial(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return PartialView("Home/_HardDeleteAllPartial");
+        }
+
+        // POST: /Home/HardDeleteAllPartial
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult HardDeleteAllPartial(string? returnUrl = null, bool? placeholder = false)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            string? userId = _userManager.GetUserId(User);
+
+            // delete projects
+            _context.Projects.RemoveRange(_context.Projects
+                .Where(p => p.UserId == userId && p.IsDeleted == true)
+                .IgnoreQueryFilters());
+
+            // delete tasks and notes
+            var activeProjects = _context.Projects
+                .Where(p => p.UserId == userId)
+                .Include(p => p.Tasks.Where(t => t.IsDeleted == true))
+                .Include(p => p.Notes.Where(n => n.IsDeleted == true))
+                .IgnoreQueryFilters();
+
+            foreach (var project in activeProjects)
+            {
+                _context.Tasks.RemoveRange(project.Tasks);
+                _context.Notes.RemoveRange(project.Notes);
+            }
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
         #region Helpers
         private Models.Project GetOrCreateDefaultProject()
         {
