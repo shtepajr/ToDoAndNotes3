@@ -13,6 +13,7 @@ using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Models.MainViewModels;
 using static ToDoAndNotes3.Controllers.ManageController;
 using ToDoAndNotes3.Models.ManageViewModels;
+using System;
 
 namespace ToDoAndNotes3.Controllers
 {
@@ -61,6 +62,7 @@ namespace ToDoAndNotes3.Controllers
 
             string? userId = _userManager.GetUserId(User);
             var defaultProject = GetOrCreateDefaultProject();
+            //SeedDbData();
 
             if (daysViewName is not null)
             {
@@ -69,6 +71,10 @@ namespace ToDoAndNotes3.Controllers
                 ViewData["ReturnUrl"] = Url.Action(nameof(Main), "Home", new { daysViewName });
                 TempData["DaysViewName"] = daysViewName;
                 ViewData["DisplayDataTitle"] = daysViewName;
+                if (daysViewName == DaysViewName.Unsorted)
+                {
+                    TempData["CurrentProjectId"] = defaultProject.ProjectId;
+                }
             }
             if (projectId is not null)
             {
@@ -535,43 +541,126 @@ namespace ToDoAndNotes3.Controllers
         // test
         void SeedDbData()
         {
-            if (_context.Projects.Any() || _context.Labels.Any())
+            if (_context.Projects.Count() > 1)
             {
                 return;
-                //_context.Projects.RemoveRange(_context.Projects);
-                //_context.Labels.RemoveRange(_context.Labels);
             }
-            //_context.Database.EnsureDeleted();
-            //_context.Database.EnsureCreated();
-
-            for (int i = 0; i < 5; i++)
+            DateOnly RandomDate()
             {
-                _context.Labels.Add(new Label()
-                {
-                    UserId = _userManager.GetUserId(User),
-                    Title = "Label title lorem" + i,
-                });
+                Random random = new Random();
+                // Generate random year between 1900 and 2100
+                int year = random.Next(2024, 2026);
+                int month = random.Next(1, 13);
+                int maxDay = DateTime.DaysInMonth(year, month);
+                int day = random.Next(1, maxDay + 1);
+                DateOnly randomDate = new DateOnly(year, month, day);
+                return randomDate;
             }
+            TimeOnly RandomTime()
+            {
+                Random random = new Random();
+                int hour = random.Next(0, 24);
+                int minute = random.Next(0, 60);
+                int second = random.Next(0, 60);
+                int millisecond = random.Next(0, 1000);
+                TimeOnly randomTime = new TimeOnly(hour, minute, second, millisecond);
+                return randomTime;
+            }
+
+            var habbitLabel = new Label()
+            {
+                Title = "habbit",
+                UserId = _userManager.GetUserId(User),
+            };
+            var importantLabel = new Label()
+            {
+                Title = "important",
+                UserId = _userManager.GetUserId(User),
+            };
+            var repeatLabel = new Label()
+            {
+                Title = "repeat",
+                UserId = _userManager.GetUserId(User),
+            };
+            _context.Labels.AddRange(habbitLabel, importantLabel, repeatLabel);
 
             for (int i = 0; i < 10; i++)
             {
-                _context.Projects.Add(new Models.Project()
+                var project = new Models.Project()
                 {
                     UserId = _userManager.GetUserId(User),
-                    CreatedDate = DateTime.UtcNow,
                     IsDeleted = false,
-                    Title = "Project title lorem" + i,
-                    Tasks = new List<Models.Task>()
+                    Title = i + "-Project title lorem",
+                };
+                
+                for (int j = 0; j < 10; j++)
+                {
+                    Models.Task task = new Models.Task();
+                    task.Title = j + "-Task title lorem ";
+                    task.Description = j + "-Desc ";
+                    task.TaskLabels = new List<TaskLabel>()
                     {
-                        new Models.Task()
+                        new TaskLabel()
                         {
-                            Title = "Task title lorem " + i,
-                            Description = "Desc",
-                        }
-                    }                   
-                });
+                            Label = importantLabel,
+                            Task = task,
+                        },
+                        new TaskLabel()
+                        {
+                            Label = repeatLabel,
+                            Task = task,
+                        },
+                    };
+                    if (j % 5 == 0)
+                    {
+                        task.DueDate = DateOnly.FromDateTime(DateTime.Now);  
+                    }
+                    else
+                    {
+                        task.DueDate = RandomDate();
+                    }
+                    task.DueTime = RandomTime();
+                    project.Tasks.Add(task);
+                }
+                for (int j = 0; j < 10; j++)
+                {
+                    Note note = new Note();
+                    note.Title = j + "-Task title lorem ";
+                    note.ShortDescription = j + "-Desc ";
+                    note.NoteLabels = new List<NoteLabel>()
+                    {
+                        new NoteLabel()
+                        {
+                            Label = importantLabel,
+                            Note = note,
+                        },
+                        new NoteLabel()
+                        {
+                            Label = repeatLabel,
+                            Note = note,
+                        },
+                    };
+                    if (j % 5 == 0)
+                    {
+                        note.DueDate = DateOnly.FromDateTime(DateTime.Now);
+                    }
+                    else
+                    {
+                        note.DueDate = RandomDate();
+                    }
+                    note.DueTime = RandomTime();
+                    note.NoteDescription = new NoteDescription()
+                    {
+                        Description = $"<p>{j}-Hello World!</p>\r\n  <p>Some initial <strong>bold</strong> text</p>\r\n  <p><br /></p>"
+                    };
+                    project.Notes.Add(note);
+                }
+
+                _context.Projects.Add(project);
             }            
             _context.SaveChanges();
+
+            
         }
         #endregion
     }

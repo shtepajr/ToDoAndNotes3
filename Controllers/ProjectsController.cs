@@ -173,7 +173,7 @@ namespace ToDoAndNotes3.Controllers
                 project.IsDeleted = false;
 
                 var projectTasks = await _context.Tasks.IgnoreQueryFilters().Where(t => t.ProjectId == id).ToListAsync();
-                var projectNotes = await _context.Tasks.IgnoreQueryFilters().Where(t => t.ProjectId == id).ToListAsync();
+                var projectNotes = await _context.Notes.IgnoreQueryFilters().Where(t => t.ProjectId == id).ToListAsync();
 
                 foreach (var task in projectTasks)
                 {

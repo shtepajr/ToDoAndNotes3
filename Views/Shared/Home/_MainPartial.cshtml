@@ -105,14 +105,14 @@
     <ul class="tasks">
         @if (Model.TdnElements.OfType<ToDoAndNotes3.Models.Task>().Count() == 0)
         {
-            <div class="empty-msg">Empty now. <u class="btn js-submit-by-form-id" data-form-id="create-task-form">Let's do something!</u></div>
+            <div class="empty-msg">No tasks now. <u class="btn js-submit-by-form-id" data-form-id="create-task-form">Let's do something!</u></div>
         }
         @foreach (var task in Model.TdnElements.OfType<ToDoAndNotes3.Models.Task>())
         {
             <li class="task nav-link dropdown" title="@task.Description">
                 <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
                     <div class="task-toggler">
-                        <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
+                        <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax js-done-sound"
                               data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
                             <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                             <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">
@@ -202,7 +202,7 @@
     <ul class="notes">
         @if (Model.TdnElements.OfType<ToDoAndNotes3.Models.Note>().Count() == 0)
         {
-            <div class ="empty-msg">Empty now. <u class="btn js-submit-by-form-id" data-form-id="create-note-form">Let's write something!</u></div>
+            <div class ="empty-msg">No notes now. <u class="btn js-submit-by-form-id" data-form-id="create-note-form">Let's write something!</u></div>
         }
         @foreach (var note in Model.TdnElements.OfType<ToDoAndNotes3.Models.Note>())
         {
@@ -282,7 +282,7 @@
                 <li class="task nav-link dropdown" title="@task.Description">
                     <a class="link js-update-action-with-id" data-receiver-id="edit-task-form" data-id="@task.TaskId">
                         <div class="task-toggler">
-                            <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax"
+                            <form asp-controller="Tasks" asp-action="ToggleState" asp-route-id="@task.TaskId" class="js-post-modal-with-partial-update-ajax js-done-sound"
                                   data-update-partial-id="@updateTargetId" data-update-action="@updateUrl">
                                 <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
                                 <button class="btn btn-clean" type="submit" onclick="event.stopPropagation()">

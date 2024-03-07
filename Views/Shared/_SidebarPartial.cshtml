@@ -55,7 +55,7 @@
 <nav class="projects">
     <div class="projects-preview">
         <p>Projects</p>
-        <form asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-project-modal">
+        <form id="create-project-form" asp-controller="Projects" asp-action="CreatePartial" method="get" class="js-get-modal-ajax" data-target-modal-id="create-project-modal">
             <input hidden type="text" name="returnUrl" value="@ViewData["ReturnUrl"]">
             <button class="btn btn-plus" type="submit" title="Add project">
                 <span class="material-symbols-outlined md-24">
@@ -74,6 +74,10 @@
     <div id="delete-project-modal" class="modal js-modal">
     </div>
     <ul class="projects-list">
+        @if (Model.Count() == 0)
+        {
+            <div class="empty-msg">No projects now. <u class="btn js-submit-by-form-id" data-form-id="create-project-form">Let's create one!</u></div>
+        }
         @foreach (var project in Model)
         {
             <li class="project nav-link dropdown js-nav-link" title="@project.Title">

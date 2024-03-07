@@ -119,7 +119,7 @@ namespace ToDoAndNotes3.Controllers
                         "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    returnUrl = Url.Action(nameof(AccountController.CheckEmail), "Account");
+                    returnUrl = Url.Action(nameof(AccountController.CheckEmail), "Account", new { email = changeEmail.NewEmail });
                     return Json(new { success = true, redirectTo = returnUrl });
                 }
             }

@@ -53,17 +53,30 @@ namespace ToDoAndNotes3.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = model.Email, Email = model.Email, CustomName = model.Name };
-                user.EmailConfirmed = true; // for test (to delete)
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                IdentityResult result = IdentityResult.Failed();
+
+                if (user is null)
+                {
+                    user = new User { UserName = model.Email, Email = model.Email, CustomName = model.Name };
+                    result = await _userManager.CreateAsync(user, model.Password);
+                }
+                else if(user is not null && user?.EmailConfirmed == false)
+                {
+                    user.UserName = model.Email;
+                    user.Email = model.Email;
+                    user.CustomName = model.Name;
+                    result = await _userManager.UpdateAsync(user);
+                }
+
                 if (result.Succeeded)
                 {
-                    // Send an email
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                    //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                    //    "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
-                    //_logger.LogInformation(3, "User created a new account with password.");
+                    // Send/resend an email
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                        "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
+                    _logger.LogInformation(3, "User created a new account with password.");
                     return View("CheckEmail", user.Email);
                 }
                 AddErrors(result);
@@ -76,7 +89,7 @@ namespace ToDoAndNotes3.Controllers
         [AllowAnonymous]
         public IActionResult CheckEmail(string email)
         {
-            return View(email);
+            return View("CheckEmail", email);
         }
 
         // GET: Account/ConfirmEmail

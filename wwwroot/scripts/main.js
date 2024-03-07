@@ -139,8 +139,10 @@ $(function () {
             formAction,
             form,
             function successCallback() {
-
                 deleteOpenModalParam();
+                if (form.hasClass('js-done-sound') && form[0].innerHTML.includes('radio_button_unchecked')) {
+                    $('#doneAudio')[0].play();
+                }
                 targetModal.css('display', 'none');
                 if ($updatePartial.length > 0) {
                     // next ajax
