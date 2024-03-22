@@ -10,7 +10,6 @@ namespace ToDoAndNotes3.Models
         [Required]
         [Display(Name = "Name")]
         public string? Title { get; set; }
-        public bool IsDeleted { get; set; } = false;
         public ICollection<NoteLabel>? NoteLabels { get; set; }
         public ICollection<TaskLabel>? TaskLabels { get; set; }
     }

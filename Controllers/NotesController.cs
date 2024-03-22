@@ -121,10 +121,11 @@ namespace ToDoAndNotes3.Controllers
 
             var noteInclude = _context?.Notes
                 ?.Where(n => n.NoteId == id)
-                ?.Include(n => n.NoteDescription)
                 ?.Include(n => n.NoteLabels)?.ThenInclude(nl => nl.Label)
                 ?.Include(n => n.Project)
                 ?.FirstOrDefault();
+            _context.Entry(noteInclude).Reference(n => n.NoteDescription).Load();
+
 
             if (noteInclude is null)
             {
@@ -160,8 +161,9 @@ namespace ToDoAndNotes3.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Entry(noteLabels.Note).Reference(t => t.Project).Load(); // for next authorization
+                _context.Entry(noteLabels.Note).Reference(n => n.Project).Load(); // for next authorization
                 _context.Attach(noteLabels.Note).State = EntityState.Modified;
+                _context.Attach(noteLabels.Note.NoteDescription). State = EntityState.Modified;
 
                 try
                 {

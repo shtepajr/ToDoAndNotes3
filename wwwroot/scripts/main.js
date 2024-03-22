@@ -362,6 +362,7 @@ $(function () {
                 ele: projectSelect.get(0),
                 options: projectsOptions.map(option => ({ label: option.Text, value: option.Value })),
                 hideClearButton: true,
+                noOptionsText: "No labels found",
             });
             projectSelect.get(0).setValue(projectsSelected);
 
@@ -390,6 +391,7 @@ $(function () {
                 optionsSelectedText: "labels",
                 optionSelectedText: "label",
                 hideClearButton: true,
+                noOptionsText: "No labels found",
             });
             labelsSelect.get(0).setValue(labelsSelected);
 
