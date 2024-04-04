@@ -53,6 +53,10 @@ namespace ToDoAndNotes3.Data
                 .HasMany(l => l.NoteLabels)
                 .WithOne(nl => nl.Label)
                 .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Note>()
+                .HasOne(n => n.NoteDescription)
+                .WithOne(nd => nd.Note)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(builder);
         }

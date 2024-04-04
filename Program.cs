@@ -7,15 +7,20 @@ using ToDoAndNotes3.Authorization;
 using ToDoAndNotes3.Data;
 using ToDoAndNotes3.Models;
 using ToDoAndNotes3.Services;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DB https://www.nuget.org/packages/Microsoft.AspNetCore.Identity.EntityFrameworkCore/8.0.0
+// Deployment with Azure Key Vault
+//var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+//builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
+
+// nuget [Microsoft.AspNetCore.Identity.EntityFrameworkCore]
 var connectionString = builder.Configuration.GetConnectionString("ToDoAndNotes3") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<TdnDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Identity https://www.nuget.org/packages/Microsoft.AspNetCore.Identity.UI/8.0.0
+// nuget [Microsoft.AspNetCore.Identity.UI]
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<TdnDbContext>();
 

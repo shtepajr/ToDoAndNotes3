@@ -183,12 +183,12 @@ namespace ToDoAndNotes3.Controllers
                 return View(projectLabelViewModel);
             }
         }
-        
-        // GET: /Home/Bin
+
+        // GET: /Home/RecycleBin
         [HttpGet]
-        public async Task<IActionResult> Bin(bool isGetPartial = false)
+        public async Task<IActionResult> RecycleBin(bool isGetPartial = false)
         {
-            ViewData["ReturnUrl"] = Url.Action(nameof(Bin), "Home");
+            ViewData["ReturnUrl"] = Url.Action(nameof(RecycleBin), "Home");
 
             string userId = _userManager.GetUserId(User);
 
@@ -236,7 +236,7 @@ namespace ToDoAndNotes3.Controllers
             }
         }
 
-        // GET: /Home/Bin
+        // GET: /Home/Manage
         [HttpGet]
         public async Task<IActionResult> Manage(bool isGetPartial = false)
         {
