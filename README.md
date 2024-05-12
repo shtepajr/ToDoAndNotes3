@@ -1,8 +1,8 @@
 # To Do & Notes 3
 ## Technology stack that was used
-> **Backend:** ASP.NET Core MVC, C#, Entity Framework Core, ASP.NET Core Identity, SendGrid, Google OAuth 2.0, Secret Manager tool, Azure Key Vault, Dependency injection and Options patterns, C#.
+> **Backend:** ASP.NET Core MVC, C#, Entity Framework Core, ASP.NET Core Identity, SendGrid, Google OAuth 2.0, Secret Manager tool, Azure Key Vault, Dependency injection and Options patterns.
 
-> **Frontend:** JS, jQuery, HTML, CSS.
+> **Frontend:** JavaScript, jQuery, HTML, CSS.
 
 ## Screenshots
 ![Hello][1]
