@@ -1,6 +1,3 @@
 bin
 obj
-ToDoAndNotes3.sln
-
-Properties/*
-!Properties/launchSettings.json
+/.vs
